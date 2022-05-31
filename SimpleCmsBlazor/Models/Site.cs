@@ -7,6 +7,6 @@ public class Site
     public string? Name { get; set; }
     public string? HeaderBackground { get; set; }
     public string? HeaderColour { get; set; }
-    public bool hasLogo { get; set; } = false;
-    public bool? isExpanded { get; set; }
+    public bool HasLogo { get; set; } = false;
+    public bool? IsExpanded { get; set; }
 }

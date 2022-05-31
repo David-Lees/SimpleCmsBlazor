@@ -46,6 +46,32 @@
           "lib/netstandard2.0/Azure.Storage.Common.dll": {}
         }
       },
+      "MatBlazor/2.8.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "3.1.10",
+          "Microsoft.AspNetCore.Components.Web": "3.1.10"
+        },
+        "compile": {
+          "lib/netstandard2.1/MatBlazor.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/MatBlazor.dll": {}
+        },
+        "contentFiles": {
+          "contentFiles/any/netstandard2.1/Properties/launchSettings.json": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          }
+        },
+        "build": {
+          "buildTransitive/MatBlazor.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/MatBlazor.props": {}
+        }
+      },
       "Microsoft.AspNetCore.Authorization/6.0.5": {
         "type": "package",
         "dependencies": {
@@ -608,6 +634,32 @@
         },
         "runtime": {
           "lib/netstandard2.0/Azure.Storage.Common.dll": {}
+        }
+      },
+      "MatBlazor/2.8.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "3.1.10",
+          "Microsoft.AspNetCore.Components.Web": "3.1.10"
+        },
+        "compile": {
+          "lib/netstandard2.1/MatBlazor.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/MatBlazor.dll": {}
+        },
+        "contentFiles": {
+          "contentFiles/any/netstandard2.1/Properties/launchSettings.json": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          }
+        },
+        "build": {
+          "buildTransitive/MatBlazor.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/MatBlazor.props": {}
         }
       },
       "Microsoft.AspNetCore.Authorization/6.0.5": {
@@ -1177,6 +1229,27 @@
         "azureicon.png",
         "lib/netstandard2.0/Azure.Storage.Common.dll",
         "lib/netstandard2.0/Azure.Storage.Common.xml"
+      ]
+    },
+    "MatBlazor/2.8.0": {
+      "sha512": "NAbkrLR6YdEXNtQQreJOAdZEqTBeG6wXiTxs9ItHBCLnoCouX//VELHakDXcMtK27QzmeB8uGRwWIkglvhpKLg==",
+      "type": "package",
+      "path": "matblazor/2.8.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/MatBlazor.props",
+        "build/Microsoft.AspNetCore.StaticWebAssets.props",
+        "buildMultiTargeting/MatBlazor.props",
+        "buildTransitive/MatBlazor.props",
+        "content/Properties/launchSettings.json",
+        "contentFiles/any/netstandard2.1/Properties/launchSettings.json",
+        "lib/netstandard2.1/MatBlazor.dll",
+        "lib/netstandard2.1/MatBlazor.xml",
+        "matblazor.2.8.0.nupkg.sha512",
+        "matblazor.nuspec",
+        "staticwebassets/dist/matBlazor.css",
+        "staticwebassets/dist/matBlazor.js"
       ]
     },
     "Microsoft.AspNetCore.Authorization/6.0.5": {
@@ -2195,6 +2268,7 @@
   "projectFileDependencyGroups": {
     "net6.0": [
       "Azure.Storage.Blobs >= 12.12.0",
+      "MatBlazor >= 2.8.0",
       "Microsoft.AspNetCore.Components.WebAssembly >= 6.0.5",
       "Microsoft.AspNetCore.Components.WebAssembly.DevServer >= 6.0.5",
       "Microsoft.Authentication.WebAssembly.Msal >= 6.0.5",
@@ -2203,36 +2277,37 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dal19\\.nuget\\packages\\": {},
+    "C:\\Users\\dl00\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {}
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj",
+      "projectUniqueName": "C:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj",
       "projectName": "SimpleCmsBlazor",
-      "projectPath": "D:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj",
-      "packagesPath": "C:\\Users\\dal19\\.nuget\\packages\\",
-      "outputPath": "D:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\obj\\",
+      "projectPath": "C:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj",
+      "packagesPath": "C:\\Users\\dl00\\.nuget\\packages\\",
+      "outputPath": "C:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\dal19\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\dl00\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Users\\dl00\\.nuget-local\\packages": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://packages.stride3d.net/nuget": {}
+        "https://cefas.pkgs.visualstudio.com/_packaging/Shared/nuget/v3/index.json": {},
+        "https://pkgs.dev.azure.com/cefas/WaveNetSmartBuoy/_packaging/wavenet-smartbuoy/nuget/v3/index.json": {}
       },
       "frameworks": {
         "net6.0": {
@@ -2253,6 +2328,10 @@
           "Azure.Storage.Blobs": {
             "target": "Package",
             "version": "[12.12.0, )"
+          },
+          "MatBlazor": {
+            "target": "Package",
+            "version": "[2.8.0, )"
           },
           "Microsoft.AspNetCore.Components.WebAssembly": {
             "target": "Package",
