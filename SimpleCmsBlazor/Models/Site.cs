@@ -1,6 +1,6 @@
 ﻿namespace SimpleCmsBlazor.Models;
 
-public class Site
+public class Site : IPageList
 {
     public string? Id { get; set; }
     public List<Page> Pages { get; set; } = new();

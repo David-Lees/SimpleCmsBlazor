@@ -1,0 +1,48 @@
+﻿@using SimpleCmsBlazor.Services
+@inject ISiteService SiteService
+@inject NavigationManager NavManager
+
+<PageTitle>@Page?.Name - @Site?.Name</PageTitle>
+
+<Header site=@Site></Header>
+@if(Page != null)
+{
+    foreach(var s in Page.Sections) 
+    {
+        <Section _section=@s _page=@Page></Section>
+    }
+}
+
+
+@code {
+    private string? Id;
+    private Page? Page;
+    private Site Site = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Id = NavManager.Uri;
+        Site = await SiteService.GetSiteAsync();
+        Page = FindPage(Id);
+    }
+
+    private Page FindPage(string? url)
+    {
+        if (string.IsNullOrEmpty(url) || url == "/")
+            return Site.Pages[0];
+
+        var urls = url.Split('/');
+        var page = Site as IPageList;;
+        Array.ForEach(urls, x => page = FindChildPage(x, page));
+        if (page == Site) page = Site.Pages[0];
+        return (Page)page ?? Site.Pages[0];
+    }
+
+    private Page? FindChildPage(string url, IPageList page)
+    {
+        if (page != null && page.Pages != null)
+            return page.Pages.FirstOrDefault(x => x.Url?.ToLowerInvariant() == url.ToLowerInvariant());
+
+        return null;
+    }
+}

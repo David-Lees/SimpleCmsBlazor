@@ -1,0 +1,58 @@
+﻿<nav class="navbar navbar-expand-lg navbar-light"
+     [style.backgroundColor]="site.headerBackground"
+     [style.color]="site.headerColour">
+
+    @if (Site?.HasLogo == true)
+    {
+        <NavLink href="/" style=@LogoStyle>
+            <div class="logo-background" style="background-color: @(Site?.HeaderBackground ?? "none")"></div>
+            <img src=@Logo alt=@(Site?.Name ?? string.Empty) />
+        </NavLink>
+    }
+    else
+    {
+        <NavLink href="/" class="navbar-brand" style=@LogoStyle>
+            @Site?.Name
+        </NavLink>
+    }
+
+    @if (Site != null && Site.Pages != null && Site.Pages.Count > 1)
+    {
+        <button class="navbar-toggler"
+            type="button"
+            @onclick="ToggleCollapse"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse @(IsMenuCollapsed ? "": "show")" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                @foreach(var p in Site.Pages)
+                {
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href=@p.Url style=@LogoStyle>@p.Name</NavLink>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</nav>
+<div class="nav-spacer"></div>
+
+@code {
+    public bool IsMenuCollapsed { get; set; } = true;
+
+    [Parameter]
+    public Site? Site { get; set; }
+
+    [Inject]
+    public IConfiguration? Config { get; set; }
+
+    public void ToggleCollapse() => IsMenuCollapsed = !IsMenuCollapsed;
+
+    public string Logo => $"{Config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/logo.png";
+        
+    public string LogoStyle => $"color: {Site?.HeaderColour ?? "black"}";    
+}

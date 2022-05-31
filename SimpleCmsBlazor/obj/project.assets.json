@@ -46,6 +46,15 @@
           "lib/netstandard2.0/Azure.Storage.Common.dll": {}
         }
       },
+      "Markdig/0.30.2": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/Markdig.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/Markdig.dll": {}
+        }
+      },
       "MatBlazor/2.8.0": {
         "type": "package",
         "dependencies": {
@@ -634,6 +643,15 @@
         },
         "runtime": {
           "lib/netstandard2.0/Azure.Storage.Common.dll": {}
+        }
+      },
+      "Markdig/0.30.2": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/Markdig.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/Markdig.dll": {}
         }
       },
       "MatBlazor/2.8.0": {
@@ -1229,6 +1247,29 @@
         "azureicon.png",
         "lib/netstandard2.0/Azure.Storage.Common.dll",
         "lib/netstandard2.0/Azure.Storage.Common.xml"
+      ]
+    },
+    "Markdig/0.30.2": {
+      "sha512": "rm5rfHGP0BZtcB31CmQeWLLPdpG6xA6xN92x2KcNrl+9MPJONq9u4dfG7VgnTOxdjDnuEkX6GCxMYS+LpoKGOQ==",
+      "type": "package",
+      "path": "markdig/0.30.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net452/Markdig.dll",
+        "lib/net452/Markdig.xml",
+        "lib/net6.0/Markdig.dll",
+        "lib/net6.0/Markdig.xml",
+        "lib/netcoreapp3.1/Markdig.dll",
+        "lib/netcoreapp3.1/Markdig.xml",
+        "lib/netstandard2.0/Markdig.dll",
+        "lib/netstandard2.0/Markdig.xml",
+        "lib/netstandard2.1/Markdig.dll",
+        "lib/netstandard2.1/Markdig.xml",
+        "markdig.0.30.2.nupkg.sha512",
+        "markdig.nuspec",
+        "markdig.png",
+        "readme.md"
       ]
     },
     "MatBlazor/2.8.0": {
@@ -2268,6 +2309,7 @@
   "projectFileDependencyGroups": {
     "net6.0": [
       "Azure.Storage.Blobs >= 12.12.0",
+      "Markdig >= 0.30.2",
       "MatBlazor >= 2.8.0",
       "Microsoft.AspNetCore.Components.WebAssembly >= 6.0.5",
       "Microsoft.AspNetCore.Components.WebAssembly.DevServer >= 6.0.5",
@@ -2328,6 +2370,10 @@
           "Azure.Storage.Blobs": {
             "target": "Package",
             "version": "[12.12.0, )"
+          },
+          "Markdig": {
+            "target": "Package",
+            "version": "[0.30.2, )"
           },
           "MatBlazor": {
             "target": "Package",

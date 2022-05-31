@@ -2,13 +2,18 @@
 
 namespace SimpleCmsBlazor.Services;
 
-public class BlobUploadService
+public interface IBlobUploadService
+{
+    Task<string> GetUserDelegationKeyAsync();
+}
+
+public class BlobUploadService : IBlobUploadService
 {
     private readonly HttpClient _httpClient;
 
     public BlobUploadService(IHttpClientFactory clientFactory)
     {
-        _httpClient = clientFactory.CreateClient(HttpClients.Private);
+        _httpClient = clientFactory.CreateClient(HttpClients.Api);
     }
 
     public async Task<string> GetUserDelegationKeyAsync()

@@ -1,0 +1,137 @@
+﻿@using SimpleCmsBlazor.Services
+@inject BrowserResizeService _resize
+
+@if (_section.Name == SectionType.GallerySection)
+{
+    if (!string.IsNullOrWhiteSpace(_section.GalleryName))
+    {
+        <h1>@_section.GalleryName</h1>
+        <Gallery SourceData=@_section></Gallery>
+    }
+}
+else if (_section.Name == SectionType.BannerSection)
+{
+    <div class="jumbotron jumbotron-fluid banner">
+        <img src="@BannerUrl" alt="" />
+    </div>
+}
+else if (_section.Name == SectionType.HtmlSection)
+{
+    <div>@((MarkupString)(_section.Html ?? ""))</div>
+}
+else if (_section.Name == SectionType.ChildrenSection)
+{
+
+    <div class="margin-fix" style=@SectionStyle data-url="@BackgroundUrl">
+        <div class="container" style=@ContainerStyle>
+            <div class="links">
+                @foreach (var p in _page.Pages)
+                {
+                    <NavLink class="page-link" href=@p.Url style=@LinkStyle>@p.Name</NavLink>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="margin-fix" style=@SectionStyle data-url="@BackgroundUrl">
+        <div class="container" style=@ContainerFilterStyle>
+            <BlazorMarkdown Text=@(_section.Text ?? string.Empty)></BlazorMarkdown>
+        </div>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public Models.PageSection _section { get; set; } = new();
+
+    [Parameter]
+    public Page _page { get; set; } = new();
+
+    public int Height { get; set; } = 100;
+    public int Width { get; set; } = 1000;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _resize.OnResize += OnResize;
+        await OnResize();
+    }
+
+    private async Task OnResize()
+    {
+        Width = await _resize.GetInnerWidth();
+
+        var s = _section;
+        if (s != null && s.Image != null)
+        {
+            var h = s.Image.RawHeight ?? 1;
+            var w = s.Image.RawWidth ?? 1;
+            var ar = h / w;
+            Height = ar * Width;
+        }
+
+        Height = await _resize.GetInnerHeight();
+        StateHasChanged();
+    }
+
+    public string BannerUrl
+    {
+        get
+        {
+            var bannerSection = _section;
+
+            if (Width < (bannerSection?.Image?.PreviewSmallWidth ?? 0))
+                return bannerSection?.Image?.PreviewSmallPath ?? string.Empty;
+
+            if (Width < (bannerSection?.Image?.PreviewMediumWidth ?? 0))
+                return bannerSection?.Image?.PreviewMediumPath ?? string.Empty;
+
+            if (Width < (bannerSection?.Image?.PreviewLargeWidth ?? 0))
+                return bannerSection?.Image?.PreviewLargePath ?? string.Empty;
+
+            return bannerSection?.Image?.RawPath ?? string.Empty;
+        }
+    }
+
+    public string BackgroundUrl
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(BannerUrl))
+            {
+                return $"linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(\"{BannerUrl}\")";
+            }
+            return "none";
+        }
+    }
+
+    public string TextFilter
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(_section.BackgroundColour))
+            {
+                return $"drop-shadow(0 0 0.75rem {_section.BackgroundColour}) drop-shadow(0 0 0.25rem {_section.BackgroundColour})";
+            }
+            return "none";
+        }
+    }
+
+    public void Dispose()
+    {
+        _resize.OnResize -= OnResize;
+    }
+
+    public string bc => _section.BackgroundColour ?? "none";
+    public string bp => _section.BackgroundAlign ?? "left";
+    public string c => _section.Colour ?? "black";
+    public string a => _section.Align ?? "left";
+
+    public string SectionStyle => $"background-color: {bc}, background-position: {bp}, background-image: {BackgroundUrl}, background-size: cover";
+    public string ContainerStyle => $"color: {c}, text-align: {a}";
+    public string ContainerFilterStyle => $"color: {c}, filter: {TextFilter}, text-align: {a}";
+    public string LinkStyle => $"color: {c}, border-color: {c}";
+}

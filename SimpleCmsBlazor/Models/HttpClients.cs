@@ -2,7 +2,8 @@
 {
     public static class HttpClients
     {
-        public static string Private => "private";
+        public static string Storage => "storage";
         public static string Public => "public";
+        public static string Api => "api";
     }
 }
