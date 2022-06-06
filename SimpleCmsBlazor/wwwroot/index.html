@@ -48,6 +48,9 @@
 
         document.addEventListener('scroll', debounce(storeScroll), { passive: true });
         storeScroll();
+
+        GetClientWidth = (elem) => elem.clientWidth;
+        GetClientHeight = (elem) => elem.clientHeight;
     </script>
 </body>
 

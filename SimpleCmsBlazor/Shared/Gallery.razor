@@ -1,5 +1,265 @@
-﻿<h3>Gallery</h3>
+﻿@using System.Reactive
+@using SimpleCmsBlazor.Services
+@implements IDisposable
+
+<div @ref=galleryContainer class="galleryContainer">
+    <div class="innerGalleryContainer">
+        <div *ngFor="let imgrow of gallery | slice: rowIndex:rowIndex + rowsPerPage; let i = index"
+             class="imagerow"
+             [style.margin-bottom.px]="calcImageMargin()">
+            <img #imageElement
+                 *ngFor="let img of imgrow; let j = index"
+                 class="thumbnail"
+                 [style.width.px]="img.width"
+                 [style.height.px]="img.height"
+                 (click)="openImageViewer(img)"
+                 [src]="img.srcAfterFocus"
+                 [style.background]="img.dominantColour"
+                 [style.margin-right.px]="calcImageMargin()"
+                 alt="{{ img.description }}" />
+        </div>
+    </div>
+
+    <div class="pagerContainer" *ngIf="!rightArrowInactive || !leftArrowInactive">
+        <img [ngClass]="{ inactive: leftArrowInactive }"
+             class="pager left"
+             src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaWQ9IkxheWVyXzEiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4IDQ4OyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNDggNDgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnPjxwYXRoIGQ9Ik0yNCw0NkMxMS45LDQ2LDIsMzYuMSwyLDI0UzExLjksMiwyNCwyczIyLDkuOSwyMiwyMlMzNi4xLDQ2LDI0LDQ2eiBNMjQsNEMxMyw0LDQsMTMsNCwyNGMwLDExLDksMjAsMjAsMjAgICBjMTEsMCwyMC05LDIwLTIwQzQ0LDEzLDM1LDQsMjQsNHoiLz48L2c+PGc+PHBvbHlnb24gcG9pbnRzPSIyNy42LDM2LjcgMTQuOSwyNCAyNy42LDExLjMgMjkuMSwxMi43IDE3LjgsMjQgMjkuMSwzNS4zICAiLz48L2c+PC9zdmc+"
+             (click)="navigate(-1)"
+             alt="←" />
+        <img [ngClass]="{ inactive: rightArrowInactive }"
+             class="pager right"
+             src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaWQ9IkxheWVyXzEiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4IDQ4OyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNDggNDgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnPjxwYXRoIGQ9Ik0yNCw0NkMxMS45LDQ2LDIsMzYuMSwyLDI0UzExLjksMiwyNCwyczIyLDkuOSwyMiwyMlMzNi4xLDQ2LDI0LDQ2eiBNMjQsNEMxMyw0LDQsMTMsNCwyNHM5LDIwLDIwLDIwczIwLTksMjAtMjAgICBTMzUsNCwyNCw0eiIvPjwvZz48Zz48cG9seWdvbiBwb2ludHM9IjIxLjQsMzYuNyAxOS45LDM1LjMgMzEuMiwyNCAxOS45LDEyLjcgMjEuNCwxMS4zIDM0LjEsMjQgICIvPjwvZz48L3N2Zz4="
+             (click)="navigate(1)"
+             alt="→" />
+    </div>
+</div>
+
+<Viewer></Viewer>
 
 @code {
+    private List<List<GalleryImage>> gallery = new();
+    private List<GalleryImage> _images = new();
+    private string minimalQualityCategory = "previewSamll";
+    private IDisposable viewerSubscription;
+    private int rowIndex = 0;
+    private bool rightArrowInactive = false;
+    private bool leftArrowInactive = false;
+    private ElementReference galleryContainer;
 
+    private PageSection _sourceData = new();
+    [Parameter]
+    public PageSection SourceData { get; set; } = new();
+
+    [Parameter]
+    public int ImageMargin { get; set; } = 3;
+    public int ImageSize { get; set; } = 7;
+    public string GalleryName { get; set; } = string.Empty;
+    public int RowsPerPage { get; set; } = 200;
+
+    [Parameter]
+    public EventCallback<bool> OnViewerChange { get; set; }
+
+    [Inject]
+    public IJSRuntime runtime { get; set; }
+
+    [Inject]
+    public ImageService imageService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _sourceData = SourceData;
+        await FetchDataAndRenderAsync();
+        if (imageService == null) throw new NullReferenceException("Image service failed to load");
+        viewerSubscription = imageService.ShowImageViewerChanged.Subscribe<bool>(visibility => OnViewerChange.InvokeAsync(visibility));
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_sourceData != SourceData)
+        {
+            _sourceData = SourceData;
+            await FetchDataAndRenderAsync();
+        }
+        else
+        {
+            Render();
+        }
+    }
+
+    protected void Dispose()
+    {
+        if (viewerSubscription != null)
+            viewerSubscription.Dispose();
+    }
+
+    public void OpenImageViewer(GalleryImage img)
+    {
+        imageService.UpdateImages(_images);
+        imageService.UpdateSelectedImageIndex(_images.IndexOf(img));
+        imageService.ShowImageViewer(true);
+    }
+
+    /**
+     * direction (-1: left, 1: right)
+     */
+    public void Navigate(int direction)
+    {
+        if ((direction == 1 && rowIndex < gallery.Count - RowsPerPage) ||
+            (direction == -1 && rowIndex > 0))
+        {
+            rowIndex += RowsPerPage * direction;
+        }
+        RefreshNavigationErrorState();
+    }
+
+    public async Task<int> CalcImageMargin()
+    {
+        var galleryWidth = await GetGalleryWidth();
+        var ratio = galleryWidth / 1920.0M;
+        return (int)Math.Round(Math.Max(1, ImageMargin * ratio));
+    }
+
+    private async Task FetchDataAndRenderAsync()
+    {
+        if (_sourceData != null && _sourceData.Images != null)
+        {
+            _images = _sourceData.Images;
+        }
+        else
+        {
+            _images = new();
+        }
+
+        imageService.UpdateImages(_images);
+        foreach (var image in _images)
+        {
+            image.GalleryImageLoaded = false;
+            image.ViewerImageLoaded = false;
+            image.SrcAfterFocus = string.Empty;
+        }
+        await Render();
+    }
+
+    private async Task Render()
+    {
+        gallery = new();
+        var tempRow = _images[0];
+        var currentRowIndex = 0;
+        var i = 0;
+
+        while (i < _images.Count - 2)
+        {
+            while (_images[i + 1] && ShouldAddCandidate(tempRow, _images[i + 1]))
+            {
+                i++;
+            }
+            if (_images[i + 1])
+            {
+                tempRow.pop();
+            }
+            this.gallery[currentRowIndex++] = tempRow;
+            tempRow = [this.images[i + 1]];
+            i++;
+        }
+        await ScaleGallery();
+    }
+
+    private bool ShouldAddCandidate(List<GalleryImage> imgRow, GalleryImage candidate)
+    {
+        var oldDifference = CalcIdealHeight() - CalcRowHeight(imgRow);
+        imgRow.Add(candidate);
+        var newDifference = CalcIdealHeight() - CalcRowHeight(imgRow);
+        return Math.Abs(oldDifference) > Math.Abs(newDifference);
+    }
+
+    private async Task<int> CalcRowHeight(List<GalleryImage> imgRow)
+    {
+        var originalRowWidth = CalcOriginalRowWidth(imgRow);
+        var ratio = (await GetGalleryWidth() - (imgRow.Count - 1) * await CalcImageMargin()) / originalRowWidth;
+        return imgRow[0].GetPropValue<int?>(minimalQualityCategory + "Height") * ratio;
+    }
+
+    private int CalcOriginalRowWidth(List<GalleryImage> imgRow)
+    {
+        var originalRowWidth = 0;
+        foreach (var img in imgRow)
+        {
+            var individualRatio = CalcIdealHeight() / (img.GetPropValue<int?>(minimalQualityCategory + "Height") ?? 1);
+            img.SetPropValue(minimalQualityCategory + "Width", img.GetPropValue(minimalQualityCategory + "Width") * individualRatio);
+            img.SetPropValue(minimalQualityCategory + "Height", CalcIdealHeight());
+            originalRowWidth += img.GetPropValue(minimalQualityCategory + "Width");
+        }
+        return originalRowWidth;
+    }
+
+    private async Task<int> CalcIdealHeight()
+    {
+        return await GetGalleryWidth() / (80 / ImageSize) + 100;
+    }
+
+    private async Task<int> GetGalleryWidth()
+    {
+        return await runtime.InvokeAsync<int>("GetClientWidth", galleryContainer);
+    }
+
+    private async Task ScaleGallery()
+    {
+        var imageCounter = 0;
+        var maximumGalleryImageHeight = 0;
+
+        foreach (var imgRow in gallery/*.Skip(rowIndex).Take(RowsPerPage)*/)
+        {
+            var originalRowWidth = CalcOriginalRowWidth(imgRow);
+            if (imgRow != gallery.Last())
+            {
+                var ratio = (await GetGalleryWidth() - (imgRow.Count - 1) * await CalcImageMargin()) / originalRowWidth;
+
+                foreach (var img in imgRow)
+                {
+                    img.Width = img.GetPropValue(minimalQualityCategory + "Width") * ratio;
+                    img.Height = img.GetPropValue(minimalQualityCategory + "Height") * ratio;
+                    maximumGalleryImageHeight = Math.Max(maximumGalleryImageHeight, img.Height);
+                    CheckForAsyncLoading(img, imageCounter++);
+                }
+            }
+            else
+            {
+                foreach (var img in imgRow)
+                {
+                    img.Width = img.GetPropValue(minimalQualityCategory + "Width");
+                    img.Height = img.GetPopValue(minimalQualityCategory + "Height");
+                    maximumGalleryImageHeight = Math.Max(maximumGalleryImageHeight, img.Height);
+                    CheckForAsyncLoading(img, imageCounter++);
+                }
+            }
+        }
+
+        minimalQualityCategory = "previewSmall";
+        if (maximumGalleryImageHeight > 375) this.minimalQualityCategory = "previewMeduim";
+        if (maximumGalleryImageHeight > 768) this.minimalQualityCategory = "previewLarge";
+        if (maximumGalleryImageHeight > 1080) this.minimalQualityCategory = "raw";
+
+        RefreshNavigationErrorState();
+        StateHasChanged();
+    }
+
+    private void CheckForAsyncLoading(GalleryImage image, int imageCounter)
+    {
+        var imageElements = (this.imageElements || new QueryList<any>()).ToArray();
+        if (image.GalleryImageLoaded || (imageElements.Length > 0 && imageElements[imageCounter]))
+        {
+            image.GalleryImageLoaded = true;
+            image.SrcAfterFocus = environment.storageUrl + "/images/" + image.GetPropValue<string>(minimalQualityCategory + "Path");
+        }
+        else
+        {
+            image.SrcAfterFocus = "";
+        }
+    }
+
+    private void RefreshNavigationErrorState()
+    {
+        leftArrowInactive = rowIndex == 0;
+        rightArrowInactive = rowIndex > gallery.Count - RowsPerPage;
+    }
 }

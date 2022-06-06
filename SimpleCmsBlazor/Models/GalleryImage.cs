@@ -1,4 +1,6 @@
-﻿namespace SimpleCmsBlazor.Models
+﻿using System.Text.Json.Serialization;
+
+namespace SimpleCmsBlazor.Models
 {
     public class GalleryImage
     {
@@ -23,5 +25,20 @@
 
         public string? DominantColour { get; set; }
         public string? Description { get; set; }
+
+        [JsonIgnore]
+        public bool GalleryImageLoaded { get; set; } = false;
+
+        [JsonIgnore]
+        public bool ViewerImageLoaded { get; set; } = false;
+
+        [JsonIgnore]
+        public string SrcAfterFocus { get; set; } = string.Empty;
+
+        [JsonIgnore]
+        public int Width { get; set; } = 0;
+
+        [JsonIgnore]
+        public int Height { get; set; } = 0;
     }
 }

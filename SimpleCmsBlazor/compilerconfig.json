@@ -6,5 +6,9 @@
   {
     "outputFile": "Shared/Header.razor.css",
     "inputFile": "Shared/Header.razor.scss"
+  },
+  {
+    "outputFile": "Shared/Gallery.Razor.css",
+    "inputFile": "Shared/Gallery.Razor.scss"
   }
 ]
