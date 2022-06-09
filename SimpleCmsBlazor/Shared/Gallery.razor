@@ -39,8 +39,7 @@
 @code {
     private List<List<GalleryImage>> gallery = new();
     private List<GalleryImage> _images = new();
-    private string minimalQualityCategory = "previewSamll";
-    private IDisposable viewerSubscription;
+    private IDisposable? viewerSubscription;
     private int rowIndex = 0;
     private bool rightArrowInactive = false;
     private bool leftArrowInactive = false;
@@ -60,10 +59,13 @@
     public EventCallback<bool> OnViewerChange { get; set; }
 
     [Inject]
-    public IJSRuntime runtime { get; set; }
+    public IJSRuntime? runtime { get; set; }
 
     [Inject]
-    public ImageService imageService { get; set; }
+    public ImageService? imageService { get; set; }
+
+    [Inject]
+    public IConfiguration? Config { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,7 +84,7 @@
         }
         else
         {
-            Render();
+            await Render();
         }
     }
 
@@ -94,9 +96,12 @@
 
     public void OpenImageViewer(GalleryImage img)
     {
-        imageService.UpdateImages(_images);
-        imageService.UpdateSelectedImageIndex(_images.IndexOf(img));
-        imageService.ShowImageViewer(true);
+        if (imageService != null)
+        {
+            imageService.UpdateImages(_images);
+            imageService.UpdateSelectedImageIndex(_images.IndexOf(img));
+            imageService.ShowImageViewer(true);
+        }
     }
 
     /**
@@ -112,11 +117,10 @@
         RefreshNavigationErrorState();
     }
 
-    public async Task<int> CalcImageMargin()
+    public decimal CalcImageMargin(decimal galleryWidth)
     {
-        var galleryWidth = await GetGalleryWidth();
         var ratio = galleryWidth / 1920.0M;
-        return (int)Math.Round(Math.Max(1, ImageMargin * ratio));
+        return Math.Max(1.0M, ImageMargin * ratio);
     }
 
     private async Task FetchDataAndRenderAsync()
@@ -130,7 +134,7 @@
             _images = new();
         }
 
-        imageService.UpdateImages(_images);
+        imageService?.UpdateImages(_images);
         foreach (var image in _images)
         {
             image.GalleryImageLoaded = false;
@@ -142,119 +146,105 @@
 
     private async Task Render()
     {
+        var galleryWidth = await GetGalleryWidth();
         gallery = new();
-        var tempRow = _images[0];
-        var currentRowIndex = 0;
-        var i = 0;
-
-        while (i < _images.Count - 2)
+        var tempRow = new List<GalleryImage>();
+        foreach (var image in _images)
         {
-            while (_images[i + 1] && ShouldAddCandidate(tempRow, _images[i + 1]))
+            var spaceLeft = AddCandidateIfWidthAvailable(tempRow, image, galleryWidth);
+            if (!spaceLeft)
             {
-                i++;
+                gallery.Add(tempRow);
+                tempRow = new();
             }
-            if (_images[i + 1])
-            {
-                tempRow.pop();
-            }
-            this.gallery[currentRowIndex++] = tempRow;
-            tempRow = [this.images[i + 1]];
-            i++;
         }
-        await ScaleGallery();
+        if (tempRow.Any()) gallery.Add(tempRow);
+
+        ScaleGallery(galleryWidth);
     }
 
-    private bool ShouldAddCandidate(List<GalleryImage> imgRow, GalleryImage candidate)
+    private bool AddCandidateIfWidthAvailable(List<GalleryImage> imgRow, GalleryImage candidate, decimal galleryWidth)
     {
-        var oldDifference = CalcIdealHeight() - CalcRowHeight(imgRow);
+        var idealHeight = CalcIdealHeight(galleryWidth);
+        var oldDifference = idealHeight - CalcRowHeight(imgRow, galleryWidth);
         imgRow.Add(candidate);
-        var newDifference = CalcIdealHeight() - CalcRowHeight(imgRow);
+        var newDifference = idealHeight - CalcRowHeight(imgRow, galleryWidth);
         return Math.Abs(oldDifference) > Math.Abs(newDifference);
     }
 
-    private async Task<int> CalcRowHeight(List<GalleryImage> imgRow)
+    private decimal CalcRowHeight(List<GalleryImage> imgRow, decimal galleryWidth)
     {
-        var originalRowWidth = CalcOriginalRowWidth(imgRow);
-        var ratio = (await GetGalleryWidth() - (imgRow.Count - 1) * await CalcImageMargin()) / originalRowWidth;
-        return imgRow[0].GetPropValue<int?>(minimalQualityCategory + "Height") * ratio;
+        var originalRowWidth = CalcOriginalRowWidth(imgRow, galleryWidth);
+        var ratio = (galleryWidth - (imgRow.Count - 1) * CalcImageMargin(galleryWidth)) / originalRowWidth;
+        return (imgRow.FirstOrDefault()?.RawHeight ?? 0) * ratio;
     }
 
-    private int CalcOriginalRowWidth(List<GalleryImage> imgRow)
+    private decimal CalcOriginalRowWidth(List<GalleryImage> imgRow, decimal galleryWidth)
     {
-        var originalRowWidth = 0;
+        var originalRowWidth = 0.0M;
         foreach (var img in imgRow)
         {
-            var individualRatio = CalcIdealHeight() / (img.GetPropValue<int?>(minimalQualityCategory + "Height") ?? 1);
-            img.SetPropValue(minimalQualityCategory + "Width", img.GetPropValue(minimalQualityCategory + "Width") * individualRatio);
-            img.SetPropValue(minimalQualityCategory + "Height", CalcIdealHeight());
-            originalRowWidth += img.GetPropValue(minimalQualityCategory + "Width");
+            var individualRatio = CalcIdealHeight(galleryWidth) / (img.RawHeight ?? 1);
+            originalRowWidth += (img.RawWidth ?? 0) * individualRatio;
         }
         return originalRowWidth;
     }
 
-    private async Task<int> CalcIdealHeight()
+    private decimal CalcIdealHeight(decimal galleryWidth) => galleryWidth / (80.0M / ImageSize) + 100;
+
+    private async Task<decimal> GetGalleryWidth()
     {
-        return await GetGalleryWidth() / (80 / ImageSize) + 100;
+        if (runtime == null) return 0;
+        return await runtime.InvokeAsync<decimal>("GetClientWidth", galleryContainer);
     }
 
-    private async Task<int> GetGalleryWidth()
+    private void ChooseThumbnailSize(GalleryImage image)
     {
-        return await runtime.InvokeAsync<int>("GetClientWidth", galleryContainer);
+        image.SrcAfterFocus = image.PreviewSmallPath ?? string.Empty;
+
+        if (image.PreviewSmallWidth < image.Width || image.PreviewSmallHeight < image.Height)
+            image.SrcAfterFocus = image.PreviewMediumPath ?? string.Empty;
+
+        if (image.PreviewMediumWidth < image.Width || image.PreviewMediumHeight < image.Height)
+            image.SrcAfterFocus = image.PreviewLargePath ?? string.Empty;
+
+        if (image.PreviewLargeWidth < image.Width || image.PreviewLargeHeight < image.Height)
+            image.SrcAfterFocus = image.RawPath ?? string.Empty;
+
+        image.SrcAfterFocus = $"{Config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/{image.SrcAfterFocus}";
     }
 
-    private async Task ScaleGallery()
+    private void ScaleGallery(decimal galleryWidth)
     {
-        var imageCounter = 0;
-        var maximumGalleryImageHeight = 0;
+        var maximumGalleryImageHeight = 0.0M;
 
-        foreach (var imgRow in gallery/*.Skip(rowIndex).Take(RowsPerPage)*/)
+        foreach (var imgRow in gallery)
         {
-            var originalRowWidth = CalcOriginalRowWidth(imgRow);
-            if (imgRow != gallery.Last())
-            {
-                var ratio = (await GetGalleryWidth() - (imgRow.Count - 1) * await CalcImageMargin()) / originalRowWidth;
+            var originalRowWidth = CalcOriginalRowWidth(imgRow, galleryWidth);
+            var ratio = (galleryWidth - (imgRow.Count - 1) * CalcImageMargin(galleryWidth)) / originalRowWidth;
 
-                foreach (var img in imgRow)
-                {
-                    img.Width = img.GetPropValue(minimalQualityCategory + "Width") * ratio;
-                    img.Height = img.GetPropValue(minimalQualityCategory + "Height") * ratio;
-                    maximumGalleryImageHeight = Math.Max(maximumGalleryImageHeight, img.Height);
-                    CheckForAsyncLoading(img, imageCounter++);
-                }
-            }
-            else
+            foreach (var img in imgRow)
             {
-                foreach (var img in imgRow)
-                {
-                    img.Width = img.GetPropValue(minimalQualityCategory + "Width");
-                    img.Height = img.GetPopValue(minimalQualityCategory + "Height");
-                    maximumGalleryImageHeight = Math.Max(maximumGalleryImageHeight, img.Height);
-                    CheckForAsyncLoading(img, imageCounter++);
-                }
+                img.Width = (img.RawWidth ?? 0) * ratio;
+                img.Height = (img.RawHeight ?? 0) * ratio;
+                maximumGalleryImageHeight = Math.Max(maximumGalleryImageHeight, img.Height);
+                ChooseThumbnailSize(img);
             }
         }
 
-        minimalQualityCategory = "previewSmall";
-        if (maximumGalleryImageHeight > 375) this.minimalQualityCategory = "previewMeduim";
-        if (maximumGalleryImageHeight > 768) this.minimalQualityCategory = "previewLarge";
-        if (maximumGalleryImageHeight > 1080) this.minimalQualityCategory = "raw";
+        foreach(var img in gallery.Last())
+        {
+            // last row will currently fit whole width
+            // it could have a lot less images than other rows
+            // so scale it to same height as others
+            var ratio = maximumGalleryImageHeight / img.Height;
+            img.Height = img.Height * ratio;
+            img.Width = img.Width * ratio;
+            ChooseThumbnailSize(img);
+        }
 
         RefreshNavigationErrorState();
         StateHasChanged();
-    }
-
-    private void CheckForAsyncLoading(GalleryImage image, int imageCounter)
-    {
-        var imageElements = (this.imageElements || new QueryList<any>()).ToArray();
-        if (image.GalleryImageLoaded || (imageElements.Length > 0 && imageElements[imageCounter]))
-        {
-            image.GalleryImageLoaded = true;
-            image.SrcAfterFocus = environment.storageUrl + "/images/" + image.GetPropValue<string>(minimalQualityCategory + "Path");
-        }
-        else
-        {
-            image.SrcAfterFocus = "";
-        }
     }
 
     private void RefreshNavigationErrorState()

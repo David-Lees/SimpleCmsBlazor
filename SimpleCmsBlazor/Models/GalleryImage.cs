@@ -8,20 +8,20 @@ namespace SimpleCmsBlazor.Models
         public string? RowKey { get; set; }
 
         public string? PreviewSmallPath { get; set; }
-        public int? PreviewSmallWidth { get; set; }
-        public int? PreviewSmallHeight { get; set; }
+        public decimal? PreviewSmallWidth { get; set; }
+        public decimal? PreviewSmallHeight { get; set; }
 
         public string? PreviewMediumPath { get; set; }
-        public int? PreviewMediumWidth { get; set; }
-        public int? PreviewMediumHeight { get; set; }
+        public decimal? PreviewMediumWidth { get; set; }
+        public decimal? PreviewMediumHeight { get; set; }
 
         public string? PreviewLargePath { get; set; }
-        public int? PreviewLargeWidth { get; set; }
-        public int? PreviewLargeHeight { get; set; }
+        public decimal? PreviewLargeWidth { get; set; }
+        public decimal? PreviewLargeHeight { get; set; }
 
         public string? RawPath { get; set; }
-        public int? RawWidth { get; set; }
-        public int? RawHeight { get; set; }
+        public decimal? RawWidth { get; set; }
+        public decimal? RawHeight { get; set; }
 
         public string? DominantColour { get; set; }
         public string? Description { get; set; }
@@ -36,9 +36,9 @@ namespace SimpleCmsBlazor.Models
         public string SrcAfterFocus { get; set; } = string.Empty;
 
         [JsonIgnore]
-        public int Width { get; set; } = 0;
+        public decimal Width { get; set; } = 0;
 
         [JsonIgnore]
-        public int Height { get; set; } = 0;
+        public decimal Height { get; set; } = 0;
     }
 }
