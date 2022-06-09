@@ -40,5 +40,11 @@ namespace SimpleCmsBlazor.Models
 
         [JsonIgnore]
         public decimal Height { get; set; } = 0;
+
+        [JsonIgnore]
+        public bool Active { get; set; } = false;
+
+        [JsonIgnore]
+        public string Transition { get; set; } = string.Empty;
     }
 }

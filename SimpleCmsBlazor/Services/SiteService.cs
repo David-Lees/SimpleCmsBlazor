@@ -34,7 +34,7 @@ public class SiteService : ISiteService
     }
 
     public async Task SaveSiteAsync(Site site)
-    {
+    {        
         var response = await _apiClient.PostAsJsonAsync("/api/UpdateSite", site);
         if (response.IsSuccessStatusCode)
         {

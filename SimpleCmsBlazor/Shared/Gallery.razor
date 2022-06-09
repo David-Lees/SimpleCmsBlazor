@@ -4,34 +4,32 @@
 
 <div @ref=galleryContainer class="galleryContainer">
     <div class="innerGalleryContainer">
-        <div *ngFor="let imgrow of gallery | slice: rowIndex:rowIndex + rowsPerPage; let i = index"
-             class="imagerow"
-             [style.margin-bottom.px]="calcImageMargin()">
-            <img #imageElement
-                 *ngFor="let img of imgrow; let j = index"
-                 class="thumbnail"
-                 [style.width.px]="img.width"
-                 [style.height.px]="img.height"
-                 (click)="openImageViewer(img)"
-                 [src]="img.srcAfterFocus"
-                 [style.background]="img.dominantColour"
-                 [style.margin-right.px]="calcImageMargin()"
-                 alt="{{ img.description }}" />
-        </div>
+        @foreach (var imgRow in gallery)
+        {
+            <div class="imagerow" style="margin-bottom: @(margin)px">
+                @foreach (var img in imgRow)
+                {
+                    <img class="thumbnail" @onclick="(() => OpenImageViewer(img))" style="width: @(img.Width)px; height: @(img.Height)px; background: @img.DominantColour; margin-right: @(margin)px" src="@img.SrcAfterFocus" alt="@img.Description" />
+                }
+            </div>
+        }
     </div>
 
-    <div class="pagerContainer" *ngIf="!rightArrowInactive || !leftArrowInactive">
-        <img [ngClass]="{ inactive: leftArrowInactive }"
-             class="pager left"
+    @if (!rightArrowInactive || !leftArrowInactive)
+    {
+        <div class="pagerContainer">
+            <img 
+             class="pager left @(leftArrowInactive ? "inactive" : "")"
              src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaWQ9IkxheWVyXzEiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4IDQ4OyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNDggNDgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnPjxwYXRoIGQ9Ik0yNCw0NkMxMS45LDQ2LDIsMzYuMSwyLDI0UzExLjksMiwyNCwyczIyLDkuOSwyMiwyMlMzNi4xLDQ2LDI0LDQ2eiBNMjQsNEMxMyw0LDQsMTMsNCwyNGMwLDExLDksMjAsMjAsMjAgICBjMTEsMCwyMC05LDIwLTIwQzQ0LDEzLDM1LDQsMjQsNHoiLz48L2c+PGc+PHBvbHlnb24gcG9pbnRzPSIyNy42LDM2LjcgMTQuOSwyNCAyNy42LDExLjMgMjkuMSwxMi43IDE3LjgsMjQgMjkuMSwzNS4zICAiLz48L2c+PC9zdmc+"
-             (click)="navigate(-1)"
+             @onclick="() => Navigate(-1)"
              alt="←" />
-        <img [ngClass]="{ inactive: rightArrowInactive }"
-             class="pager right"
+            <img 
+             class="pager right @(rightArrowInactive ? "inactive" : "")"
              src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaWQ9IkxheWVyXzEiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4IDQ4OyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNDggNDgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnPjxwYXRoIGQ9Ik0yNCw0NkMxMS45LDQ2LDIsMzYuMSwyLDI0UzExLjksMiwyNCwyczIyLDkuOSwyMiwyMlMzNi4xLDQ2LDI0LDQ2eiBNMjQsNEMxMyw0LDQsMTMsNCwyNHM5LDIwLDIwLDIwczIwLTksMjAtMjAgICBTMzUsNCwyNCw0eiIvPjwvZz48Zz48cG9seWdvbiBwb2ludHM9IjIxLjQsMzYuNyAxOS45LDM1LjMgMzEuMiwyNCAxOS45LDEyLjcgMjEuNCwxMS4zIDM0LjEsMjQgICIvPjwvZz48L3N2Zz4="
-             (click)="navigate(1)"
+             @onclick="() => Navigate(1)"
              alt="→" />
-    </div>
+        </div>
+    }
 </div>
 
 <Viewer></Viewer>
@@ -44,6 +42,7 @@
     private bool rightArrowInactive = false;
     private bool leftArrowInactive = false;
     private ElementReference galleryContainer;
+    private decimal margin = 1.0M;
 
     private PageSection _sourceData = new();
     [Parameter]
@@ -120,7 +119,8 @@
     public decimal CalcImageMargin(decimal galleryWidth)
     {
         var ratio = galleryWidth / 1920.0M;
-        return Math.Max(1.0M, ImageMargin * ratio);
+        margin = Math.Max(1.0M, ImageMargin * ratio);
+        return margin;
     }
 
     private async Task FetchDataAndRenderAsync()
@@ -232,7 +232,7 @@
             }
         }
 
-        foreach(var img in gallery.Last())
+        foreach (var img in gallery.Last())
         {
             // last row will currently fit whole width
             // it could have a lot less images than other rows

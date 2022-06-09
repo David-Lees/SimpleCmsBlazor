@@ -1,19 +1,19 @@
 ﻿using Microsoft.JSInterop;
+using System.Reactive.Subjects;
 
 namespace SimpleCmsBlazor.Services;
 
 public interface IBrowserResizeService
 {
-    event Func<Task>? OnResize;
-
-    Task<int> GetInnerHeight();
-    Task<int> GetInnerWidth();
-    Task OnBrowserResize();
+    IObservable<(decimal, decimal)> OnResize { get; }
+    Task<decimal> GetInnerHeight();
+    Task<decimal> GetInnerWidth();
 }
 
 public class BrowserResizeService : IBrowserResizeService
 {
-    public event Func<Task>? OnResize;
+    private readonly Subject<(decimal, decimal)> onResize = new();
+    public IObservable<(decimal, decimal)> OnResize => onResize;
     private readonly IJSRuntime _runtime;
 
     public BrowserResizeService(IJSRuntime runtime)
@@ -22,19 +22,18 @@ public class BrowserResizeService : IBrowserResizeService
     }
 
     [JSInvokable]
-    public async Task OnBrowserResize()
+    public void OnBrowserResize(decimal width, decimal height)
     {
-        if (OnResize != null)
-            await OnResize.Invoke();
+        onResize.OnNext((width, height));
     }
 
-    public async Task<int> GetInnerHeight()
+    public async Task<decimal> GetInnerHeight()
     {
-        return await _runtime.InvokeAsync<int>("browserResize.getInnerHeight");
+        return await _runtime.InvokeAsync<decimal>("browserResize.getInnerHeight");
     }
 
-    public async Task<int> GetInnerWidth()
+    public async Task<decimal> GetInnerWidth()
     {
-        return await _runtime.InvokeAsync<int>("browserResize.getInnerWidth");
+        return await _runtime.InvokeAsync<decimal>("browserResize.getInnerWidth");
     }
 }

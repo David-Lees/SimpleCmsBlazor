@@ -10,5 +10,9 @@
   {
     "outputFile": "Shared/Gallery.Razor.css",
     "inputFile": "Shared/Gallery.Razor.scss"
+  },
+  {
+    "outputFile": "Shared/Viewer.razor.css",
+    "inputFile": "Shared/Viewer.razor.scss"
   }
 ]
