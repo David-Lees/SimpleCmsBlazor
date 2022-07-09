@@ -1,0 +1,358 @@
+﻿@using SimpleCmsBlazor.Services
+<div class="flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <MatTooltip Tooltip="Show/hide pages">
+            <MatButton @onclick="() => showPages = !showPages" Class="mt-3">
+                <MatIcon Style="transform: scale(2);">@MatIconNames.List</MatIcon>
+            </MatButton>
+        </MatTooltip>
+    </div>
+    <!-- End Sidebar -->
+    <!-- Pages -->
+    @if (showPages)
+    {
+        <div class="pages">
+            <MatButton Class="float-right" OnClick="@OpenMenu">
+                <MatIcon Style="transform: scale(1.5)">@MatIconNames.More_horiz</MatIcon>
+            </MatButton>
+            <MatMenu @ref="menu">
+                <MatList>
+                    <MatListItem OnClick="@AddPage">Add Page</MatListItem>
+                    @if (activePage != null)
+                    {
+                        <MatListItem OnClick="@AddChild">Add Child Page</MatListItem>
+                    }
+                    @if (CanDelete())
+                    {
+                        <MatListItem OnClick="@DeletePage">Delete @activePage?.Name</MatListItem>
+                    }
+                </MatList>
+            </MatMenu>
+            <h5 class="mt-0">Pages</h5>
+            <p>Drag and drop pages to rearrange order.</p>
+            <div cdkDropList
+             [cdkDropListData]="site"
+             [id]="'main'"
+             [cdkDropListConnectedTo]="dropTargetIds"
+             (cdkDropListDropped)="drop($event)"
+             [cdkDropListSortingDisabled]="true">
+                <ng-container *ngIf="site.pages && site.pages.length">
+                    <div *ngFor="let p of site.pages"
+                     cdkDrag
+                     [cdkDragData]="p.id"
+                     (cdkDragMoved)="dragMoved($event)">
+                        <ng-template [ngTemplateOutlet]="nodeTemplateRef" [ngTemplateOutletContext]="{ node: p }">
+                        </ng-template>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    }
+    <!-- End Pages -->
+    <!-- Body -->
+    <div class="body">
+        <div class="float-right">
+            <button mat-raised-button color="primary" (click)="save()">Save site</button>
+        </div>
+
+        <h5 class="mt-0" *ngIf="!activePage">Edit Page</h5>
+        <h5 class="mt-0" *ngIf="activePage">Edit Page: {{ activePage.name }}</h5>
+        <ng-container *ngIf="site && site.pages && site.pages.length && activePage">
+            <h2 class="container-fluid">Properties for {{ activePage.name }}</h2>
+            <app-edit-page [(page)]="activePage"></app-edit-page>
+        </ng-container>
+    </div>
+    <!-- End Body -->
+</div>
+
+<ng-template #nodeTemplateRef let-node="node">
+    <div class="node-item" [attr.data-id]="node.id" [attr.id]="'node-' + node.id">
+        <a (click)="nodeClick(node)" class="node__label" [class.selected]="activePage?.id === node.id">
+            <ng-container *ngIf="node.pages && node.pages.length">
+                <fa-icon *ngIf="isExpanded(node.id)" [icon]="caretDown" [fixedWidth]="true"></fa-icon>
+                <fa-icon *ngIf="isExpanded(node.id)" [icon]="folderOpen" [fixedWidth]="true"></fa-icon>
+                <fa-icon *ngIf="!isExpanded(node.id)" [icon]="caretRight" [fixedWidth]="true"></fa-icon>
+                <fa-icon *ngIf="!isExpanded(node.id)" [icon]="folder" [fixedWidth]="true"></fa-icon>
+            </ng-container>
+            <ng-container *ngIf="!(node.pages && node.pages.length)">
+                <fa-icon [icon]="caretRight" [fixedWidth]="true" [style.opacity]="0"></fa-icon>
+                <fa-icon [icon]="folder" [fixedWidth]="true"></fa-icon>
+            </ng-container>
+            {{ node.name }}
+        </a>
+
+        <div *ngIf="isExpanded(node.id) && node.pages.length"
+             class="node-children"
+             cdkDropList
+             [cdkDropListData]="node.pages"
+             [id]="node.id"
+             [cdkDropListConnectedTo]="dropTargetIds"
+             (cdkDropListDropped)="drop($event)"
+             [cdkDropListSortingDisabled]="true">
+            <div class="m-0 p-0"
+                 *ngFor="let child of node.pages"
+                 cdkDrag
+                 [cdkDragData]="child.id"
+                 (cdkDragMoved)="dragMoved($event)">
+                <ng-template [ngTemplateOutlet]="nodeTemplateRef"
+                             [ngTemplateOutletContext]="{ node: child }">
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+@code {
+    [Inject]
+    private MatDialogService? matDialogService;
+
+    public bool showPages = true;
+    public Page activePage { get; set; }
+    public Site site { get; set; }
+    public bool loaded = false;
+    public List<string> expandedNodes = new();
+
+    public BaseMatMenu menu;
+
+    public async Task OpenMenu()
+    {
+        await menu.OpenAsync();
+    }
+
+    // ids for connected drop lists
+    //  dropTargetIds = [];
+    //nodeLookup = {};
+    //dropActionTodo: DropInfo = null;
+
+    [Inject]
+    private ISiteService siteService;
+
+    [Inject]
+    private IMediaService mediaService;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+
+    public void AddPage()
+    {
+        site.Pages.Add(NewPage());
+    }
+
+    public viod AddChild()
+    {
+        activePage.Pages.Add(NewPage());
+    }
+
+    public bool CanDelete()
+    {
+        return true;
+    }
+
+    private Page newPage()
+    {
+        return new Page
+            {
+                Id = Guid.NewGuid().ToString(),
+                name = "New page",
+                Url = "new-page",
+                Sections = new(),
+                Pages = new(),
+            };
+    }
+
+    public void Remove(x: number)
+    {
+        if (site.Pages.Contains(p))
+        {
+            site.Pages.Remove(p);
+        }
+    }
+
+    public async Task SaveAsync()
+    {
+        siteService.SaveAsync(site);
+    }
+
+    private async Task LoadAsync()
+    {
+        if (siteService != null)
+        {
+            site = await siteService.GetSiteAsync();
+            if (!site.id) this.site.id = uuidv4();
+            if (!this.site.hasLogo) this.site.hasLogo = false;
+            this.loaded = true;
+            if (this.site.pages && this.site.pages.length)
+            {
+                this.activePage = this.site.pages[0];
+            }
+        }
+    }
+
+    public bool IsExpanded(string id)
+    {
+        return expandedNodes.Contains(id);
+    }
+
+    public void NodeClick(Page node)
+    {
+        if (expandedNodes.Contains(node.Id))
+        {
+            expandedNodes.Remove(node.Id)
+        }
+        else
+        {
+            expandedNodes.Add(node.id);
+        }
+        var p = GetNode(node.id);
+        activePage = p as Page;
+    }
+
+    @debounce(50)
+    dragMoved(event: CdkDragMove<any>) {
+        let e = this.document.elementFromPoint(event.pointerPosition.x, event.pointerPosition.y);
+
+    if (!e)
+    {
+    this.clearDragInfo();
+    return;
+    }
+    let container = e.classList.contains('node-item') ? e : e.closest('.node-item');
+    if (!container)
+    {
+    this.clearDragInfo();
+    return;
+    }
+    this.dropActionTodo = {
+    targetId: container.getAttribute('data-id'),
+    };
+    const targetRect = container.getBoundingClientRect();
+    const oneThird = targetRect.height / 3;
+
+    if (event.pointerPosition.y - targetRect.top < oneThird) {
+    // before
+    this.dropActionTodo['action'] = 'before';
+    } else if (event.pointerPosition.y - targetRect.top > 2 * oneThird) {
+    // after
+    this.dropActionTodo['action'] = 'after';
+    } else
+    {
+    // inside
+    this.dropActionTodo['action'] = 'inside';
+    }
+    this.showDragInfo();
+    }
+
+    drop(event: any)
+    {
+    if (!this.dropActionTodo) return;
+
+    var oldParent = this.getParentNode(event.item.data);
+
+    let i = oldParent.pages.findIndex(c => c.id === event.item.data);
+    const draggedItem = oldParent.pages.splice(i, 1)[0];
+
+    switch (this.dropActionTodo.action)
+    {
+        case 'before':
+        case 'after':
+            const f = this.getParentNode(this.dropActionTodo.targetId);
+            f.pages = f.pages || [];
+            const targetIndex = f.pages.findIndex(c => c.id === this.dropActionTodo.targetId);
+            if (this.dropActionTodo.action == 'before')
+            {
+                f.pages.splice(targetIndex, 0, draggedItem);
+            }
+            else
+            {
+                f.pages.splice(targetIndex + 1, 0, draggedItem);
+            }
+            break;
+
+        case 'inside':
+            const newParent = this.getNode(this.dropActionTodo.targetId);
+            newParent.pages = newParent.pages || [];
+            newParent.pages = [...newParent.pages, draggedItem];
+            if (!this.expandedNodes.includes(newParent.id))
+            {
+                this.expandedNodes.push(newParent.id);
+            }
+            break;
+    }
+
+    this.clearDragInfo(true);
+    }
+
+    public IPageList GetNode(string id, IPageList? nodesToSearch)
+    {
+    if (id == "main") return site;
+    if (nodesToSearch == null)
+    {
+        nodesToSearch = site;
+    }
+    if (nodesToSearch.Id == id) return nodesToSearch;
+    for (var node in nodesToSearch.Pages)
+    {
+        var ret = GetNode(id, node);
+        if (ret != null) return ret;
+    }
+    return null;
+    }
+
+    public IPageList GetParentNode(string id, IPageList? nodesToSearch)
+    {
+    if (id == "main") return site;
+    if (nodesToSearch == null)
+    {
+        nodesToSearch = site;
+    }
+    foreach(var node in nodesToSearch.Pages ?? new())
+    {
+        if (node.Id == id) return nodesToSearch;
+        var ret = GetParentNode(id, node);
+        if (ret) return ret;
+    }
+    return null;
+    }
+
+    public async Task DeletePage()
+    {
+        if (activePage != null && await MatDialogService.Confirmsync("Are you sure you want to delete this page?"))
+        {
+            var sourceFolder = GetParentNode(activePage.Id);
+            var i = sourceFolder.Pages.IndexOf(c => c.Id == activePage.Id);
+            sourceFolder.Pages.RemoveAt(i);
+        }
+    }
+
+    showDragInfo()
+    {
+    this.clearDragInfo();
+    if (this.dropActionTodo)
+    {
+        this.document
+          .getElementById('node-' + this.dropActionTodo.targetId)
+          .classList.add('drop-' + this.dropActionTodo.action);
+    }
+    }
+    clearDragInfo(dropped = false)
+    {
+    if (dropped)
+    {
+        this.dropActionTodo = null;
+    }
+    this.document
+      .querySelectorAll('.drop-before')
+      .forEach(element => element.classList.remove('drop-before'));
+    this.document
+      .querySelectorAll('.drop-after')
+      .forEach(element => element.classList.remove('drop-after'));
+    this.document
+      .querySelectorAll('.drop-inside')
+      .forEach(element => element.classList.remove('drop-inside'));
+    }
+}

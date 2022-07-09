@@ -14,5 +14,21 @@
   {
     "outputFile": "Shared/Viewer.razor.css",
     "inputFile": "Shared/Viewer.razor.scss"
+  },
+  {
+    "outputFile": "Shared/Admin.razor.css",
+    "inputFile": "Shared/Admin.razor.scss"
+  },
+  {
+    "outputFile": "Shared/AdminAddFolder.razor.css",
+    "inputFile": "Shared/AdminAddFolder.razor.scss"
+  },
+  {
+    "outputFile": "Shared/AdminContent.razor.css",
+    "inputFile": "Shared/AdminContent.razor.scss"
+  },
+  {
+    "outputFile": "Shared/AdminLibrary.razor.css",
+    "inputFile": "Shared/AdminLibrary.razor.scss"
   }
 ]

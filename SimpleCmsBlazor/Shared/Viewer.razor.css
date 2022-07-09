@@ -1,4 +1,12 @@
-﻿.outerContainer {
+﻿.viewer-fade-in {
+  transition: 1000ms ease-in;
+}
+
+.viewer-fade-out {
+  transition: 500ms ease-out;
+}
+
+.outerContainer {
   top: 0;
   bottom: 0;
   left: 0;

@@ -1,0 +1,83 @@
+﻿.flex {
+    height: calc(100vh - 90px);
+    display: flex;
+    flex-direction: row;
+
+    .sidebar {
+        min-width: 64px;
+        border-right: 1px solid grey;
+
+        button {
+            display: block;
+        }
+    }
+
+    .pages {
+        width: 20vw;
+        border-right: 1px solid grey;
+        padding: 5px;
+        overflow-y: auto;
+    }
+
+    .body {
+        flex: 1;
+        padding: 5px;
+        overflow-y: auto;
+    }
+}
+
+.menu-button {
+    font-size: 16px;
+    line-height: 24px !important;
+    height: 32px;
+}
+
+.selected {
+    background-color: skyblue !important;
+}
+
+.cdk-drag-placeholder {
+    display: none;
+}
+
+.cdk-drag-preview {
+    box-sizing: border-box;
+    box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    background: #fff;
+    opacity: 0.3;
+}
+
+.drop-inside {
+    border: 1px solid #00f;
+}
+
+.drop-before {
+    border-top: 1px solid #00f;
+}
+
+.drop-after {
+    border-bottom: 1px solid #00f;
+}
+
+.node-title {
+    padding: 15px;
+    margin: 5px;
+    background: #eee;
+    cursor: grab;
+}
+
+.node-children {
+    position: relative;
+    transition: height 0.2s;
+    margin-left: 40px;
+}
+
+.item-notes {
+    margin-left: 20px;
+    color: #aaa;
+}
+
+.node__label {
+    width: 100%;
+    display: block;
+}

@@ -1,0 +1,33 @@
+﻿.flex {
+    height: calc(100vh - 90px);
+    display: flex;
+    flex-direction: row;
+
+    .sidebar {
+        min-width: 64px;
+        border-right: 1px solid grey;
+
+        button {
+            display: block;
+        }
+    }
+
+    .folders {
+        width: 20vw;
+        border-right: 1px solid grey;
+        padding: 5px;
+        overflow-y: auto;
+    }
+
+    .body {
+        flex: 1;
+        padding: 5px;
+        overflow-y: auto;
+    }
+}
+
+.menu-button {
+    font-size: 16px;
+    line-height: 24px !important;
+    height: 32px;
+}

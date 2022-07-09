@@ -87,7 +87,7 @@
         }
     }
 
-    protected void Dispose()
+    void IDisposable.Dispose()
     {
         if (viewerSubscription != null)
             viewerSubscription.Dispose();
