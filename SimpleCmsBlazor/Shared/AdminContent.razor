@@ -31,6 +31,9 @@
             </MatMenu>
             <h5 class="mt-0">Pages</h5>
             <p>Drag and drop pages to rearrange order.</p>
+            <Dropzone Items="site.Pages">
+
+            </Dropzone>
             <div cdkDropList
              [cdkDropListData]="site"
              [id]="'main'"
@@ -109,7 +112,7 @@
     private MatDialogService? matDialogService;
 
     public bool showPages = true;
-    public Page activePage { get; set; }
+    public Page? activePage { get; set; }
     public Site site { get; set; }
     public bool loaded = false;
     public List<string> expandedNodes = new();
@@ -183,13 +186,9 @@
         if (siteService != null)
         {
             site = await siteService.GetSiteAsync();
-            if (!site.id) this.site.id = uuidv4();
-            if (!this.site.hasLogo) this.site.hasLogo = false;
-            this.loaded = true;
-            if (this.site.pages && this.site.pages.length)
-            {
-                this.activePage = this.site.pages[0];
-            }
+            if (string.IsNullOrEmpty(site.Id)) site.Id = Guid.NewGuid().ToString();
+            loaded = true;
+            activePage = site.Pages.FirstOrDefault();
         }
     }
 
@@ -310,7 +309,7 @@
     {
         nodesToSearch = site;
     }
-    foreach(var node in nodesToSearch.Pages ?? new())
+    foreach (var node in nodesToSearch.Pages ?? new())
     {
         if (node.Id == id) return nodesToSearch;
         var ret = GetParentNode(id, node);
@@ -321,38 +320,11 @@
 
     public async Task DeletePage()
     {
-        if (activePage != null && await MatDialogService.Confirmsync("Are you sure you want to delete this page?"))
-        {
-            var sourceFolder = GetParentNode(activePage.Id);
-            var i = sourceFolder.Pages.IndexOf(c => c.Id == activePage.Id);
-            sourceFolder.Pages.RemoveAt(i);
-        }
-    }
-
-    showDragInfo()
+    if (activePage != null && await MatDialogService.Confirmsync("Are you sure you want to delete this page?"))
     {
-    this.clearDragInfo();
-    if (this.dropActionTodo)
-    {
-        this.document
-          .getElementById('node-' + this.dropActionTodo.targetId)
-          .classList.add('drop-' + this.dropActionTodo.action);
+        var sourceFolder = GetParentNode(activePage.Id);
+        var i = sourceFolder.Pages.IndexOf(c => c.Id == activePage.Id);
+        sourceFolder.Pages.RemoveAt(i);
     }
-    }
-    clearDragInfo(dropped = false)
-    {
-    if (dropped)
-    {
-        this.dropActionTodo = null;
-    }
-    this.document
-      .querySelectorAll('.drop-before')
-      .forEach(element => element.classList.remove('drop-before'));
-    this.document
-      .querySelectorAll('.drop-after')
-      .forEach(element => element.classList.remove('drop-after'));
-    this.document
-      .querySelectorAll('.drop-inside')
-      .forEach(element => element.classList.remove('drop-inside'));
     }
 }

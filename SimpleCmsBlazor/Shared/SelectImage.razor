@@ -1,0 +1,57 @@
+﻿@using SimpleCmsBlazor.Services
+<MatDialogTitle><h2>Select Image:</h2></MatDialogTitle>
+<MatDialogContent>
+    <div class="row mt-4">
+        <div class="col-3">
+            <h5>Select folder:</h5>
+            <MediaTree Nodes="@folders" (OnSelectChange)="@SelectFolder"></MediaTree>
+        </div>
+        <div class="col-9" *ngIf="currentFolder && images">
+            <h5>Media for folder: {{ currentFolder.name }}</h5>
+            <MediaList Images="@images"
+                       CanSort="false"
+                       CanDelete="false"
+                       CanSelect="true"
+                       CanMove="false"
+                       OnSelected="@Select">
+            </MediaList>
+        </div>
+    </div>
+</MatDialogContent>
+<MatDialogActions>
+    <MatButton OnClick="@(_ => CloseDialog())">Cancel</MatButton>
+</MatDialogActions>
+
+@inject IFolderService folderService;
+@code {
+    [CascadingParameter]
+    public MatDialogReference? DialogReference { get; set; }
+
+    [Parameter] public GalleryImage? Selection { get; set; }
+    [Parameter] public EventCallback<GalleryImage?> SelectionChanged { get; set; }
+
+    List<GalleryFolder> folders = new();
+    GalleryFolder? currentFolder;
+    List<GalleryImage> images = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        folders = await folderService.GetFoldersAsync();
+    }
+
+    public async Task SelectFolder(GalleryFolder folder)
+    {
+        currentFolder = folder;
+        images = await folderService.GetImagesAsync(currentFolder);
+    }
+
+    void Select(GalleryImage image)
+    {
+        DialogReference?.Close(image);
+    }
+
+    void CloseDialog()
+    {
+        DialogReference?.Close(null);
+    }
+}

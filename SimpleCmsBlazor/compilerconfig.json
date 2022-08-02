@@ -30,5 +30,13 @@
   {
     "outputFile": "Shared/AdminLibrary.razor.css",
     "inputFile": "Shared/AdminLibrary.razor.scss"
+  },
+  {
+    "outputFile": "Shared/AdminSortSections.razor.css",
+    "inputFile": "Shared/AdminSortSections.razor.scss"
+  },
+  {
+    "outputFile": "Shared/AdminHeader.razor.css",
+    "inputFile": "Shared/AdminHeader.razor.scss"
   }
 ]

@@ -1,0 +1,54 @@
+﻿@using SimpleCmsBlazor.Services
+<div class="container-fluid">
+    @if (loaded)
+    {
+        <div class="float-right mt-1">
+            <MatButton Raised="true" OnClick="@SaveAsync">Save site</MatButton>
+        </div>
+    }
+    <h1 class="mt-0">Site Settings</h1>
+    @if (loaded)
+    {
+        <MatTextField Outlined="true" Class="width-100"
+                  Label="Site name" @bind-Value="site.Name"
+                  Hint="The name of the site is displayed in the header.">
+        </MatTextField>
+
+        <div class="row mt-4">
+            <div class="col">
+                <MatCheckbox @bind-Value="@site.HasLogo" Label="Site Has Logo?"></MatCheckbox>
+            </div>
+            <div class="col">
+                <label for="header-color">Header bar text colour</label>
+                <input id="header-color" @bind-value="@site.HeaderColour" type="color" />
+            </div>
+            <div class="col">
+                <label for="header-back">Header bar background colour</label>
+                <input id="header-back" @bind-value="@site.HeaderBackground" type="color" />
+            </div>
+        </div>
+    }
+</div>
+
+@inject SiteService _siteService;
+@code {
+    Site site = new();
+    bool loaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    public async Task SaveAsync()
+    {
+        await _siteService.SaveSiteAsync(site);
+    }
+
+    public async Task LoadAsync()
+    {
+        site = await _siteService.GetSiteAsync();
+        loaded = true;
+        StateHasChanged();
+    }
+}

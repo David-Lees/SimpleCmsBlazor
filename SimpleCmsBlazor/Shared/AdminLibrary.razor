@@ -1,58 +1,56 @@
 ﻿<div class="flex">
-  <!-- Sidebar -->
-  <div class="sidebar">
-      <MatTooltip Tooltip="Show/hide folders">
-      <MatButton OnClick="@(() => showFolders = !showFolders)">
-          <MatIcon Style="transform: scale(2)">@MatIconNames.View_list</MatIcon>
-      </MatButton>
-          </MatTooltip>
-   <MatTooltip Tooltip="Upload">
-       <MatButton OnClick="@Upload" Class="mt-3"><MatIcon Style="transform: scale(2)">@MatIconNames.Cloud_upload</MatIcon></MatButton>
-   </MatTooltip>
-    <button type="button" mat-button (click)="upload()" class="mt-3" matTooltip="Upload">
-      <fa-icon [icon]="uploadIcon" [fixedWidth]="true" size="2x"></fa-icon>
-    </button>
-  </div>
-  <!-- End Sidebar -->
-  <!-- Folders -->
-  <div *ngIf="showFolders" class="folders">
-    <button class="float-right" type="button" mat-button [matMenuTriggerFor]="menu">
-      <fa-icon [icon]="ellipse" [fixedWidth]="true" size="lg"></fa-icon>
-    </button>
-    <mat-menu #menu="matMenu">
-      <button class="menu-button" mat-menu-item (click)="addFolder()">Add Folder</button>
-      <button class="menu-button" mat-menu-item (click)="renameFolder()" *ngIf="canRename()">
-        Rename {{ currentFolder.name }}
-      </button>
-      <button class="menu-button" mat-menu-item (click)="deleteFolder()" *ngIf="canDelete()">
-        Delete {{ currentFolder.name }}
-      </button>
-    </mat-menu>
-    <h5 class="mt-0">Folders</h5>
-    <app-media-tree (selectChange)="folderChange($event)"></app-media-tree>
-  </div>
-  <!-- End Folders -->
-  <!-- Body -->
-  <div class="body">
-    <h5 *ngIf="currentFolder">Media for folder: {{ currentFolder.name }}</h5>
-    <div class="" *ngIf="currentFolder && images.length">
-      <app-media-list
-        [(images)]="images"
-        [canSort]="true"
-        [canDelete]="true"
-        [canSelect]="false"
-        [canMove]="true"
-        (moved)="move($event)"
-        (delete)="delete($event)"
-      ></app-media-list>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <MatTooltip Tooltip="Show/hide folders">
+            <MatButton OnClick="@(() => showFolders = !showFolders)">
+                <MatIcon Style="transform: scale(2)">@MatIconNames.View_list</MatIcon>
+            </MatButton>
+        </MatTooltip>
+        <MatTooltip Tooltip="Upload">
+            <MatButton OnClick="@Upload" Class="mt-3"><MatIcon Style="transform: scale(2)">@MatIconNames.Cloud_upload</MatIcon></MatButton>
+        </MatTooltip>
+        <button type="button" mat-button (click)="upload()" class="mt-3" matTooltip="Upload">
+            <fa-icon [icon]="uploadIcon" [fixedWidth]="true" size="2x"></fa-icon>
+        </button>
     </div>
-  </div>
-  <!-- End Body -->
+    <!-- End Sidebar -->
+    <!-- Folders -->
+    <div *ngIf="showFolders" class="folders">
+        <button class="float-right" type="button" mat-button [matMenuTriggerFor]="menu">
+            <fa-icon [icon]="ellipse" [fixedWidth]="true" size="lg"></fa-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+            <button class="menu-button" mat-menu-item (click)="addFolder()">Add Folder</button>
+            <button class="menu-button" mat-menu-item (click)="renameFolder()" *ngIf="canRename()">
+                Rename {{ currentFolder.name }}
+            </button>
+            <button class="menu-button" mat-menu-item (click)="deleteFolder()" *ngIf="canDelete()">
+                Delete {{ currentFolder.name }}
+            </button>
+        </mat-menu>
+        <h5 class="mt-0">Folders</h5>
+        <app-media-tree (selectChange)="folderChange($event)"></app-media-tree>
+    </div>
+    <!-- End Folders -->
+    <!-- Body -->
+    <div class="body">
+        <h5 *ngIf="currentFolder">Media for folder: {{ currentFolder.name }}</h5>
+        <div class="" *ngIf="currentFolder && images.length">
+            <app-media-list [(images)]="images"
+                            [canSort]="true"
+                            [canDelete]="true"
+                            [canSelect]="false"
+                            [canMove]="true"
+                            (moved)="move($event)"
+                            (delete)="delete($event)"></app-media-list>
+        </div>
+    </div>
+    <!-- End Body -->
 </div>
 
 
 @code {
-     subscription: Subscription;
+    subscription: Subscription;
   folders: GalleryFolder[] = [];
   list = faList;
   ellipse = faEllipsisH;
@@ -70,93 +68,110 @@
     private _bottomSheet: MatBottomSheet
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() : void {
     this.loadFolders();
-  }
+    }
 
-  loadFolders() {
-    this.folderService.getFolders().subscribe(x => {
-      this.folders = [...x];
-      this.folderChange(this.folders.find(y => y.rowKey === this.folderService.empty));
+    loadFolders()
+    {
+    this.folderService.getFolders().subscribe(x =>
+    {
+        this.folders = [...x];
+        this.folderChange(this.folders.find(y => y.rowKey === this.folderService.empty));
     });
-  }
+    }
 
-  reload() {
+    reload()
+    {
     const current = this.currentFolder.rowKey;
-    this.folderService.getFolders(true).subscribe(x => {
-      this.folders = [...x];
-      this.folderChange(this.folders.find(y => y.rowKey === current));
+    this.folderService.getFolders(true).subscribe(x =>
+    {
+        this.folders = [...x];
+        this.folderChange(this.folders.find(y => y.rowKey === current));
     });
-  }
+    }
 
-  upload() {
+    upload()
+    {
     const ref = this._bottomSheet.open(MaterialFileUploadComponent, { data: this.currentFolder });
-    ref.afterDismissed().subscribe(dataFromChild => {
-      if (dataFromChild) this.folderChange(this.currentFolder);
+    ref.afterDismissed().subscribe(dataFromChild =>
+    {
+        if (dataFromChild) this.folderChange(this.currentFolder);
     });
-  }
+    }
 
-  folderChange(folder: GalleryFolder) {
+    folderChange(folder: GalleryFolder)
+    {
     this.currentFolder = folder;
     this.images = [];
     this.folderService.getImages(folder).subscribe(x => (this.images = x));
-  }
+    }
 
-  move(image: GalleryImage) {
+    move(image: GalleryImage)
+    {
     const dialogRef = this.dialog.open(FolderSelectComponent, {
-      width: '250px',
+    width: '250px',
     });
 
     dialogRef.afterClosed().subscribe((result: GalleryFolder) => {
-      this.mediaService.move(image, result);
-      this.folderChange(this.currentFolder);
+        this.mediaService.move(image, result);
+        this.folderChange(this.currentFolder);
     });
-  }
+    }
 
-  delete(image: GalleryImage) {
-    this.mediaService.delete(image).subscribe(() => {
-      this.folderChange(this.currentFolder);
+    delete(image: GalleryImage)
+    {
+    this.mediaService.delete(image).subscribe(() =>
+    {
+        this.folderChange(this.currentFolder);
     });
-  }
+    }
 
-  addFolder() {
+    addFolder()
+    {
     const ref = this._bottomSheet.open(AdminAddFolderComponent, { data: this.currentFolder });
     ref.afterDismissed().subscribe(() => this.reload());
-  }
+    }
 
-  renameFolder() {
+    renameFolder()
+    {
     const ref = this._bottomSheet.open(AdminRenameFolderComponent, { data: this.currentFolder });
     ref.afterDismissed().subscribe(() => this.reload());
-  }
+    }
 
-  deleteFolder() {
+    deleteFolder()
+    {
     if (
       this.currentFolder &&
       this.currentFolder.rowKey !== this.folderService.empty &&
       this.folders.filter(x => x.partitionKey === this.currentFolder.rowKey).length === 0 &&
       this.images.filter(x => x.partitionKey === this.currentFolder.rowKey).length === 0 &&
       confirm('Are you sure you want to delete the "' + this.currentFolder.name + '" folder?')
-    ) {
-      this.folderService.delete(this.currentFolder);
-      const i = this.folders.findIndex(x => x === this.currentFolder);
-      if (i > -1) {
-        this.folders.splice(i, 1);
-        this.folderService.update(this.folders);
-      }
-      this.reload();
+    )
+    {
+        this.folderService.delete(this.currentFolder);
+        const i = this.folders.findIndex(x => x === this.currentFolder);
+        if (i > -1)
+        {
+            this.folders.splice(i, 1);
+            this.folderService.update(this.folders);
+        }
+        this.reload();
     }
-  }
+    }
 
-  canDelete() {
+    canDelete()
+    {
     return (
       this.currentFolder &&
       this.folders.filter(x => x.partitionKey === this.currentFolder.rowKey).length === 0 &&
       this.currentFolder.rowKey !== this.folderService.empty &&
       this.images.length === 0
     );
-  }
+    }
 
-  canRename() {
+    canRename()
+    {
     return this.currentFolder && this.currentFolder.rowKey !== this.folderService.empty;
-  }
+    }
 }

@@ -1,0 +1,50 @@
+﻿<div class="container-fluid">
+    <div class="row">
+        @if (pageSection != null && pageSection.Image != null)
+        {
+            <div class="col-sm-3">
+                <MatCard Style="height: 100%">
+                    <img src="@(prefix + pageSection.Image?.PreviewSmallPath)"
+                     class="img-fluid"
+                     alt="@(pageSection.Image?.Description)" />
+                </MatCard>
+            </div>
+        }
+        <div class="col-sm-9">
+            <h4>Select image:</h4>
+            <div>
+                <MatButton Raised="true" OnClick="@Select">Select Image</MatButton>
+            </div>
+        </div>
+    </div>
+</div>
+
+@inject IMatDialogService MatDialogService
+@code {
+    [Parameter] public PageSection? Section { get; set; }
+    [Parameter] public EventCallback<PageSection> SectionChanged { get; set; }
+
+    private PageSection? pageSection;
+
+    [Inject]
+    public IConfiguration? Config { get; set; }
+
+    string prefix = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        pageSection = Section;
+        prefix = $"{Config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/";
+    }
+
+    public async Task Select()
+    {
+        var result = await MatDialogService.OpenAsync(typeof(SelectImage), null);
+        if (pageSection != null && result is GalleryImage i)
+        {
+            pageSection.Image = i;
+            await SectionChanged.InvokeAsync(pageSection);
+        }
+    }
+}

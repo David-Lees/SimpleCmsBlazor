@@ -1,0 +1,109 @@
+﻿@using MatBlazor
+@using Microsoft.AspNetCore.Components
+@using SimpleCmsBlazor.Models
+
+<div class="list-box">
+    @if (Images != null && Images.Any())
+    {
+        <Dropzone OnItemDrop="@Drop" Items="@Images">
+            <div class="row m-2">
+                <div class="col-3">
+                    <img src="@(prefix + context.PreviewSmallPath)"
+                     class="img-fluid"
+                     alt="@context.description" />
+                </div>
+                <div class="col-6">
+                    <h4 class="m-1">@context.Description</h4>
+                    <p class="m-1">
+                        <NavLink href="@(prefix + context.PreviewSmallPath)" target="_blank">Small</NavLink>:
+                        @context.PreviewSmallWidth x @context.PreviewSmallHeight px
+                    </p>
+                    <p class="m-1">
+                        <NavLink href="@(prefix + context.PreviewMediumPath)" target="_blank">Medium</NavLink>:
+                        @context.PreviewMediumWidth x @context.PreviewMediumHeight px
+                    </p>
+                    <p class="m-1">
+                        <NavLink href="@(prefix + context.PreviewLargePath)" target="_blank">Large</NavLink>:
+                        @context.PreviewLargeWidth x @context.PreviewLargeHeight px
+                    </p>
+                    <p class="m-1">
+                        <NavLink href="@(prefix + context.RawPath)" target="_blank">Original</NavLink>:
+                        @context.RawWidth x @context.RawHeight px
+                    </p>
+                </div>
+                <div class="col-3">
+                    @if (CanSelect)
+                    {
+                    <MatButton Class="m-1" Raised="true" OnClick="@(_ => Select(context))">Select</MatButton>
+                    }
+                @if (CanMove)
+                    {
+                    <MatButton Class="m-1" Raised="true" OnClick="@(_ => Move(context))">Move</MatButton>
+                    }
+                @if (CanDelete)
+                    {
+                    <MatButton Class="m-1" Raised="true" OnClick="@(_ => Delete(context))">Delete</MatButton>
+                    }
+            </div>
+        </div>
+    </Dropzone>
+    }
+</div>
+
+@code {
+    [Parameter] public List<GalleryImage> Images { get; set; };
+    [Parameter] public EventCallback<List<GalleryImage>> ImagesChanged { get; set; }
+    private List<GalleryImage> images = new();
+
+    [Parameter] public bool CanSelect { get; set; } = false;
+    [Parameter] public bool CanDelete { get; set; } = false;
+    [Parameter] public bool CanMove { get; set; } = false;
+    [Parameter] public bool CanSort { get; set; } = false;
+    [Parameter] public EventCallback<GalleryImage> Deleted { get; set; }
+    [Parameter] public EventCallback<GalleryImage> Selected { get; set; }
+    [Parameter] public EventCallback<GalleryImage> Moved { get; set; }
+
+    [Inject]
+    public IConfiguration? Config { get; set; }
+
+    [Inject]
+    public IMatDialogService matDialogService { get; set; }
+
+    public string prefix => $"{Config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/";
+
+    protected override OnInitialized()
+    {
+        images = Images;
+    }
+
+    public async Task Select(GalleryImage image)
+    {
+        await Selected.InvokeAsync(image);
+    }
+
+    public async Task Drop(GalleryImage image)
+    {
+        if (CanSort)
+        {
+            await ImagesChanged.InvokeAsync(images);
+        }
+    }
+
+    public async Task Remove(GalleryImage image)
+    {
+        if (await matDialogService.ConfirmAsync($"Are you sure you want to remove {image.Description}?"))
+        {
+            await Delete.InvokeAsync(image);
+        }
+    }
+
+    public async Task Move(GalleryImage image)
+    {
+        await Moved.InvokeAsync(image);
+    }
+
+    public async Task Delete(GalleryImage image)
+    {
+        await Deleted.InvokeAsync(image)
+    }
+}

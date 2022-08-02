@@ -9,7 +9,7 @@ public interface IFolderService
     Task DeleteAsync(GalleryFolder folder);
     Task<List<GalleryFolder>> GetFoldersAsync(bool reload = false);
     Task<List<GalleryImage>> GetImagesAsync(GalleryFolder folder);
-    Task MoveAsync(GalleryFolder folder, string destination);
+    Task MoveAsync(GalleryFolder folder, Guid destination);
     Task ReloadAsync();
     void Update(List<GalleryFolder> galleryFolders);
 }
@@ -60,7 +60,7 @@ public class FolderService : IFolderService
         await ReloadAsync();
     }
 
-    public async Task MoveAsync(GalleryFolder folder, string destination)
+    public async Task MoveAsync(GalleryFolder folder, Guid destination)
     {
         await _client.PutAsJsonAsync($"/api/folder/{destination}", folder);
         await ReloadAsync();

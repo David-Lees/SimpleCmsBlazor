@@ -46,6 +46,20 @@
           "lib/netstandard2.0/Azure.Storage.Common.dll": {}
         }
       },
+      "blazor-dragdrop/2.4.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "6.0.1",
+          "Microsoft.AspNetCore.Components.Web": "6.0.1",
+          "Microsoft.CSharp": "4.7.0"
+        },
+        "compile": {
+          "lib/net6.0/Plk.Blazor.DragDrop.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/Plk.Blazor.DragDrop.dll": {}
+        }
+      },
       "Markdig/0.30.2": {
         "type": "package",
         "compile": {
@@ -233,6 +247,15 @@
         },
         "runtime": {
           "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {}
+        }
+      },
+      "Microsoft.CSharp/4.7.0": {
+        "type": "package",
+        "compile": {
+          "ref/netcoreapp2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.0/_._": {}
         }
       },
       "Microsoft.Extensions.Configuration/6.0.0": {
@@ -645,6 +668,20 @@
           "lib/netstandard2.0/Azure.Storage.Common.dll": {}
         }
       },
+      "blazor-dragdrop/2.4.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "6.0.1",
+          "Microsoft.AspNetCore.Components.Web": "6.0.1",
+          "Microsoft.CSharp": "4.7.0"
+        },
+        "compile": {
+          "lib/net6.0/Plk.Blazor.DragDrop.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/Plk.Blazor.DragDrop.dll": {}
+        }
+      },
       "Markdig/0.30.2": {
         "type": "package",
         "compile": {
@@ -832,6 +869,15 @@
         },
         "runtime": {
           "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {}
+        }
+      },
+      "Microsoft.CSharp/4.7.0": {
+        "type": "package",
+        "compile": {
+          "ref/netcoreapp2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.0/_._": {}
         }
       },
       "Microsoft.Extensions.Configuration/6.0.0": {
@@ -1249,6 +1295,18 @@
         "lib/netstandard2.0/Azure.Storage.Common.xml"
       ]
     },
+    "blazor-dragdrop/2.4.0": {
+      "sha512": "gLw4kjHNV/q1x/KeNLDMvr1SHOU9XsbYuJ0k9Bta3I9DqJqqwBgiuCJPYT+YgoMVzMHPwQMlpSA7eO0Jsk+b7g==",
+      "type": "package",
+      "path": "blazor-dragdrop/2.4.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "blazor-dragdrop.2.4.0.nupkg.sha512",
+        "blazor-dragdrop.nuspec",
+        "lib/net6.0/Plk.Blazor.DragDrop.dll"
+      ]
+    },
     "Markdig/0.30.2": {
       "sha512": "rm5rfHGP0BZtcB31CmQeWLLPdpG6xA6xN92x2KcNrl+9MPJONq9u4dfG7VgnTOxdjDnuEkX6GCxMYS+LpoKGOQ==",
       "type": "package",
@@ -1607,6 +1665,75 @@
         "ref/net461/Microsoft.Bcl.AsyncInterfaces.dll",
         "ref/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.dll",
         "ref/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
+    "Microsoft.CSharp/4.7.0": {
+      "sha512": "pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA==",
+      "type": "package",
+      "path": "microsoft.csharp/4.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/netcore50/Microsoft.CSharp.dll",
+        "lib/netcoreapp2.0/_._",
+        "lib/netstandard1.3/Microsoft.CSharp.dll",
+        "lib/netstandard2.0/Microsoft.CSharp.dll",
+        "lib/netstandard2.0/Microsoft.CSharp.xml",
+        "lib/portable-net45+win8+wp8+wpa81/_._",
+        "lib/uap10.0.16299/_._",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "microsoft.csharp.4.7.0.nupkg.sha512",
+        "microsoft.csharp.nuspec",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/_._",
+        "ref/netcore50/Microsoft.CSharp.dll",
+        "ref/netcore50/Microsoft.CSharp.xml",
+        "ref/netcore50/de/Microsoft.CSharp.xml",
+        "ref/netcore50/es/Microsoft.CSharp.xml",
+        "ref/netcore50/fr/Microsoft.CSharp.xml",
+        "ref/netcore50/it/Microsoft.CSharp.xml",
+        "ref/netcore50/ja/Microsoft.CSharp.xml",
+        "ref/netcore50/ko/Microsoft.CSharp.xml",
+        "ref/netcore50/ru/Microsoft.CSharp.xml",
+        "ref/netcore50/zh-hans/Microsoft.CSharp.xml",
+        "ref/netcore50/zh-hant/Microsoft.CSharp.xml",
+        "ref/netcoreapp2.0/_._",
+        "ref/netstandard1.0/Microsoft.CSharp.dll",
+        "ref/netstandard1.0/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/de/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/es/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/fr/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/it/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/ja/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/ko/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/ru/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/zh-hans/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/zh-hant/Microsoft.CSharp.xml",
+        "ref/netstandard2.0/Microsoft.CSharp.dll",
+        "ref/netstandard2.0/Microsoft.CSharp.xml",
+        "ref/portable-net45+win8+wp8+wpa81/_._",
+        "ref/uap10.0.16299/_._",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
@@ -2315,7 +2442,8 @@
       "Microsoft.AspNetCore.Components.WebAssembly.DevServer >= 6.0.5",
       "Microsoft.Authentication.WebAssembly.Msal >= 6.0.5",
       "Microsoft.Extensions.Http >= 6.0.0",
-      "System.Reactive >= 5.0.0"
+      "System.Reactive >= 5.0.0",
+      "blazor-dragdrop >= 2.4.0"
     ]
   },
   "packageFolders": {
@@ -2395,6 +2523,10 @@
           "System.Reactive": {
             "target": "Package",
             "version": "[5.0.0, )"
+          },
+          "blazor-dragdrop": {
+            "target": "Package",
+            "version": "[2.4.0, )"
           }
         },
         "imports": [

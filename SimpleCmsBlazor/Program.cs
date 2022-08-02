@@ -5,6 +5,7 @@ using SimpleCmsBlazor;
 using SimpleCmsBlazor.Models;
 using SimpleCmsBlazor.Services;
 using MatBlazor;
+using Plk.Blazor.DragDrop;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -45,5 +46,7 @@ builder.Services.AddMatToaster(config =>
     config.ShowTransitionDuration = 500;
     config.ShowProgressBar = true;
 });
+
+builder.Services.AddBlazorDragDrop();
 
 await builder.Build().RunAsync();

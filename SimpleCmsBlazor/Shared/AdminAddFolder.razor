@@ -44,8 +44,8 @@
     {
         var newFolder = new GalleryFolder
         {
-            PartitionKey = folder?.RowKey ?? string.Empty,
-            RowKey = Guid.NewGuid().ToString(),
+            PartitionKey = folder?.RowKey ?? Guid.Empty,
+            RowKey = Guid.NewGuid(),
             Name = folderName,
         };
         if (folderService != null)
