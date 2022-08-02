@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj": {}
+    "C:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj": {}
   },
   "projects": {
-    "D:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj": {
+    "C:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj",
+        "projectUniqueName": "C:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj",
         "projectName": "SimpleCmsBlazor",
-        "projectPath": "D:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj",
-        "packagesPath": "C:\\Users\\dal19\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\obj\\",
+        "projectPath": "C:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\SimpleCmsBlazor.csproj",
+        "packagesPath": "C:\\Users\\dl00\\.nuget\\packages\\",
+        "outputPath": "C:\\Projects\\SimpleCmsBlazor\\SimpleCmsBlazor\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\dal19\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\dl00\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,8 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://packages.stride3d.net/nuget": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net6.0": {
@@ -96,7 +95,7 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.NETCore.App.Runtime.Mono.browser-wasm",
-              "version": "[6.0.5, 6.0.5]"
+              "version": "[6.0.7, 6.0.7]"
             }
           ],
           "frameworkReferences": {
@@ -104,7 +103,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.300\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.302\\RuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {

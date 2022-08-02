@@ -13,7 +13,9 @@ public interface IBrowserResizeService
 public class BrowserResizeService : IBrowserResizeService
 {
     private readonly Subject<(decimal, decimal)> onResize = new();
+    
     public IObservable<(decimal, decimal)> OnResize => onResize;
+
     private readonly IJSRuntime _runtime;
 
     public BrowserResizeService(IJSRuntime runtime)

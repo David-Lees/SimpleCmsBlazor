@@ -1,4 +1,9 @@
-﻿<div class="flex">
+﻿@using SimpleCmsBlazor.Services
+@inject IMatDialogService _matDialogService
+@inject IFolderService  _folderService
+@inject IMediaService _mediaService
+
+<div class="flex">
     <!-- Sidebar -->
     <div class="sidebar">
         <MatTooltip Tooltip="Show/hide folders">
@@ -9,28 +14,31 @@
         <MatTooltip Tooltip="Upload">
             <MatButton OnClick="@Upload" Class="mt-3"><MatIcon Style="transform: scale(2)">@MatIconNames.Cloud_upload</MatIcon></MatButton>
         </MatTooltip>
-        <button type="button" mat-button (click)="upload()" class="mt-3" matTooltip="Upload">
-            <fa-icon [icon]="uploadIcon" [fixedWidth]="true" size="2x"></fa-icon>
-        </button>
     </div>
     <!-- End Sidebar -->
     <!-- Folders -->
-    <div *ngIf="showFolders" class="folders">
-        <button class="float-right" type="button" mat-button [matMenuTriggerFor]="menu">
-            <fa-icon [icon]="ellipse" [fixedWidth]="true" size="lg"></fa-icon>
-        </button>
-        <mat-menu #menu="matMenu">
-            <button class="menu-button" mat-menu-item (click)="addFolder()">Add Folder</button>
-            <button class="menu-button" mat-menu-item (click)="renameFolder()" *ngIf="canRename()">
-                Rename {{ currentFolder.name }}
-            </button>
-            <button class="menu-button" mat-menu-item (click)="deleteFolder()" *ngIf="canDelete()">
-                Delete {{ currentFolder.name }}
-            </button>
-        </mat-menu>
-        <h5 class="mt-0">Folders</h5>
-        <app-media-tree (selectChange)="folderChange($event)"></app-media-tree>
-    </div>
+    @if (showFolders)
+    {
+        <div class="folders">
+            <MatButton OnClick="@OpenMenu" RefBack="@buttonForwardRef">
+                <MatIcon>@MatIconNames.More_horiz</MatIcon>
+            </MatButton>
+            <MatMenu @ref="Menu" TargetForwardRef="@buttonForwardRef">
+                <MatList>
+                    <MatListItem OnClick="@AddFolder">Add Folder</MatListItem>
+                    @if (CanRename()) {
+                        <MatListItem OnClick="@RenameFolder">Rename @currentFolder?.Name</MatListItem>
+                    }
+                    @if (CanDelete())
+                    {
+                        <MatListItem OnClick="@DeleteFolder">Delete @currentFolder?.Name</MatListItem>
+                    }
+                </MatList>
+            </MatMenu>
+            <h5 class="mt-0">Folders</h5>
+            <MediaTree SelectedFolder="currentFolder" Node="@currentFolder" SelectedChanged="@FolderChange"></MediaTree>  
+        </div>
+    }
     <!-- End Folders -->
     <!-- Body -->
     <div class="body">
@@ -48,130 +56,123 @@
     <!-- End Body -->
 </div>
 
-
 @code {
-    subscription: Subscription;
-  folders: GalleryFolder[] = [];
-  list = faList;
-  ellipse = faEllipsisH;
-  uploadIcon = faUpload;
-  showFolders = true;
-  currentFolder: GalleryFolder;
-  images: GalleryImage[] = [];
-  folderName = 'New Folder';
+    ForwardRef buttonForwardRef = new();
+    BaseMatMenu? Menu;
 
-  constructor(
-    public dialog: MatDialog,
-    public adalService: MsAdalAngular6Service,
-    private mediaService: MediaService,
-    public folderService: FolderService,
-    private _bottomSheet: MatBottomSheet
-  ) {}
-
-  ngOnInit() : void {
-    this.loadFolders();
-    }
-
-    loadFolders()
+    public async Task OpenMenu(MouseEventArgs e)
     {
-    this.folderService.getFolders().subscribe(x =>
-    {
-        this.folders = [...x];
-        this.folderChange(this.folders.find(y => y.rowKey === this.folderService.empty));
-    });
-    }
-
-    reload()
-    {
-    const current = this.currentFolder.rowKey;
-    this.folderService.getFolders(true).subscribe(x =>
-    {
-        this.folders = [...x];
-        this.folderChange(this.folders.find(y => y.rowKey === current));
-    });
-    }
-
-    upload()
-    {
-    const ref = this._bottomSheet.open(MaterialFileUploadComponent, { data: this.currentFolder });
-    ref.afterDismissed().subscribe(dataFromChild =>
-    {
-        if (dataFromChild) this.folderChange(this.currentFolder);
-    });
-    }
-
-    folderChange(folder: GalleryFolder)
-    {
-    this.currentFolder = folder;
-    this.images = [];
-    this.folderService.getImages(folder).subscribe(x => (this.images = x));
-    }
-
-    move(image: GalleryImage)
-    {
-    const dialogRef = this.dialog.open(FolderSelectComponent, {
-    width: '250px',
-    });
-
-    dialogRef.afterClosed().subscribe((result: GalleryFolder) => {
-        this.mediaService.move(image, result);
-        this.folderChange(this.currentFolder);
-    });
-    }
-
-    delete(image: GalleryImage)
-    {
-    this.mediaService.delete(image).subscribe(() =>
-    {
-        this.folderChange(this.currentFolder);
-    });
-    }
-
-    addFolder()
-    {
-    const ref = this._bottomSheet.open(AdminAddFolderComponent, { data: this.currentFolder });
-    ref.afterDismissed().subscribe(() => this.reload());
-    }
-
-    renameFolder()
-    {
-    const ref = this._bottomSheet.open(AdminRenameFolderComponent, { data: this.currentFolder });
-    ref.afterDismissed().subscribe(() => this.reload());
-    }
-
-    deleteFolder()
-    {
-    if (
-      this.currentFolder &&
-      this.currentFolder.rowKey !== this.folderService.empty &&
-      this.folders.filter(x => x.partitionKey === this.currentFolder.rowKey).length === 0 &&
-      this.images.filter(x => x.partitionKey === this.currentFolder.rowKey).length === 0 &&
-      confirm('Are you sure you want to delete the "' + this.currentFolder.name + '" folder?')
-    )
-    {
-        this.folderService.delete(this.currentFolder);
-        const i = this.folders.findIndex(x => x === this.currentFolder);
-        if (i > -1)
-        {
-            this.folders.splice(i, 1);
-            this.folderService.update(this.folders);
+        if (Menu != null) {
+            await Menu.OpenAsync();
         }
-        this.reload();
-    }
     }
 
-    canDelete()
+    public async Task AddFolder()
     {
-    return (
-      this.currentFolder &&
-      this.folders.filter(x => x.partitionKey === this.currentFolder.rowKey).length === 0 &&
-      this.currentFolder.rowKey !== this.folderService.empty &&
-      this.images.length === 0
-    );
+        var result = await _matDialogService.PromptAsync($"Add folder under {currentFolder?.Name ?? "root folder"}", folderName);
+        if (!string.IsNullOrWhiteSpace(result))
+        {
+            var newFolder = new GalleryFolder
+            {
+                PartitionKey = currentFolder?.RowKey ?? Guid.Empty,
+                RowKey = Guid.NewGuid(),
+                Name = result
+            };
+            if (_folderService != null)
+            {
+                await _folderService.CreateAsync(newFolder);
+                await Reload();                
+            }
+        }
     }
 
-    canRename()
+    public async Task RenameFolder()
     {
-    return this.currentFolder && this.currentFolder.rowKey !== this.folderService.empty;
+        if (currentFolder != null)
+        {
+            var result = await _matDialogService.PromptAsync($"Rename {currentFolder.Name} to:", currentFolder.Name);
+            if (!string.IsNullOrWhiteSpace(result) && currentFolder.Name != result)
+            {
+                currentFolder.Name = result;
+                await _folderService.CreateAsync(currentFolder);
+                await Reload();
+            }
+        }
     }
+
+    public async Task DeleteFolder()
+    {
+        if (currentFolder != null && currentFolder.RowKey != Guid.Empty &&
+            !folders.Any(x => x.PartitionKey == currentFolder.RowKey) &&
+            !images.Any(x => x.PartitionKey == currentFolder.RowKey) &&
+            await _matDialogService.ConfirmAsync($"Are you sure you want to delete the {currentFolder.Name} folder?"))
+        {
+            await _folderService.DeleteAsync(currentFolder);
+            await Reload();
+        }
+    }
+
+    public bool CanDelete() => currentFolder != null && 
+        !folders.Any(x => x.PartitionKey == currentFolder.RowKey) &&
+        currentFolder.RowKey != Guid.Empty &&
+        images.Count == 0;
+
+    public bool CanRename() => currentFolder != null && currentFolder.RowKey != Guid.Empty;
+
+    GalleryFolder? currentFolder;
+    List<GalleryFolder> folders = new();
+    bool showFolders = true;
+    List<GalleryImage> images = new();
+    string folderName = "New Folder";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFoldersAsync();
+    }
+
+    public async Task FolderChange(GalleryFolder? folder)
+    {
+        currentFolder = folder;                
+        images = folder != null ? await _folderService.GetImagesAsync(folder) : new();
+        StateHasChanged();
+    }
+
+    public async Task LoadFoldersAsync()
+    {
+        folders = await _folderService.GetFoldersAsync();
+        await FolderChange(folders.First(x => x.RowKey == Guid.Empty));
+    }
+
+    public async Task Delete(GalleryImage image)
+    {
+        await _mediaService.Delete(image);
+        await FolderChange(currentFolder);    
+    }
+
+    public async Task Reload()
+    {
+        var current = currentFolder?.RowKey;
+        folders = await _folderService.GetFoldersAsync(true);
+        var newFolder = folders.FirstOrDefault(x => x.RowKey == current);
+        if (newFolder != null) 
+        {
+            await FolderChange(newFolder);
+        }    
+    }
+
+    private async Task Upload()
+    {
+        await _matDialogService.OpenAsync(typeof(MaterialFileUpload), null);
+        await FolderChange(currentFolder);
+    }
+
+    public async Task Move(GalleryImage image)
+    {
+        var result = await _matDialogService.OpenAsync(typeof(FolderSelect), null);
+        if (result != null && result is GalleryFolder folder)
+        {
+            await _mediaService.Move(image, folder);
+        }
+        StateHasChanged();
+    } 
 }

@@ -1,16 +1,18 @@
 ﻿@using MatBlazor
 @using Microsoft.AspNetCore.Components
 @using SimpleCmsBlazor.Models
+@inject IConfiguration Config
+@inject IMatDialogService matDialogService
 
 <div class="list-box">
     @if (Images != null && Images.Any())
     {
-        <Dropzone OnItemDrop="@Drop" Items="@Images">
+        <Dropzone OnItemDrop="@Drop" Items="@Images" TItem="GalleryImage">
             <div class="row m-2">
                 <div class="col-3">
                     <img src="@(prefix + context.PreviewSmallPath)"
                      class="img-fluid"
-                     alt="@context.description" />
+                     alt="@context.Description" />
                 </div>
                 <div class="col-6">
                     <h4 class="m-1">@context.Description</h4>
@@ -51,27 +53,41 @@
 </div>
 
 @code {
-    [Parameter] public List<GalleryImage> Images { get; set; };
-    [Parameter] public EventCallback<List<GalleryImage>> ImagesChanged { get; set; }
+    [Parameter]
+    public List<GalleryImage> Images { get; set; } = new();
+
+    [Parameter] 
+    public EventCallback<List<GalleryImage>> ImagesChanged { get; set; }
+
     private List<GalleryImage> images = new();
 
-    [Parameter] public bool CanSelect { get; set; } = false;
-    [Parameter] public bool CanDelete { get; set; } = false;
-    [Parameter] public bool CanMove { get; set; } = false;
-    [Parameter] public bool CanSort { get; set; } = false;
-    [Parameter] public EventCallback<GalleryImage> Deleted { get; set; }
-    [Parameter] public EventCallback<GalleryImage> Selected { get; set; }
-    [Parameter] public EventCallback<GalleryImage> Moved { get; set; }
+    [Parameter] 
+    public bool CanSelect { get; set; } = false;
 
-    [Inject]
-    public IConfiguration? Config { get; set; }
+    [Parameter] 
+    public bool CanDelete { get; set; } = false;
 
-    [Inject]
-    public IMatDialogService matDialogService { get; set; }
+    [Parameter] 
+    public bool CanMove { get; set; } = false;
+
+    [Parameter] 
+    public bool CanSort { get; set; } = false;
+
+    [Parameter] 
+    public EventCallback<GalleryImage> Deleted { get; set; }
+
+
+    [Parameter] 
+    public EventCallback<GalleryImage> Selected { get; set; }
+
+    [Parameter] 
+    public EventCallback<GalleryImage> Moved { get; set; }
+
+
 
     public string prefix => $"{Config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/";
 
-    protected override OnInitialized()
+    protected override void OnInitialized()
     {
         images = Images;
     }
@@ -93,7 +109,7 @@
     {
         if (await matDialogService.ConfirmAsync($"Are you sure you want to remove {image.Description}?"))
         {
-            await Delete.InvokeAsync(image);
+            await Delete(image);
         }
     }
 
@@ -104,6 +120,6 @@
 
     public async Task Delete(GalleryImage image)
     {
-        await Deleted.InvokeAsync(image)
+        await Deleted.InvokeAsync(image);
     }
 }

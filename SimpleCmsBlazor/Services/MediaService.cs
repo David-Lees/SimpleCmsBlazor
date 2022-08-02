@@ -2,8 +2,10 @@
 
 using Azure;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using MatBlazor;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using SimpleCmsBlazor.Models;
 using System.Net.Http.Json;
 
@@ -12,7 +14,31 @@ public interface IMediaService
     Task Delete(GalleryImage image);
     Task<List<GalleryImage>> LoadAsync(GalleryFolder folder);
     Task Move(GalleryImage image, GalleryFolder folder);
-    Task Upload(InputFileChangeEventArgs e);
+    Task Upload(List<FileUploadProgress> files);
+}
+
+public class FileUploadProgress : IProgress<long>
+{
+    public long Progress { get; set; } = 0;
+    public IBrowserFile File { get; private set; }
+
+    public FileUploadProgress(IBrowserFile file, Action action)
+    {
+        File = file;
+        ProgressMade = action;
+    }
+
+    public CancellationTokenSource TokenSource { get; set; } = new();
+
+    public void Report(long value)
+    {
+        Progress = value / File.Size;
+        ProgressMade();
+    }
+
+    public Action ProgressMade { get; set; }
+
+    public void CancelUpload(MouseEventArgs _) => TokenSource.Cancel();
 }
 
 public class MediaService : IMediaService
@@ -70,27 +96,29 @@ public class MediaService : IMediaService
         }
     }
 
-    public async Task Upload(InputFileChangeEventArgs e)
+    public async Task Upload(List<FileUploadProgress> files)
     {
         var key = await _blobUploadService.GetUserDelegationKeyAsync();
         var credentials = new AzureSasCredential(key);
+        var storageUrl = _configuration.GetValue<string>("storageUrl");
 
-        if (e.FileCount > 0)
+        await Parallel.ForEachAsync(files, async (file, token) =>
         {
-            foreach (var file in e.GetMultipleFiles())
+            token.Register(() => file.TokenSource.Cancel());
+            var uri = new Uri($"{storageUrl}/image-upload/{file.File.Name}");
+            try
             {
-                try
+                var blobClient = new BlobClient(uri, credentials);
+                await blobClient.UploadAsync(file.File.OpenReadStream(cancellationToken: file.TokenSource.Token), new BlobUploadOptions
                 {
-                    var uri = new Uri($"{_configuration.GetValue<string>("storageUrl")}/image-upload/{file.Name}");
-                    var blobClient = new BlobClient(uri, credentials);
-                    await blobClient.UploadAsync(file.OpenReadStream());
-                    _toastService.Add($"{file.Name} uploaded", MatToastType.Success);
-                }
-                catch (RequestFailedException ex)
-                {
-                    _toastService.Add(ex.Message, MatToastType.Danger);
-                }
+                    ProgressHandler = file
+                }, file.TokenSource.Token);
+                _toastService.Add($"{file.File.Name} uploaded", MatToastType.Success);
             }
-        }
+            catch (RequestFailedException ex)
+            {
+                _toastService.Add(ex.Message, MatToastType.Danger);
+            }
+        });
     }
 }

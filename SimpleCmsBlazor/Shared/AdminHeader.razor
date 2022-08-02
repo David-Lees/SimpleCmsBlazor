@@ -1,15 +1,16 @@
-﻿<nav class="navbar navbar-expand-lg navbar-light"
-    style="backgroundColor: @headerBackground; color: @headerColour">
+﻿<nav class="navbar navbar-expand-lg navbar-light" style=@navStyle>
         <img src="/assets/favicon-32x32.png" alt="Administration" />
-        <NavLink class="nav-link" href="/admin" style="color: @headerColour">Content</NavLink>
-        <NavLink class="nav-link" href="/admin/library" style="color: @headerColour">Image Library</NavLink>
-        <NavLink class="nav-link" href="/admin/settings" style="color: @headerColour">Settings</NavLink>
+        <NavLink class="nav-link" href="/admin" style=@linkStyle>Content</NavLink>
+        <NavLink class="nav-link" href="/admin/library" style=@linkStyle>Image Library</NavLink>
+        <NavLink class="nav-link" href="/admin/settings" style=@linkStyle>Settings</NavLink>
         <span class="example-spacer"></span>
-        <NavLink class="nav-link" href="/"  style="color: @headerColour">View Site</NavLink>
+        <NavLink class="nav-link" href="/"  style=@linkStyle>View Site</NavLink>
 </nav>
 <div class="nav-spacer"></div>
 
 @code {
     const string headerColour = "#FFF";
     const string headerBackground = "#000066";
+    string navStyle=$"backgroundColor: {headerBackground}; color: {headerColour}";
+    string linkStyle = $"color: {headerColour}";
 }

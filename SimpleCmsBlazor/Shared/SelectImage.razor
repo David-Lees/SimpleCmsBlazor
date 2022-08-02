@@ -4,7 +4,7 @@
     <div class="row mt-4">
         <div class="col-3">
             <h5>Select folder:</h5>
-            <MediaTree Nodes="@folders" (OnSelectChange)="@SelectFolder"></MediaTree>
+            <MediaTree Nodes="@folders" SelectedChanged="@SelectFolder"></MediaTree>
         </div>
         <div class="col-9" *ngIf="currentFolder && images">
             <h5>Media for folder: {{ currentFolder.name }}</h5>
@@ -13,7 +13,7 @@
                        CanDelete="false"
                        CanSelect="true"
                        CanMove="false"
-                       OnSelected="@Select">
+                       Selected="@Select">
             </MediaList>
         </div>
     </div>

@@ -51,29 +51,29 @@ else
     [Parameter]
     public Page _page { get; set; } = new();
 
-    public int Height { get; set; } = 100;
-    public int Width { get; set; } = 1000;
+    public decimal Height { get; set; } = 100;
+    public decimal Width { get; set; } = 1000;
 
-    protected override async Task OnInitializedAsync()
+    private IDisposable? resizeSubscription; 
+
+    protected override void OnInitialized()
     {
-        _resize.OnResize += OnResize;
-        await OnResize();
+        resizeSubscription = _resize.OnResize.Subscribe(o => OnResize(o.Item1, o.Item2));
     }
 
-    private async Task OnResize()
+    private void OnResize(decimal width, decimal height)
     {
-        Width = await _resize.GetInnerWidth();
-
+        Width = width;
         var s = _section;
         if (s != null && s.Image != null)
         {
             var h = s.Image.RawHeight ?? 1;
             var w = s.Image.RawWidth ?? 1;
             var ar = h / w;
-            Height = ar * Width;
+            Height = ar * width;
         }
 
-        Height = await _resize.GetInnerHeight();
+        Height = height;
         StateHasChanged();
     }
 
@@ -122,7 +122,7 @@ else
 
     public void Dispose()
     {
-        _resize.OnResize -= OnResize;
+        resizeSubscription?.Dispose();
     }
 
     public string bc => _section.BackgroundColour ?? "none";

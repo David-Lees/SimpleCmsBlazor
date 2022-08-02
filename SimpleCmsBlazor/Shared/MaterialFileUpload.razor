@@ -1,0 +1,88 @@
+﻿@using SimpleCmsBlazor.Services
+@inject IBlobUploadService _blobUploadService
+@inject IHttpClientFactory _httpClientFactory
+@inject IMediaService _mediaService
+@inject IJSRuntime _runtime
+
+<MatDialogTitle style="display: flex; align-items: center;">
+    <div style="flex: 1;">File Upload</div>
+    <div @onclick="@(_=>CloseDialog())" style="cursor: pointer;">
+        <MatIcon Icon="@MatIconNames.Close"></MatIcon>
+    </div>
+</MatDialogTitle>
+<MatDialogContent>
+
+    <h5>Add files to @folder?.Name</h5>
+    <MatButton Raised="true" OnClick="@OnClick">
+        <MatIcon>@MatIconNames.Cloud_upload</MatIcon> @Text
+    </MatButton>
+    <br />
+    <ul>
+        @foreach (var file in Files)
+        {
+            <li>
+                <MatProgressBar Progress="file.Progress"></MatProgressBar>
+                <span>
+                    @file.File.Name
+                    @if (file.TokenSource.Token.CanBeCanceled)
+                    {
+                        <MatButton OnClick="@file.CancelUpload"><MatIcon>@MatIconNames.Cancel</MatIcon></MatButton>
+                    }
+                </span>
+            </li>
+        }
+    </ul>
+    <MatButton OnClick="@(_ => CloseDialog())">Close and return value</MatButton>
+</MatDialogContent>
+<MatDialogActions>
+
+</MatDialogActions>
+<InputFile id="fileUpload" @ref="fileUpload" OnChange="@OnInputFileChange" hidden multiple accept=@Accept />
+
+@code {
+    InputFile? fileUpload;
+
+    [Parameter]
+    public GalleryFolder? folder { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "Upload";
+
+    [Parameter]
+    public string Param { get; set; } = "file";
+
+    [Parameter]
+    public string Target { get; set; } = "https://file.io";
+
+    [Parameter]
+    public string Accept { get; set; } = "image/*";
+
+    [Parameter]
+    public EventCallback<string>? UploadComplete { get; set; }
+
+    [Parameter]
+    public MatDialogReference? DialogReference { get; set; }
+
+    public List<FileUploadProgress> Files { get; set; } = new();
+
+
+    public async Task OnClick()
+    {
+        await _runtime.InvokeVoidAsync("Click", new object[] { "fileUpload" });
+    }
+
+    public async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles();
+        foreach(var f in files)
+        {
+            Files.Add(new FileUploadProgress(f, () => StateHasChanged()));
+        }
+        await _mediaService.Upload(Files);
+    }
+
+    public void CloseDialog()
+    {
+        DialogReference?.Close(true);
+    }
+}

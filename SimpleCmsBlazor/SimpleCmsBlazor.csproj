@@ -8,12 +8,10 @@
 
   <ItemGroup>
     <Content Remove="compilerconfig.json" />
-    <Content Remove="Shared\AdminRenameFolder.razor" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="compilerconfig.json" />
-    <None Include="Shared\AdminRenameFolder.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,14 +24,6 @@
     <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="6.0.5" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Shared\AdminRenameFolder.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Shared\AdminRenameFolder.razor" />
   </ItemGroup>
 
 </Project>

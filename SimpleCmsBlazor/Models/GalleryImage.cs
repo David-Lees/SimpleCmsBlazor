@@ -4,8 +4,8 @@ namespace SimpleCmsBlazor.Models
 {
     public class GalleryImage
     {
-        public string? PartitionKey { get; set; }
-        public string? RowKey { get; set; }
+        public Guid? PartitionKey { get; set; }
+        public Guid? RowKey { get; set; }
 
         public string? PreviewSmallPath { get; set; }
         public decimal? PreviewSmallWidth { get; set; }
