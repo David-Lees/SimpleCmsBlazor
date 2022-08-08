@@ -21,15 +21,24 @@
     List<Guid> expandedNodes = new();
 
     private GalleryFolder root = new GalleryFolder
-    {
-        Name = "Library",
-        Level = 0,
-        PartitionKey = Guid.Empty,
-        RowKey = Guid.Empty
-    };
+        {
+            Name = "Library",
+            Level = 0,
+            PartitionKey = Guid.Empty,
+            RowKey = Guid.Empty
+        };
 
     public async Task selectNode(GalleryFolder folder)
     {
+        if (expandedNodes.Contains(folder.RowKey))
+        {
+            expandedNodes.Remove(folder.RowKey);
+        }
+        else
+        {
+            expandedNodes.Add(folder.RowKey);
+        }
+
         SelectedFolder = folder;
         await SelectedChanged.InvokeAsync(folder);
     }

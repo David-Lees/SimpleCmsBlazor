@@ -2,6 +2,7 @@
 @inject ISiteService siteService
 @inject IMediaService mediaService
 @inject IHxMessageBoxService _messageBoxService
+@inject ILogger<AdminContent> Log
 @layout Admin
 @page "/admin"
 
@@ -35,9 +36,11 @@
             @if (site != null)
             {
                 <div class="node-item">
-                    <Dropzone Items="site.Pages" Accepts="@AcceptDrop">
-                        <AdminContentItem Node="@context" ActivePage="@activePage" NodeClick="@NodeClick" ExpandedNodes="@expandedNodes"></AdminContentItem>
-                    </Dropzone>
+                    <DragDropList Items="site.Pages" TItem="Page" Verify="@AcceptDrop">
+                        <ItemTemplate>
+                            <AdminContentItem Node="@context" ActivePage="@activePage" NodeClick="@NodeClick" ExpandedNodes="@expandedNodes"></AdminContentItem>
+                        </ItemTemplate>
+                    </DragDropList>
                 </div>
             }
         </div>
@@ -172,13 +175,19 @@
         return null;
     }
 
-    public bool AcceptDrop(Page droppedItem, Page? target)
+    public bool AcceptDrop(Page droppedItem)
     {
-        if (target == null) return true;
-        return ContainsPage(droppedItem, target);
+        if (activePage == null)
+        {
+            Log.LogInformation("AcceptDrop target is null");
+            return true;
+        }
+        var allowed = !ContainsPage(droppedItem, site);
+        Log.LogInformation("Accept Drop {allowed}", allowed);
+        return allowed;
     }
 
-    private bool ContainsPage(Page item, Page parent)
+    private bool ContainsPage(Page item, IPageList parent)
     {
         if (parent.Pages.Contains(item)) return true;
         foreach (var p in parent.Pages)

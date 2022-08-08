@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using SimpleCmsBlazor;
 using SimpleCmsBlazor.Models;
 using SimpleCmsBlazor.Services;
-using Plk.Blazor.DragDrop;
 using Havit.Blazor.Components.Web;
+using DragDrop.Blazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -36,10 +36,8 @@ builder.Services.AddScoped<IFolderService, FolderService>();
 builder.Services.AddScoped<IImageService, ImageService>();   
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<ISiteService, SiteService>();
-
+builder.Services.AddSingleton<DragDropService>();
 builder.Services.AddHxMessenger();
 builder.Services.AddHxMessageBoxHost();
-
-builder.Services.AddBlazorDragDrop();
 
 await builder.Build().RunAsync();

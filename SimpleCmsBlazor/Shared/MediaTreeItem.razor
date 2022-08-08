@@ -11,28 +11,30 @@
                     if (IsExpanded(Folder.RowKey))
                     {
                         <HxIcon Icon="@BootstrapIcon.CaretDownFill" />
-                        <HxIcon Icon="@BootstrapIcon.Folder2Open" />
+                        <HxIcon Icon="@FontAwesome.FolderOpen" />
                     }
                     else
                     {
                         <HxIcon Icon="@BootstrapIcon.CaretRightFill" />
-                        <HxIcon Icon="@BootstrapIcon.Folder2" />
+                        <HxIcon Icon="@FontAwesome.Folder" />
                     }
                 }
                 else
                 {
                     <HxIcon Icon="@BootstrapIcon.CaretRightFill" CssClass="transparent" />
-                    <HxIcon Icon="@BootstrapIcon.Folder2" />
+                    <HxIcon Icon="@FontAwesome.Folder" />
                 }
             </div>
             <div @onclick="@OnNodeClick" class="node-title">@Folder.Name</div>
         </div>
-        @if (IsExpanded(Folder.RowKey))
+        @if (HasChildren(Folder.RowKey) && IsExpanded(Folder.RowKey))
         {
             <div class="node-children" id="@Folder.RowKey">
-                <Dropzone Items="GetChildren(Folder.RowKey)" TItem="GalleryFolder" OnItemDrop="@DropItem" Accepts="@AcceptDrop">
-                    <MediaTreeItem CanMove="CanMove" Folder="@context" ActiveFolder="@ActiveFolder" NodeClick="@NodeClick" ExpandedNodes="@ExpandedNodes"></MediaTreeItem>
-                </Dropzone>
+                <DragDropList Items="GetChildren(Folder.RowKey)" TItem="GalleryFolder" OnItemAdded="@DropItem" Verify="@AcceptDrop">
+                    <ItemTemplate>
+                        <MediaTreeItem Folders="@Folders" CanMove="CanMove" Folder="@context" ActiveFolder="@ActiveFolder" NodeClick="@NodeClick" ExpandedNodes="@ExpandedNodes" />
+                    </ItemTemplate>
+                </DragDropList>
             </div>
         }
     </div>
@@ -74,9 +76,9 @@
         await NodeClick.InvokeAsync(Folder);
     }
 
-    public bool AcceptDrop(GalleryFolder drag, GalleryFolder target)
+    public bool AcceptDrop(GalleryFolder drag)
     {
-        return CanMove && drag != target && !IsChildOf(target, drag);
+        return CanMove && drag != Folder && !IsChildOf(Folder, drag);
     }
 
     private bool IsChildOf(GalleryFolder target, GalleryFolder item)
@@ -97,5 +99,4 @@
             StateHasChanged();
         }
     }
-
 }

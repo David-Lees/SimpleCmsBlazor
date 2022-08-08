@@ -1501,11 +1501,7 @@ C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\build-gz\OtuFrW58.g
 C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\scopedcss\Shared\Header.razor.rz.scp.css
 C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\scopedcss\Shared\Section.razor.rz.scp.css
 C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\bin\Debug\net6.0\wwwroot\_framework\dotnet.6.0.7.t7cznrhgnw.js
-C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\bin\Debug\net6.0\wwwroot\_framework\Plk.Blazor.DragDrop.dll
-C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\bin\Debug\net6.0\wwwroot\_framework\Plk.Blazor.DragDrop.dll.gz
 C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\bin\Debug\net6.0\wwwroot\_framework\dotnet.6.0.7.t7cznrhgnw.js.gz
-C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\bin\Debug\net6.0\Plk.Blazor.DragDrop.dll
-C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\build-gz\hFiL+Rhc.gz
 C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\build-gz\niP9rCM0.gz
 C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\build-gz\D9ImBqCb.gz
 C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\build-gz\ScBpj3gE.gz
@@ -1730,3 +1726,7 @@ C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\build-gz\+S5jfeS6.g
 C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\build-gz\0mtMkDQC.gz
 C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\build-gz\QLaDN+qL.gz
 C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\scopedcss\Pages\AdminLibrary.razor.rz.scp.css
+C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\bin\Debug\net6.0\wwwroot\_framework\DragDrop.Blazor.dll
+C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\bin\Debug\net6.0\wwwroot\_framework\DragDrop.Blazor.dll.gz
+C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\bin\Debug\net6.0\DragDrop.Blazor.dll
+C:\Projects\SimpleCmsBlazor\SimpleCmsBlazor\obj\Debug\net6.0\build-gz\NJFeWGEj.gz

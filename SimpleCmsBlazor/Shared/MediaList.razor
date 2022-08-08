@@ -6,48 +6,50 @@
 <div class="list-box">
     @if (Images != null && Images.Any())
     {
-        <Dropzone OnItemDrop="@Drop" Items="@Images" TItem="GalleryImage">
-            <div class="row m-2">
-                <div class="col-3">
-                    <img src="@(prefix + context.PreviewSmallPath)"
-                     class="img-fluid"
-                     alt="@context.Description" />
+        <DragDropList OnItemSwap="@Swap" OnItemAdded="@Drop" Items="@Images" TItem="GalleryImage">
+            <ItemTemplate>
+                <div class="row m-2">
+                    <div class="col-3">
+                        <img src="@(prefix + context.PreviewSmallPath)"
+                         class="img-fluid"
+                         alt="@context.Description" />
+                    </div>
+                    <div class="col-6">
+                        <h4 class="m-1">@context.Description</h4>
+                        <p class="m-1">
+                            <NavLink href="@(prefix + context.PreviewSmallPath)" target="_blank">Small</NavLink>:
+                            @context.PreviewSmallWidth x @context.PreviewSmallHeight px
+                        </p>
+                        <p class="m-1">
+                            <NavLink href="@(prefix + context.PreviewMediumPath)" target="_blank">Medium</NavLink>:
+                            @context.PreviewMediumWidth x @context.PreviewMediumHeight px
+                        </p>
+                        <p class="m-1">
+                            <NavLink href="@(prefix + context.PreviewLargePath)" target="_blank">Large</NavLink>:
+                            @context.PreviewLargeWidth x @context.PreviewLargeHeight px
+                        </p>
+                        <p class="m-1">
+                            <NavLink href="@(prefix + context.RawPath)" target="_blank">Original</NavLink>:
+                            @context.RawWidth x @context.RawHeight px
+                        </p>
+                    </div>
+                    <div class="col-3">
+                        @if (CanSelect)
+                        {
+                            <HxButton CssClass="m-1" Color="@ThemeColor.Primary" OnClick="@(_ => Select(context))">Select</HxButton>
+                        }
+                        @if (CanMove)
+                        {
+                            <HxButton CssClass="m-1" Color="@ThemeColor.Secondary" OnClick="@(_ => Move(context))">Move</HxButton>
+                        }
+                        @if (CanDelete)
+                        {
+                            <HxButton CssClass="m-1" Color="@ThemeColor.Danger" OnClick="@(_ => Delete(context))">Delete</HxButton>
+                        }
+                    </div>
                 </div>
-                <div class="col-6">
-                    <h4 class="m-1">@context.Description</h4>
-                    <p class="m-1">
-                        <NavLink href="@(prefix + context.PreviewSmallPath)" target="_blank">Small</NavLink>:
-                        @context.PreviewSmallWidth x @context.PreviewSmallHeight px
-                    </p>
-                    <p class="m-1">
-                        <NavLink href="@(prefix + context.PreviewMediumPath)" target="_blank">Medium</NavLink>:
-                        @context.PreviewMediumWidth x @context.PreviewMediumHeight px
-                    </p>
-                    <p class="m-1">
-                        <NavLink href="@(prefix + context.PreviewLargePath)" target="_blank">Large</NavLink>:
-                        @context.PreviewLargeWidth x @context.PreviewLargeHeight px
-                    </p>
-                    <p class="m-1">
-                        <NavLink href="@(prefix + context.RawPath)" target="_blank">Original</NavLink>:
-                        @context.RawWidth x @context.RawHeight px
-                    </p>
-                </div>
-                <div class="col-3">
-                    @if (CanSelect)
-                    {
-                        <HxButton CssClass="m-1" Color="@ThemeColor.Primary" OnClick="@(_ => Select(context))">Select</HxButton>
-                    }
-                    @if (CanMove)
-                    {
-                        <HxButton CssClass="m-1" Color="@ThemeColor.Secondary" OnClick="@(_ => Move(context))">Move</HxButton>
-                    }
-                    @if (CanDelete)
-                    {
-                        <HxButton CssClass="m-1" Color="@ThemeColor.Danger" OnClick="@(_ => Delete(context))">Delete</HxButton>
-                    }
-                </div>
-            </div>
-        </Dropzone>
+            </ItemTemplate>
+        </DragDropList>
     }
 </div>
 
@@ -91,6 +93,14 @@
     public async Task Select(GalleryImage image)
     {
         await Selected.InvokeAsync(image);
+    }
+
+    public async Task Swap(Tuple<int, int> data)
+    {
+        if (CanSort)
+        {
+            await ImagesChanged.InvokeAsync(images);
+        }
     }
 
     public async Task Drop(GalleryImage image)

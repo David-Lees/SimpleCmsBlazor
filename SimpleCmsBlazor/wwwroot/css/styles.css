@@ -43,47 +43,6 @@ p:first {
   padding-left: 2px;
 }
 
-/* ======== Angular material custom themes ======== */
-/*
-
-$custom-typography: mat.define-typography-config( $font-family: 'Noto Sans, cursive', $headline: mat.define-typography-level(48px, 72px, 700), $body-1: mat.define-typography-level(20px, 30px, 400), $body-2: mat.define-typography-level(20px, 30px, 700), $caption: mat.define-typography-level(16px, 24px, 400), $input: mat.define-typography-level(18px, 1, 400), );
-@include mat.all-component-typographies($custom-typography);
-
-$my-custom-primary: mat.define-palette(mat.$deep-purple-palette);
-$my-custom-accent: mat.define-palette(mat.$purple-palette);
-$my-custom-warn: mat.define-palette(mat.$red-palette);
-
-$my-custom-theme: mat.define-light-theme($my-custom-primary, $my-custom-accent, $my-custom-warn);
-
-@include mat.all-component-themes($my-custom-theme);
-
-.mat-tree-node {
-    background-color: rgb(66, 157, 253);
-    color: white;
-    user-select: none;
-    cursor: move;
-
-    &.cdk-drag-preview {
-        // while dragging
-        @include mat-elevation(12);
-    }
-
-    &.cdk-drag-placeholder {
-        // potential drop area
-        opacity: 0;
-    }
-}
-*/
-/* items moving away to make room for drop */
-.cdk-drop-list-dragging .mat-tree-node:not(.cdk-drag-placeholder) {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-/* item being dropped */
-.cdk-drag-animating {
-  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
-}
-
 .transparent {
   opacity: 0;
 }
@@ -160,11 +119,11 @@ footer {
 }
 
 .plk-dd-in-transit {
-  opacity: 0;
+  opacity: 0.8;
 }
 
 .plk-dd-in-transit > div {
-  opacity: 0;
+  opacity: 0.8;
 }
 
 @keyframes blinker {
@@ -216,4 +175,13 @@ footer {
   user-select: none;
   /* Non-prefixed version, currently
              supported by Chrome, Edge, Opera and Firefox */
+}
+
+.drop-list {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  min-height: 4px !important;
+  border-color: #000 !important;
+  border-style: solid !important;
+  border-width: 1px !important;
 }

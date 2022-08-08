@@ -1,4 +1,6 @@
-﻿@if (Node != null)
+﻿@inject ILogger<AdminContentItem> Log
+
+@if (Node != null)
 {
     <div class="node-item m-0 p-0" data-id="@(Node.Id)" id="@($"node-{Node.Id}")">
         <div class="node-label">
@@ -8,30 +10,30 @@
                     if (IsExpanded(Node.Id ?? string.Empty))
                     {
                         <HxIcon Icon="@BootstrapIcon.CaretDownFill" />
-                        <HxIcon Icon="@BootstrapIcon.Folder2Open" />
+                        <HxIcon Icon="@FontAwesome.FolderOpen" />
                     }
                     else
                     {
                         <HxIcon Icon="@BootstrapIcon.CaretRightFill" />
-                        <HxIcon Icon="@BootstrapIcon.Folder2" />
+                        <HxIcon Icon="@FontAwesome.Folder" />
                     }
                 }
                 else
                 {
                     <HxIcon Icon="@BootstrapIcon.CaretRightFill" CssClass="transparent" />
-                    <HxIcon Icon="@BootstrapIcon.Folder2" />
+                    <HxIcon Icon="@FontAwesome.Folder" />
                 }
             </div>
             <div @onclick="@OnNodeClick" class="node-title">@Node.Name</div>
         </div>
-        @if (IsExpanded(Node.Id ?? string.Empty) && Node.Pages?.Count > 0)
-        {
-            <div class="node-children" id="@Node.Id">
-                <Dropzone Items="Node.Pages" Accepts="@AcceptDrop">
+        <div class="node-children" id="@Node.Id">
+            <DragDropList Items="Node.Pages" TItem="Page" Verify="@AcceptDrop">
+                <ItemTemplate>
                     <AdminContentItem Node="@context" ActivePage="@ActivePage" NodeClick="@NodeClick" ExpandedNodes="@ExpandedNodes"></AdminContentItem>
-                </Dropzone>
-            </div>
-        }
+                </ItemTemplate>
+            </DragDropList>
+        </div>
+
     </div>
 }
 
@@ -55,10 +57,16 @@
         await NodeClick.InvokeAsync(Node);
     }
 
-    public bool AcceptDrop(Page droppedItem, Page? target)
+    public bool AcceptDrop(Page droppedItem)
     {
-        if (target == null) return true;
-        return ContainsPage(droppedItem, target);
+        if (Node == null)
+        {
+            Log.LogInformation("AcceptDrop target is null");
+            return false;
+        }
+        var allowed = !ContainsPage(droppedItem, Node);
+        Log.LogInformation("Accept Drop {allowed}", allowed);
+        return allowed;
     }
 
     private bool ContainsPage(Page item, Page parent)

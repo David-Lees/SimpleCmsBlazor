@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.13.0" />
-    <PackageReference Include="blazor-dragdrop" Version="2.4.0" />
     <PackageReference Include="Havit.Blazor.Components.Web.Bootstrap" Version="2.8.0" />
     <PackageReference Include="Markdig" Version="0.30.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.7" />
@@ -25,6 +24,7 @@
     <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="6.0.7" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="WK.Blazor.DragDrop" Version="1.1.0" />
   </ItemGroup>
 
 </Project>

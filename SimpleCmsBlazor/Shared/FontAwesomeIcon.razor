@@ -1,0 +1,20 @@
+﻿<i class="@CssClassHelper.Combine(Icon?.Icon ?? string.Empty, CssClass)"
+      @attributes="this.AdditionalAttributes"></i>
+
+@code {
+    /// <summary>
+    /// Icon to render.
+    /// </summary>
+    [Parameter] public FontAwesome? Icon { get; set; }
+
+    /// <summary>
+    /// CSS Class to combine with basic icon CSS class.
+    /// </summary>
+    [Parameter] public string CssClass { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Additional attributes to be splatted onto an underlying HTML element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> AdditionalAttributes { get; set; } = new();
+}

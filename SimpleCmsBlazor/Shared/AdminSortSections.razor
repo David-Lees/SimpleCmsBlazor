@@ -1,19 +1,21 @@
 ﻿<div id="bottom-sheet" class="overlay @(IsOpen ? "active": "")">
     <aside class="social" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
         <HxButton OnClick="@Dismiss">
-            <HxIcon Icon="@BootstrapIcon.X"/>
+            <HxIcon Icon="@BootstrapIcon.X" />
         </HxButton>
 
         <h5>Reorder Sections</h5>
         <p class="mat-body">Drag and drop sections to reorder</p>
         @if (page != null && page.Sections != null && page.Sections.Any())
         {
-            <Dropzone Items="page.Sections">
-                <HxCard CssClass="mb-2">
-                    <HxIcon Icon="@GetIcon(context)"></HxIcon>
-                    @context.Name.ToString().Replace("Section"," Section")
-                </HxCard>
-            </Dropzone>
+            <DragDropList Items="page.Sections">
+                <ItemTemplate>
+                    <HxCard CssClass="mb-2">
+                        <HxIcon Icon="@GetIcon(context)"></HxIcon>
+                        @context.Name.ToString().Replace("Section"," Section")
+                    </HxCard>
+                </ItemTemplate>
+            </DragDropList>
         }
     </aside>
 </div>
