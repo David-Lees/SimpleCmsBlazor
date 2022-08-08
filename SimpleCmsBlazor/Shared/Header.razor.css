@@ -37,13 +37,12 @@ html:not([data-scroll="0"]) .logo-background {
 }
 
 .navbar .navbar-brand {
-  width: 134px;
+  width: 134px !important;
 }
 .navbar .navbar-brand img {
   max-width: 134px;
   position: fixed;
   top: 3px;
-  left: 30x;
   z-index: 2000;
   -webkit-filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.35));
   filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.35));

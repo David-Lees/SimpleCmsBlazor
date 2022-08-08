@@ -5,25 +5,51 @@
 <PageTitle>@Page?.Name - @Site?.Name</PageTitle>
 
 <Header site=@Site></Header>
-@if(Page != null)
-{
-    foreach(var s in Page.Sections) 
+<main class="main-body">
+    @if (Page != null)
     {
-        <Section _section=@s _page=@Page></Section>
+        foreach (var s in Page.Sections)
+        {
+            <Section _section=@s _page=@Page></Section>
+        }
     }
-}
+</main>
+<footer class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4 text-start">&copy; @Site.Name @GetYear()</div>
+        <div class="col-sm-4 text-center"></div>
+        <div class="col-sm-4 text-end">
+            <LoginDisplay />            
+        </div>
+    </div>
+</footer>
+
 
 
 @code {
-    private string? Id;
+
+    [Parameter]
+    public string? Path { get; set; }
+    private string? _path;
+
     private Page? Page;
     private Site Site = new();
 
     protected override async Task OnInitializedAsync()
     {
-        Id = NavManager.Uri;
+        //Id = NavManager.Uri
         Site = await SiteService.GetSiteAsync();
-        Page = FindPage(Id);
+        _path = Path;
+        Page = FindPage(Path);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Path != _path)
+        {
+            _path = Path;
+            Page = FindPage(Path);
+        }
     }
 
     private Page FindPage(string? url)
@@ -32,7 +58,7 @@
             return Site.Pages[0];
 
         var urls = url.Split('/');
-        var page = Site as IPageList;;
+        var page = Site as IPageList; ;
         Array.ForEach(urls, x => page = FindChildPage(x, page));
         if (page == Site) page = Site.Pages[0];
         return (Page)page ?? Site.Pages[0];
@@ -45,4 +71,6 @@
 
         return null;
     }
+
+    public string GetYear() => DateTime.Now.Year.ToString();
 }

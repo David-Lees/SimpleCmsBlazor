@@ -6,8 +6,10 @@
 .flex .sidebar {
   min-width: 64px;
   border-right: 1px solid grey;
+  display: flex;
+  flex-direction: column;
 }
-.flex .sidebar button {
+.flex .sidebar span {
   display: block;
 }
 .flex .folders {

@@ -7,7 +7,8 @@
 <AuthorizeView>
     <Authorized>
         Hello, @context.User.Identity?.Name!
-        <button class="nav-link btn btn-link" @onclick="BeginLogout">Log out</button>
+        <NavLink href="#" @onclick="BeginLogout">Log out</NavLink>
+        <NavLink href="/admin">Admin</NavLink>
     </Authorized>
     <NotAuthorized>
         <a href="authentication/login">Log in</a>

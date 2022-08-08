@@ -1,13 +1,17 @@
 ﻿@using SimpleCmsBlazor.Services
-@inject BrowserResizeService _resize
+@inject IBrowserResizeService _resize
+@inject NavigationManager _navigationManager
+@inject IConfiguration Config
 
 @if (_section.Name == SectionType.GallerySection)
 {
-    if (!string.IsNullOrWhiteSpace(_section.GalleryName))
-    {
-        <h1>@_section.GalleryName</h1>
+    <div class="container-fluid">
+        @if (!string.IsNullOrWhiteSpace(_section.GalleryName))
+        {
+            <h1 class="text-center">@_section.GalleryName</h1>
+        }
         <Gallery SourceData=@_section></Gallery>
-    }
+    </div>
 }
 else if (_section.Name == SectionType.BannerSection)
 {
@@ -21,13 +25,12 @@ else if (_section.Name == SectionType.HtmlSection)
 }
 else if (_section.Name == SectionType.ChildrenSection)
 {
-
     <div class="margin-fix" style=@SectionStyle data-url="@BackgroundUrl">
         <div class="container" style=@ContainerStyle>
             <div class="links">
                 @foreach (var p in _page.Pages)
                 {
-                    <NavLink class="page-link" href=@p.Url style=@LinkStyle>@p.Name</NavLink>
+                    <NavLink class="page-link" href="@(_navigationManager.Uri + '/' + p.Url)" style=@LinkStyle>@p.Name</NavLink>
                 }
             </div>
         </div>
@@ -54,7 +57,7 @@ else
     public decimal Height { get; set; } = 100;
     public decimal Width { get; set; } = 1000;
 
-    private IDisposable? resizeSubscription; 
+    private IDisposable? resizeSubscription;
 
     protected override void OnInitialized()
     {
@@ -102,7 +105,7 @@ else
         {
             if (!string.IsNullOrWhiteSpace(BannerUrl))
             {
-                return $"linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(\"{BannerUrl}\")";
+                return $"linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(\"{Config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/{BannerUrl}\")";
             }
             return "none";
         }
@@ -130,8 +133,8 @@ else
     public string c => _section.Colour ?? "black";
     public string a => _section.Align ?? "left";
 
-    public string SectionStyle => $"background-color: {bc}, background-position: {bp}, background-image: {BackgroundUrl}, background-size: cover";
-    public string ContainerStyle => $"color: {c}, text-align: {a}";
-    public string ContainerFilterStyle => $"color: {c}, filter: {TextFilter}, text-align: {a}";
-    public string LinkStyle => $"color: {c}, border-color: {c}";
+    public string SectionStyle => $"background-color: {bc}; background-position: {bp}; background-image: {BackgroundUrl}; background-size: cover";
+    public string ContainerStyle => $"color: {c}; text-align: {a}";
+    public string ContainerFilterStyle => $"color: {c}; filter: {TextFilter}; text-align: {a}";
+    public string LinkStyle => $"color: {c}; border-color: {c}";
 }

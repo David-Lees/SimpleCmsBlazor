@@ -1,0 +1,23 @@
+﻿@inherits HxDialogBase<string>
+
+<HxModal Title="@Title" @ref="modal">
+    <BodyTemplate>
+        <HxInputText @bind-Value="PromptText" />
+    </BodyTemplate>
+    <FooterTemplate>
+        <HxButton Text="@ButtonText" Color="ThemeColor.Primary" OnClick="async () => await HideAsync(PromptText)" />
+        <HxButton Text="Cancel" Color="ThemeColor.Secondary" OnClick="async () => await HideAsCancelledAsync()" />
+    </FooterTemplate>
+</HxModal>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "OK";
+
+    [Parameter]
+    public string ButtonText { get; set; } = "OK";
+
+    [Parameter]
+    public string PromptText { get; set; } = string.Empty;
+}
+

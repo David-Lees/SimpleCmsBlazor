@@ -1,10 +1,11 @@
 ﻿@using System.Reactive
 @using SimpleCmsBlazor.Services
 @implements IDisposable
+@inject ILogger<Gallery> logger
 
 <div @ref=galleryContainer class="galleryContainer">
     <div class="innerGalleryContainer">
-        @foreach (var imgRow in gallery)
+        @foreach (var imgRow in gallery.Skip(rowIndex).Take(RowsPerPage))
         {
             <div class="imagerow" style="margin-bottom: @(margin)px">
                 @foreach (var img in imgRow)
@@ -18,13 +19,11 @@
     @if (!rightArrowInactive || !leftArrowInactive)
     {
         <div class="pagerContainer">
-            <img 
-             class="pager left @(leftArrowInactive ? "inactive" : "")"
+            <img class="pager left @(leftArrowInactive ? "inactive" : "")"
              src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaWQ9IkxheWVyXzEiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4IDQ4OyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNDggNDgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnPjxwYXRoIGQ9Ik0yNCw0NkMxMS45LDQ2LDIsMzYuMSwyLDI0UzExLjksMiwyNCwyczIyLDkuOSwyMiwyMlMzNi4xLDQ2LDI0LDQ2eiBNMjQsNEMxMyw0LDQsMTMsNCwyNGMwLDExLDksMjAsMjAsMjAgICBjMTEsMCwyMC05LDIwLTIwQzQ0LDEzLDM1LDQsMjQsNHoiLz48L2c+PGc+PHBvbHlnb24gcG9pbnRzPSIyNy42LDM2LjcgMTQuOSwyNCAyNy42LDExLjMgMjkuMSwxMi43IDE3LjgsMjQgMjkuMSwzNS4zICAiLz48L2c+PC9zdmc+"
              @onclick="() => Navigate(-1)"
              alt="←" />
-            <img 
-             class="pager right @(rightArrowInactive ? "inactive" : "")"
+            <img class="pager right @(rightArrowInactive ? "inactive" : "")"
              src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaWQ9IkxheWVyXzEiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4IDQ4OyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNDggNDgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnPjxwYXRoIGQ9Ik0yNCw0NkMxMS45LDQ2LDIsMzYuMSwyLDI0UzExLjksMiwyNCwyczIyLDkuOSwyMiwyMlMzNi4xLDQ2LDI0LDQ2eiBNMjQsNEMxMyw0LDQsMTMsNCwyNHM5LDIwLDIwLDIwczIwLTksMjAtMjAgICBTMzUsNCwyNCw0eiIvPjwvZz48Zz48cG9seWdvbiBwb2ludHM9IjIxLjQsMzYuNyAxOS45LDM1LjMgMzEuMiwyNCAxOS45LDEyLjcgMjEuNCwxMS4zIDM0LjEsMjQgICIvPjwvZz48L3N2Zz4="
              @onclick="() => Navigate(1)"
              alt="→" />
@@ -43,6 +42,7 @@
     private bool leftArrowInactive = false;
     private ElementReference galleryContainer;
     private decimal margin = 1.0M;
+    private bool readyToRender = false;
 
     private PageSection _sourceData = new();
     [Parameter]
@@ -53,6 +53,7 @@
     public int ImageSize { get; set; } = 7;
     public string GalleryName { get; set; } = string.Empty;
     public int RowsPerPage { get; set; } = 200;
+    public string MinimalQualityCategory = "previewSmall";
 
     [Parameter]
     public EventCallback<bool> OnViewerChange { get; set; }
@@ -61,17 +62,26 @@
     public IJSRuntime? runtime { get; set; }
 
     [Inject]
-    public ImageService? imageService { get; set; }
+    public IImageService? imageService { get; set; }
 
     [Inject]
     public IConfiguration? Config { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         _sourceData = SourceData;
-        await FetchDataAndRenderAsync();
+        FetchData();
         if (imageService == null) throw new NullReferenceException("Image service failed to load");
         viewerSubscription = imageService.ShowImageViewerChanged.Subscribe<bool>(visibility => OnViewerChange.InvokeAsync(visibility));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            readyToRender = true;
+            await RenderAsync();
+        }
     }
 
     protected override async Task OnParametersSetAsync()
@@ -79,11 +89,11 @@
         if (_sourceData != SourceData)
         {
             _sourceData = SourceData;
-            await FetchDataAndRenderAsync();
+            FetchData();
         }
-        else
+        if (readyToRender)
         {
-            await Render();
+            await RenderAsync();
         }
     }
 
@@ -123,7 +133,7 @@
         return margin;
     }
 
-    private async Task FetchDataAndRenderAsync()
+    private void FetchData()
     {
         if (_sourceData != null && _sourceData.Images != null)
         {
@@ -141,34 +151,48 @@
             image.ViewerImageLoaded = false;
             image.SrcAfterFocus = string.Empty;
         }
-        await Render();
     }
 
-    private async Task Render()
+    private async Task RenderAsync()
     {
         var galleryWidth = await GetGalleryWidth();
-        gallery = new();
-        var tempRow = new List<GalleryImage>();
-        foreach (var image in _images)
+        if (galleryWidth > 0 && _images.Count > 0)
         {
-            var spaceLeft = AddCandidateIfWidthAvailable(tempRow, image, galleryWidth);
-            if (!spaceLeft)
-            {
-                gallery.Add(tempRow);
-                tempRow = new();
-            }
-        }
-        if (tempRow.Any()) gallery.Add(tempRow);
+            gallery = new();
 
-        ScaleGallery(galleryWidth);
+            var tempRow = new List<GalleryImage>();
+            tempRow.Add(_images[0]);
+            int i = 0;
+
+            while (i < _images.Count)
+            {
+                while (i + 1 < _images.Count && AddCandidateIfWidthAvailable(tempRow, _images[i + 1], galleryWidth)
+                    && (tempRow.Sum(x => x.Width) + (CalcImageMargin(galleryWidth) * tempRow.Count) < galleryWidth))
+                {
+                    i++;
+                }
+                if (i + 1 < _images.Count && tempRow.Any())
+                {
+                    tempRow.RemoveAt(tempRow.Count - 1);
+                }
+                if (tempRow.Any()) gallery.Add(tempRow);
+                tempRow = new();
+                if (i + 1 < _images.Count)
+                {
+                    tempRow.Add(_images[i + 1]);
+                }
+                i++;
+            }
+            if (tempRow.Any()) gallery.Add(tempRow);
+            ScaleGallery(galleryWidth);
+        }
     }
 
     private bool AddCandidateIfWidthAvailable(List<GalleryImage> imgRow, GalleryImage candidate, decimal galleryWidth)
-    {
-        var idealHeight = CalcIdealHeight(galleryWidth);
-        var oldDifference = idealHeight - CalcRowHeight(imgRow, galleryWidth);
+    {        
+        var oldDifference = CalcIdealHeight(galleryWidth) - CalcRowHeight(imgRow, galleryWidth);
         imgRow.Add(candidate);
-        var newDifference = idealHeight - CalcRowHeight(imgRow, galleryWidth);
+        var newDifference = CalcIdealHeight(galleryWidth) - CalcRowHeight(imgRow, galleryWidth);
         return Math.Abs(oldDifference) > Math.Abs(newDifference);
     }
 
@@ -176,7 +200,7 @@
     {
         var originalRowWidth = CalcOriginalRowWidth(imgRow, galleryWidth);
         var ratio = (galleryWidth - (imgRow.Count - 1) * CalcImageMargin(galleryWidth)) / originalRowWidth;
-        return (imgRow.FirstOrDefault()?.RawHeight ?? 0) * ratio;
+        return GetMinimumQualityHeight(imgRow[0]) * ratio;
     }
 
     private decimal CalcOriginalRowWidth(List<GalleryImage> imgRow, decimal galleryWidth)
@@ -184,10 +208,79 @@
         var originalRowWidth = 0.0M;
         foreach (var img in imgRow)
         {
-            var individualRatio = CalcIdealHeight(galleryWidth) / (img.RawHeight ?? 1);
-            originalRowWidth += (img.RawWidth ?? 0) * individualRatio;
+            var individualRatio = CalcIdealHeight(galleryWidth) / GetMinimumQualityHeight(img);
+            SetMinimumQualityWidth(img, GetMinimumQualityWidth(img) * individualRatio);
+            SetMinimumQualityHeight(img, CalcIdealHeight(galleryWidth));
+            originalRowWidth += GetMinimumQualityWidth(img);
         }
+        logger.LogInformation($"Row: {imgRow.Count} {originalRowWidth}");
         return originalRowWidth;
+    }
+
+    private decimal GetMinimumQualityHeight(GalleryImage image)
+    {
+        return MinimalQualityCategory switch
+        {
+            "previewSmall" => image.PreviewSmallHeight,
+            "previewMedium" => image.PreviewMediumHeight,
+            "previewLarge" => image.PreviewLargeHeight,
+            _ => image.RawHeight
+        } ?? 1;
+    }
+
+    private void SetMinimumQualityHeight(GalleryImage image, decimal value)
+    {
+        switch (MinimalQualityCategory)
+        {
+            case "previewSmall":
+                image.PreviewSmallHeight = value;
+                break;
+
+            case "previewMedium":
+                image.PreviewMediumHeight = value;
+                break;
+
+            case "previewLarge":
+                image.PreviewLargeHeight = value;
+                break;
+
+            default:
+                image.RawHeight = value;
+                break;
+        }
+    }
+
+    private decimal GetMinimumQualityWidth(GalleryImage image)
+    {
+        return MinimalQualityCategory switch
+        {
+            "previewSmall" => image.PreviewSmallWidth,
+            "previewMedium" => image.PreviewMediumWidth,
+            "previewLarge" => image.PreviewLargeWidth,
+            _ => image.RawWidth
+        } ?? 1;
+    }
+
+    private void SetMinimumQualityWidth(GalleryImage image, decimal value)
+    {
+        switch (MinimalQualityCategory)
+        {
+            case "previewSmall":
+                image.PreviewSmallWidth = value;
+                break;
+
+            case "previewMedium":
+                image.PreviewMediumWidth = value;
+                break;
+
+            case "previewLarge":
+                image.PreviewLargeWidth = value;
+                break;
+
+            default:
+                image.RawWidth = value;
+                break;
+        }
     }
 
     private decimal CalcIdealHeight(decimal galleryWidth) => galleryWidth / (80.0M / ImageSize) + 100;
@@ -195,53 +288,62 @@
     private async Task<decimal> GetGalleryWidth()
     {
         if (runtime == null) return 0;
-        return await runtime.InvokeAsync<decimal>("GetClientWidth", galleryContainer);
+        var result = await runtime.InvokeAsync<decimal>("GetClientWidth", galleryContainer) - 20;
+        logger.LogInformation("GetClientWidth " + result.ToString());
+        return result;
     }
 
     private void ChooseThumbnailSize(GalleryImage image)
+    {        
+        image.SrcAfterFocus = $"{Config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/{GetMinimumQualityPath(image)}";
+    }
+
+    private string GetMinimumQualityPath(GalleryImage image)
     {
-        image.SrcAfterFocus = image.PreviewSmallPath ?? string.Empty;
-
-        if (image.PreviewSmallWidth < image.Width || image.PreviewSmallHeight < image.Height)
-            image.SrcAfterFocus = image.PreviewMediumPath ?? string.Empty;
-
-        if (image.PreviewMediumWidth < image.Width || image.PreviewMediumHeight < image.Height)
-            image.SrcAfterFocus = image.PreviewLargePath ?? string.Empty;
-
-        if (image.PreviewLargeWidth < image.Width || image.PreviewLargeHeight < image.Height)
-            image.SrcAfterFocus = image.RawPath ?? string.Empty;
-
-        image.SrcAfterFocus = $"{Config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/{image.SrcAfterFocus}";
+        return MinimalQualityCategory switch
+        {
+            "previewSmall" => image.PreviewSmallPath,
+            "previewMedium" => image.PreviewMediumPath,
+            "previewLarge" => image.PreviewLargePath,
+            _ => image.RawPath
+        } ?? string.Empty;
     }
 
     private void ScaleGallery(decimal galleryWidth)
     {
         var maximumGalleryImageHeight = 0.0M;
 
-        foreach (var imgRow in gallery)
+        foreach (var imgRow in gallery.Skip(rowIndex).Take(RowsPerPage))
         {
             var originalRowWidth = CalcOriginalRowWidth(imgRow, galleryWidth);
-            var ratio = (galleryWidth - (imgRow.Count - 1) * CalcImageMargin(galleryWidth)) / originalRowWidth;
 
-            foreach (var img in imgRow)
+            if (imgRow != gallery.Last())
             {
-                img.Width = (img.RawWidth ?? 0) * ratio;
-                img.Height = (img.RawHeight ?? 0) * ratio;
-                maximumGalleryImageHeight = Math.Max(maximumGalleryImageHeight, img.Height);
-                ChooseThumbnailSize(img);
+                var ratio = (galleryWidth - (imgRow.Count - 1) * CalcImageMargin(galleryWidth)) / originalRowWidth;
+                foreach(var img in imgRow)
+                {
+                    img.Width = GetMinimumQualityWidth(img) * ratio;
+                    img.Height = GetMinimumQualityHeight(img) * ratio;
+                    maximumGalleryImageHeight = Math.Max(maximumGalleryImageHeight, img.Height);
+                    ChooseThumbnailSize(img);
+                }
+            }
+            else
+            {
+                foreach (var img in imgRow)
+                {
+                    img.Width = GetMinimumQualityWidth(img);
+                    img.Height = GetMinimumQualityHeight(img);
+                    maximumGalleryImageHeight = Math.Max(maximumGalleryImageHeight, img.Height);
+                    ChooseThumbnailSize(img);
+                }
             }
         }
 
-        foreach (var img in gallery.Last())
-        {
-            // last row will currently fit whole width
-            // it could have a lot less images than other rows
-            // so scale it to same height as others
-            var ratio = maximumGalleryImageHeight / img.Height;
-            img.Height = img.Height * ratio;
-            img.Width = img.Width * ratio;
-            ChooseThumbnailSize(img);
-        }
+        MinimalQualityCategory = "previewSmall";        
+        if (maximumGalleryImageHeight > 375) MinimalQualityCategory = "previewMedium";
+        if (maximumGalleryImageHeight > 768) MinimalQualityCategory = "previewLarge";
+        if (maximumGalleryImageHeight > 1080) MinimalQualityCategory = "raw";
 
         RefreshNavigationErrorState();
         StateHasChanged();

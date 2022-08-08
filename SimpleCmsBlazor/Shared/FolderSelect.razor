@@ -1,21 +1,16 @@
-﻿<MatDialogTitle style="display: flex; align-items: center;">
-    <div style="flex: 1;">Select Folder</div>
-    <div @onclick="@(_=>CloseDialog())" style="cursor: pointer;">
-        <MatIcon Icon="@MatIconNames.Close"></MatIcon>
-    </div>
-</MatDialogTitle>
-<MatDialogContent>
-    <MediaTree SelectedChanged="@FolderChanged"></MediaTree>
-</MatDialogContent>
-<MatDialogActions>
-    <MatButton OnClick="@SelectFolder"><MatIcon>@MatIconNames.Check</MatIcon> @Text</MatButton>
-    <MatButton OnClick="@CloseDialog"><MatIcon>@MatIconNames.Close</MatIcon> Cancel</MatButton>
-</MatDialogActions>
+﻿@inherits HxDialogBase<GalleryFolder>
+
+<HxModal Title="Select Folder" @ref="modal">
+    <BodyTemplate>
+        <MediaTree SelectedChanged="@FolderChanged"></MediaTree>
+    </BodyTemplate>
+    <FooterTemplate>
+        <HxButton Text="@Text" Color="ThemeColor.Primary" OnClick="async () => await HideAsync(selectedFolder)" />
+        <HxButton Text="Cancel" Color="ThemeColor.Secondary" OnClick="async () => await HideAsCancelledAsync()" />
+    </FooterTemplate>
+</HxModal>
 
 @code {
-    [Parameter]
-    public MatDialogReference? DialogReference { get; set; }
-
     [Parameter]
     public string Text { get; set; } = "Select Folder";
 
@@ -24,15 +19,5 @@
     public void FolderChanged(GalleryFolder folder)
     {
         selectedFolder = folder;
-    }
-
-    public void CloseDialog()
-    {
-        DialogReference?.Close(null);
-    }
-
-    public void SelectFolder()
-    {
-        DialogReference?.Close(selectedFolder);
     }
 }

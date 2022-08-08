@@ -3,7 +3,8 @@
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using MatBlazor;
+using Havit.Blazor.Components.Web;
+using Havit.Blazor.Components.Web.Bootstrap;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using SimpleCmsBlazor.Models;
@@ -44,14 +45,14 @@ public class FileUploadProgress : IProgress<long>
 public class MediaService : IMediaService
 {
     private readonly HttpClient _apiClient;
-    private readonly BlobUploadService _blobUploadService;
-    private readonly IMatToaster _toastService;
+    private readonly IBlobUploadService _blobUploadService;
+    private readonly IHxMessengerService _toastService;
     private readonly IConfiguration _configuration;
 
     public MediaService(
         IHttpClientFactory clientFactory,
-        BlobUploadService blobUploadService,
-        IMatToaster toastService,
+        IBlobUploadService blobUploadService,
+        IHxMessengerService toastService,
         IConfiguration configuration)
     {
         _apiClient = clientFactory.CreateClient(HttpClients.Api);
@@ -75,11 +76,11 @@ public class MediaService : IMediaService
         var response = await _apiClient.DeleteAsync($"/api/folder/{image.PartitionKey}/{image.RowKey}");
         if (response.IsSuccessStatusCode)
         {
-            _toastService.Add("Image deleted", MatToastType.Success);
+            _toastService.AddInformation("Image deleted");
         }
         else
         {
-            _toastService.Add("Unable to delete image ", MatToastType.Danger);
+            _toastService.AddError("Unable to delete image");
         }
     }
 
@@ -88,11 +89,11 @@ public class MediaService : IMediaService
         var response = await _apiClient.DeleteAsync($"/api/MoveImage?oldParent={image.PartitionKey}&newParent={folder.RowKey}&id={image.RowKey}");
         if (response.IsSuccessStatusCode)
         {
-            _toastService.Add("Image moved", MatToastType.Success);
+            _toastService.AddInformation("Image moved");
         }
         else
         {
-            _toastService.Add("Unable to move image ", MatToastType.Danger);
+            _toastService.AddError("Unable to move image");
         }
     }
 
@@ -113,11 +114,11 @@ public class MediaService : IMediaService
                 {
                     ProgressHandler = file
                 }, file.TokenSource.Token);
-                _toastService.Add($"{file.File.Name} uploaded", MatToastType.Success);
+                _toastService.AddInformation($"{file.File.Name} uploaded");
             }
             catch (RequestFailedException ex)
             {
-                _toastService.Add(ex.Message, MatToastType.Danger);
+                _toastService.AddError(ex.Message);
             }
         });
     }

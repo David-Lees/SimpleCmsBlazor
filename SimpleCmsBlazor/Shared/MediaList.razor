@@ -1,8 +1,7 @@
-﻿@using MatBlazor
-@using Microsoft.AspNetCore.Components
+﻿@using Microsoft.AspNetCore.Components
 @using SimpleCmsBlazor.Models
 @inject IConfiguration Config
-@inject IMatDialogService matDialogService
+@inject IHxMessageBoxService _messageBoxService
 
 <div class="list-box">
     @if (Images != null && Images.Any())
@@ -36,19 +35,19 @@
                 <div class="col-3">
                     @if (CanSelect)
                     {
-                    <MatButton Class="m-1" Raised="true" OnClick="@(_ => Select(context))">Select</MatButton>
+                        <HxButton CssClass="m-1" Color="@ThemeColor.Primary" OnClick="@(_ => Select(context))">Select</HxButton>
                     }
-                @if (CanMove)
+                    @if (CanMove)
                     {
-                    <MatButton Class="m-1" Raised="true" OnClick="@(_ => Move(context))">Move</MatButton>
+                        <HxButton CssClass="m-1" Color="@ThemeColor.Secondary" OnClick="@(_ => Move(context))">Move</HxButton>
                     }
-                @if (CanDelete)
+                    @if (CanDelete)
                     {
-                    <MatButton Class="m-1" Raised="true" OnClick="@(_ => Delete(context))">Delete</MatButton>
+                        <HxButton CssClass="m-1" Color="@ThemeColor.Danger" OnClick="@(_ => Delete(context))">Delete</HxButton>
                     }
+                </div>
             </div>
-        </div>
-    </Dropzone>
+        </Dropzone>
     }
 </div>
 
@@ -56,34 +55,31 @@
     [Parameter]
     public List<GalleryImage> Images { get; set; } = new();
 
-    [Parameter] 
+    [Parameter]
     public EventCallback<List<GalleryImage>> ImagesChanged { get; set; }
 
     private List<GalleryImage> images = new();
 
-    [Parameter] 
+    [Parameter]
     public bool CanSelect { get; set; } = false;
 
-    [Parameter] 
+    [Parameter]
     public bool CanDelete { get; set; } = false;
 
-    [Parameter] 
+    [Parameter]
     public bool CanMove { get; set; } = false;
 
-    [Parameter] 
+    [Parameter]
     public bool CanSort { get; set; } = false;
 
-    [Parameter] 
+    [Parameter]
     public EventCallback<GalleryImage> Deleted { get; set; }
 
-
-    [Parameter] 
+    [Parameter]
     public EventCallback<GalleryImage> Selected { get; set; }
 
-    [Parameter] 
+    [Parameter]
     public EventCallback<GalleryImage> Moved { get; set; }
-
-
 
     public string prefix => $"{Config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/";
 
@@ -107,7 +103,7 @@
 
     public async Task Remove(GalleryImage image)
     {
-        if (await matDialogService.ConfirmAsync($"Are you sure you want to remove {image.Description}?"))
+        if (_messageBoxService != null && await _messageBoxService.ConfirmAsync("Confirm Deletion", $"Are you sure you want to remove {image.Description}?"))
         {
             await Delete(image);
         }

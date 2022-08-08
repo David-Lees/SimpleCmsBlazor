@@ -1,4 +1,5 @@
-﻿using MatBlazor;
+﻿using Havit.Blazor.Components.Web;
+using Havit.Blazor.Components.Web.Bootstrap;
 using SimpleCmsBlazor.Models;
 using System.Net.Http.Json;
 
@@ -15,9 +16,9 @@ public class SiteService : ISiteService
     private Site? _site;
     private readonly HttpClient _storageClient;
     private readonly HttpClient _apiClient;
-    private readonly IMatToaster _toastService;
+    private readonly IHxMessengerService _toastService;
 
-    public SiteService(IHttpClientFactory clientFactory, IMatToaster toastService)
+    public SiteService(IHttpClientFactory clientFactory, IHxMessengerService toastService)
     {
         _storageClient = clientFactory.CreateClient(HttpClients.Storage);
         _apiClient = clientFactory.CreateClient(HttpClients.Api);
@@ -27,7 +28,7 @@ public class SiteService : ISiteService
     public async Task<Site> GetSiteAsync()
     {
         if (_site == null)
-        {
+        {            
             _site = await _storageClient.GetFromJsonAsync<Site>("/images/site.json") ?? new();
         }
         return _site;
@@ -40,11 +41,11 @@ public class SiteService : ISiteService
         {
             var newSite = await response.Content.ReadFromJsonAsync<Site>() ?? site;
             _site = newSite;
-            _toastService.Add("Site Saved",  MatToastType.Success);
+            _toastService.AddInformation("Site Saved");
         }
         else
         {
-            _toastService.Add($"Unable to save site. {response.ReasonPhrase}", MatToastType.Danger);
+            _toastService.AddError($"Unable to save site. {response.ReasonPhrase}");
         }
     }
 }

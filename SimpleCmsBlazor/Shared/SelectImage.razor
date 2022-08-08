@@ -1,32 +1,33 @@
 ﻿@using SimpleCmsBlazor.Services
-<MatDialogTitle><h2>Select Image:</h2></MatDialogTitle>
-<MatDialogContent>
-    <div class="row mt-4">
-        <div class="col-3">
-            <h5>Select folder:</h5>
-            <MediaTree Nodes="@folders" SelectedChanged="@SelectFolder"></MediaTree>
+@inherits HxDialogBase<GalleryImage>
+
+<HxModal Title="Select Image" @ref="modal">
+    <BodyTemplate>
+        <div class="row mt-4">
+            <div class="col-3">
+                <h5>Select folder:</h5>
+                <MediaTree Nodes="@folders" SelectedChanged="@SelectFolder"></MediaTree>
+            </div>
+            <div class="col-9" *ngIf="currentFolder && images">
+                <h5>Media for folder: {{ currentFolder.name }}</h5>
+                <MediaList Images="@images"
+                           CanSort="false"
+                           CanDelete="false"
+                           CanSelect="true"
+                           CanMove="false"
+                           Selected="@Select">
+                </MediaList>
+            </div>
         </div>
-        <div class="col-9" *ngIf="currentFolder && images">
-            <h5>Media for folder: {{ currentFolder.name }}</h5>
-            <MediaList Images="@images"
-                       CanSort="false"
-                       CanDelete="false"
-                       CanSelect="true"
-                       CanMove="false"
-                       Selected="@Select">
-            </MediaList>
-        </div>
-    </div>
-</MatDialogContent>
-<MatDialogActions>
-    <MatButton OnClick="@(_ => CloseDialog())">Cancel</MatButton>
-</MatDialogActions>
+    </BodyTemplate>
+    <FooterTemplate>
+        <HxButton Text="Cancel" Color="ThemeColor.Secondary" OnClick="async () => await HideAsCancelledAsync()" />
+    </FooterTemplate>
+</HxModal>
+
 
 @inject IFolderService folderService;
 @code {
-    [CascadingParameter]
-    public MatDialogReference? DialogReference { get; set; }
-
     [Parameter] public GalleryImage? Selection { get; set; }
     [Parameter] public EventCallback<GalleryImage?> SelectionChanged { get; set; }
 
@@ -45,13 +46,8 @@
         images = await folderService.GetImagesAsync(currentFolder);
     }
 
-    void Select(GalleryImage image)
+    public async Task Select(GalleryImage image)
     {
-        DialogReference?.Close(image);
-    }
-
-    void CloseDialog()
-    {
-        DialogReference?.Close(null);
+        await HideAsync(image);
     }
 }

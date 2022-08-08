@@ -4,28 +4,29 @@
 @if (Folder != null)
 {
     <div class="node-item m-0 p-0" data-id="@(Folder.RowKey)" id="@($"node-{Folder.RowKey}")">
-        <a @onclick="@OnNodeClick" class="node__label @(ActiveFolder?.RowKey == Folder.RowKey ? "selected" : "")">
-            @if (HasChildren(Folder.RowKey))
-            {
-                if (IsExpanded(Folder.RowKey))
+        <div class="node-label">
+            <div @onclick="@OnNodeClick" class="node__label @(ActiveFolder?.RowKey == Folder.RowKey ? "selected" : "")">
+                @if (HasChildren(Folder.RowKey))
                 {
-                    <MatIcon>@MatIconNames.Keyboard_arrow_down</MatIcon>
-                    <MatIcon>@MatIconNames.Folder_open</MatIcon>
+                    if (IsExpanded(Folder.RowKey))
+                    {
+                        <HxIcon Icon="@BootstrapIcon.CaretDownFill" />
+                        <HxIcon Icon="@BootstrapIcon.Folder2Open" />
+                    }
+                    else
+                    {
+                        <HxIcon Icon="@BootstrapIcon.CaretRightFill" />
+                        <HxIcon Icon="@BootstrapIcon.Folder2" />
+                    }
                 }
                 else
                 {
-                    <MatIcon>@MatIconNames.Keyboard_arrow_right</MatIcon>
-                    <MatIcon>@MatIconNames.Folder</MatIcon>
+                    <HxIcon Icon="@BootstrapIcon.CaretRightFill" CssClass="transparent" />
+                    <HxIcon Icon="@BootstrapIcon.Folder2" />
                 }
-            }
-            else
-            {
-                <MatIcon Style="opacity: 0">@MatIconNames.Keyboard_arrow_right</MatIcon>
-                <MatIcon>@MatIconNames.Folder</MatIcon>
-            }
-            @Folder.Name
-        </a>
-
+            </div>
+            <div @onclick="@OnNodeClick" class="node-title">@Folder.Name</div>
+        </div>
         @if (IsExpanded(Folder.RowKey))
         {
             <div class="node-children" id="@Folder.RowKey">

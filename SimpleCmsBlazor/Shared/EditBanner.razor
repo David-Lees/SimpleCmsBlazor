@@ -3,28 +3,30 @@
         @if (pageSection != null && pageSection.Image != null)
         {
             <div class="col-sm-3">
-                <MatCard Style="height: 100%">
+                <HxCard style="height: 100%">
                     <img src="@(prefix + pageSection.Image?.PreviewSmallPath)"
                      class="img-fluid"
                      alt="@(pageSection.Image?.Description)" />
-                </MatCard>
+                </HxCard>
             </div>
         }
         <div class="col-sm-9">
             <h4>Select image:</h4>
             <div>
-                <MatButton Raised="true" OnClick="@Select">Select Image</MatButton>
+                <HxButton Color="@ThemeColor.Primary" OnClick="@Select">Select Image</HxButton>
             </div>
         </div>
     </div>
 </div>
 
-@inject IMatDialogService MatDialogService
+<SelectImage @ref="selectImage" />
+
 @code {
     [Parameter] public PageSection? Section { get; set; }
     [Parameter] public EventCallback<PageSection> SectionChanged { get; set; }
 
     private PageSection? pageSection;
+    SelectImage? selectImage;
 
     [Inject]
     public IConfiguration? Config { get; set; }
@@ -40,11 +42,14 @@
 
     public async Task Select()
     {
-        var result = await MatDialogService.OpenAsync(typeof(SelectImage), null);
-        if (pageSection != null && result is GalleryImage i)
+        if (selectImage != null)
         {
-            pageSection.Image = i;
-            await SectionChanged.InvokeAsync(pageSection);
+            var result = await selectImage.ShowAsync();
+            if (pageSection != null && result.Successful)
+            {
+                pageSection.Image = result.Value;
+                await SectionChanged.InvokeAsync(pageSection);
+            }
         }
     }
 }

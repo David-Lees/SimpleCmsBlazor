@@ -1,18 +1,18 @@
 ﻿<div id="bottom-sheet" class="overlay @(IsOpen ? "active": "")">
     <aside class="social" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
-        <MatButton OnClick="@Dismiss">
-            <i class="fas fa-times"></i>
-        </MatButton>
+        <HxButton OnClick="@Dismiss">
+            <HxIcon Icon="@BootstrapIcon.X"/>
+        </HxButton>
 
         <h5>Reorder Sections</h5>
         <p class="mat-body">Drag and drop sections to reorder</p>
         @if (page != null && page.Sections != null && page.Sections.Any())
         {
             <Dropzone Items="page.Sections">
-                <MatCard Class="mb-2">
-                    <MatIcon Icon="@GetIcon(context)"></MatIcon>
+                <HxCard CssClass="mb-2">
+                    <HxIcon Icon="@GetIcon(context)"></HxIcon>
                     @context.Name.ToString().Replace("Section"," Section")
-                </MatCard>
+                </HxCard>
             </Dropzone>
         }
     </aside>
@@ -22,16 +22,16 @@
     [Inject] Page? page { get; set; }
     bool IsOpen = false;
 
-    public string GetIcon(PageSection section)
+    public BootstrapIcon GetIcon(PageSection section)
     {
         return section.Name switch
         {
-            SectionType.BannerSection => "photo_camera",
-            SectionType.TextSection => "format_align_justify",
-            SectionType.GallerySection => "view_module",
-            SectionType.HtmlSection => "code",
-            SectionType.ChildrenSection => "list",
-            _ => "error"
+            SectionType.BannerSection => BootstrapIcon.Camera,
+            SectionType.TextSection => BootstrapIcon.Justify,
+            SectionType.GallerySection => BootstrapIcon.ViewList,
+            SectionType.HtmlSection => BootstrapIcon.Code,
+            SectionType.ChildrenSection => BootstrapIcon.List,
+            _ => BootstrapIcon.Exclamation
         };
     }
 

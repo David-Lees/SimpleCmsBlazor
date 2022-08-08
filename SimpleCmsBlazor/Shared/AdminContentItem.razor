@@ -1,28 +1,29 @@
 ﻿@if (Node != null)
-{    
+{
     <div class="node-item m-0 p-0" data-id="@(Node.Id)" id="@($"node-{Node.Id}")">
-        <a @onclick="@OnNodeClick" class="node__label @(ActivePage?.Id == Node.Id ? "selected" : "")">
-            @if (Node.Pages != null && Node.Pages.Count > 0)
-            {
-                if (IsExpanded(Node.Id ?? string.Empty))
+        <div class="node-label">
+            <div @onclick="@OnNodeClick" class="node-icons @(ActivePage?.Id == Node.Id ? "selected" : "")">
+                @if (Node.Pages != null && Node.Pages.Count > 0)
                 {
-                    <MatIcon>@MatIconNames.Keyboard_arrow_down</MatIcon>
-                    <MatIcon>@MatIconNames.Folder_open</MatIcon>
+                    if (IsExpanded(Node.Id ?? string.Empty))
+                    {
+                        <HxIcon Icon="@BootstrapIcon.CaretDownFill" />
+                        <HxIcon Icon="@BootstrapIcon.Folder2Open" />
+                    }
+                    else
+                    {
+                        <HxIcon Icon="@BootstrapIcon.CaretRightFill" />
+                        <HxIcon Icon="@BootstrapIcon.Folder2" />
+                    }
                 }
                 else
                 {
-                    <MatIcon>@MatIconNames.Keyboard_arrow_right</MatIcon>
-                    <MatIcon>@MatIconNames.Folder</MatIcon>
+                    <HxIcon Icon="@BootstrapIcon.CaretRightFill" CssClass="transparent" />
+                    <HxIcon Icon="@BootstrapIcon.Folder2" />
                 }
-            }
-            else
-            {
-                <MatIcon Style="opacity: 0">@MatIconNames.Keyboard_arrow_right</MatIcon>
-                <MatIcon>@MatIconNames.Folder</MatIcon>
-            }
-            @Node.Name
-        </a>
-
+            </div>
+            <div @onclick="@OnNodeClick" class="node-title">@Node.Name</div>
+        </div>
         @if (IsExpanded(Node.Id ?? string.Empty) && Node.Pages?.Count > 0)
         {
             <div class="node-children" id="@Node.Id">
