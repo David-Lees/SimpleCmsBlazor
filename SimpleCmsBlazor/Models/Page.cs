@@ -3,6 +3,8 @@
 public interface IPageList
 {
     List<Page> Pages { get; }
+    string? Id { get; }
+    string? Name { get; }
 }
 
 public class Page : IPageList

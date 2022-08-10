@@ -1,0 +1,49 @@
+﻿@if (Section != null)
+{
+    switch (Section.Name)
+    {
+        case SectionType.GallerySection:
+            <EditGallery @bind-Section="Section" OnChange="() => OnChange.InvokeAsync(null)" />
+            break;
+
+        case SectionType.BannerSection:
+            <EditBanner @bind-Section="Section" OnChange="() => OnChange.InvokeAsync(null)" />
+            break;
+
+        case SectionType.HtmlSection:
+            <EditHtml @bind-Section="Section" OnChange="() => OnChange.InvokeAsync(null)" />
+            break;
+
+        case SectionType.ChildrenSection:
+            <EditChildren @bind-Section="Section" OnChange="() => OnChange.InvokeAsync(null)" />
+            break;
+
+        default:
+            <EditText @bind-Section="Section" OnChange="() => OnChange.InvokeAsync(null)" />
+            break;
+    }
+}
+
+@inject ILogger<EditSection> Log
+@code {
+    private PageSection? _section;
+    ObjectsComparer.Comparer<PageSection?> _comparer = new();
+
+    [Parameter]
+    public PageSection? Section
+    {
+        get => _section;
+        set
+        {
+            if (_comparer.Compare(_section, value)) return;
+            _section = value;
+            SectionChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<PageSection> SectionChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+}

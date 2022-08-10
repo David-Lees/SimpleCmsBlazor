@@ -1,4 +1,6 @@
-﻿namespace SimpleCmsBlazor.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace SimpleCmsBlazor.Models;
 
 public class PageSection
 {

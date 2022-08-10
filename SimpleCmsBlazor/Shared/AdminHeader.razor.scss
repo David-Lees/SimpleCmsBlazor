@@ -1,12 +1,13 @@
-﻿.navbar {
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    padding: 0;
-    margin: 0;
-    font-size: 16px;
+﻿::deep .navbar {
+    background-color: #3D226C !important;
+}
+
+::deep .nav-link {
+    color: #FFFFFFB3 !important;
+}
+
+::deep .active {
+    color: white !important;
 }
 
 .nav-spacer {

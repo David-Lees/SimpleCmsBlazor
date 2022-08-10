@@ -1,20 +1,27 @@
-﻿@inject ILogger<AdminContentItem> Log
+﻿@using SimpleCmsBlazor.Pages
+@inject ILogger<AdminContentItem> Log
 
 @if (Node != null)
 {
     <div class="node-item m-0 p-0" data-id="@(Node.Id)" id="@($"node-{Node.Id}")">
         <div class="node-label">
-            <div @onclick="@OnNodeClick" class="node-icons @(ActivePage?.Id == Node.Id ? "selected" : "")">
+            <div class="node-icons @(ActivePage?.Id == Node.Id ? "selected" : "")">
                 @if (Node.Pages != null && Node.Pages.Count > 0)
                 {
                     if (IsExpanded(Node.Id ?? string.Empty))
                     {
-                        <HxIcon Icon="@BootstrapIcon.CaretDownFill" />
+                        <HxButton Icon="@BootstrapIcon.CaretDownFill" CssClass="border-0 p-0" OnClick="() => {
+                            ExpandedNodes.Remove(Node.Id ?? string.Empty);
+                            StateHasChanged();
+                        }" />
                         <HxIcon Icon="@FontAwesome.FolderOpen" />
                     }
                     else
                     {
-                        <HxIcon Icon="@BootstrapIcon.CaretRightFill" />
+                        <HxButton Icon="@BootstrapIcon.CaretRightFill" CssClass="border-0 p-0" OnClick="() => {
+                            ExpandedNodes.Add(Node.Id ?? string.Empty);
+                            StateHasChanged();
+                        }" />
                         <HxIcon Icon="@FontAwesome.Folder" />
                     }
                 }
@@ -24,22 +31,30 @@
                     <HxIcon Icon="@FontAwesome.Folder" />
                 }
             </div>
-            <div @onclick="@OnNodeClick" class="node-title">@Node.Name</div>
+            <div @onclick="@OnNodeClick" class="node-title @(ActivePage == Node ? "fw-bold": "")">@Node.Name</div>
         </div>
-        <div class="node-children" id="@Node.Id">
-            <DragDropList Items="Node.Pages" TItem="Page" Verify="@AcceptDrop">
-                <ItemTemplate>
-                    <AdminContentItem Node="@context" ActivePage="@ActivePage" NodeClick="@NodeClick" ExpandedNodes="@ExpandedNodes"></AdminContentItem>
-                </ItemTemplate>
-            </DragDropList>
-        </div>
-
+        @if (Node != null && Node.Pages != null && Node.Pages.Count > 0 && IsExpanded(Node.Id ?? string.Empty))
+        {
+            <div class="node-children @(Parent?.dragging == true ? "dragging" : "")">
+                <DragDropList Items="Node.Pages" TItem="Page" Verify="@AcceptDrop">
+                    <ItemTemplate>
+                        <AdminContentItem Node="@context"
+                                  ActivePage="@ActivePage"
+                                  NodeClick="@NodeClick"
+                                  ExpandedNodes="@ExpandedNodes" />
+                    </ItemTemplate>
+                </DragDropList>
+            </div>
+        }
     </div>
 }
 
 @code {
+    [CascadingParameter]
+    public AdminContent? Parent { get; set; }
+
     [Parameter]
-    public Page? Node { get; set; }
+    public IPageList? Node { get; set; }
 
     [Parameter]
     public Page? ActivePage { get; set; }
@@ -54,7 +69,8 @@
 
     public async Task OnNodeClick()
     {
-        await NodeClick.InvokeAsync(Node);
+        await NodeClick.InvokeAsync(Node as Page);
+        StateHasChanged();
     }
 
     public bool AcceptDrop(Page droppedItem)
@@ -64,12 +80,12 @@
             Log.LogInformation("AcceptDrop target is null");
             return false;
         }
-        var allowed = !ContainsPage(droppedItem, Node);
+        var allowed = !ContainsPage(Node, droppedItem);
         Log.LogInformation("Accept Drop {allowed}", allowed);
         return allowed;
     }
 
-    private bool ContainsPage(Page item, Page parent)
+    private bool ContainsPage(IPageList item, IPageList parent)
     {
         if (parent.Pages.Contains(item)) return true;
         foreach (var p in parent.Pages)
@@ -77,5 +93,17 @@
             if (ContainsPage(item, p)) return true;
         }
         return false;
+    }
+
+    public void StartDrag()
+    {
+        if (Parent != null) Parent.dragging = true;
+        StateHasChanged();
+    }
+
+    public void EndDrag()
+    {
+        if (Parent != null) Parent.dragging = false;
+        StateHasChanged();
     }
 }

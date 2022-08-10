@@ -2,7 +2,7 @@
 
 namespace SimpleCmsBlazor.Models
 {
-    public class GalleryImage
+    public class GalleryImage : ICloneable
     {
         public Guid? PartitionKey { get; set; }
         public Guid? RowKey { get; set; }
@@ -46,5 +46,35 @@ namespace SimpleCmsBlazor.Models
 
         [JsonIgnore]
         public string Transition { get; set; } = string.Empty;
+
+        public object Clone()
+        {
+            return new GalleryImage()
+            {
+                PartitionKey = PartitionKey,
+                RowKey = RowKey,
+                Active = Active,
+                Description = Description,
+                DominantColour = DominantColour,
+                GalleryImageLoaded = GalleryImageLoaded,
+                Height = Height,
+                PreviewLargeHeight = PreviewLargeHeight,
+                PreviewLargePath = PreviewLargePath,
+                PreviewLargeWidth = PreviewLargeWidth,
+                PreviewMediumHeight = PreviewMediumHeight,
+                PreviewMediumPath = PreviewMediumPath,
+                PreviewMediumWidth = PreviewMediumWidth,
+                PreviewSmallHeight = PreviewSmallHeight,
+                PreviewSmallPath = PreviewSmallPath,
+                PreviewSmallWidth = PreviewSmallWidth,
+                RawHeight = RawHeight,
+                RawPath = RawPath,
+                RawWidth = RawWidth,
+                SrcAfterFocus = SrcAfterFocus,
+                Transition = Transition,
+                ViewerImageLoaded = ViewerImageLoaded,
+                Width = Width
+            };
+        }
     }
 }

@@ -54,21 +54,24 @@
     <!-- End Body -->
 </div>
 <FolderSelect @ref="folderSelect" />
-<TextDialog @ref="textDialog" />
+<TextDialog @ref="textDialog"  ButtonText="@ButtonText" Title="@Title" PromptText="@PromptText" />
 <MaterialFileUpload @ref="upload" />
 
 @code {
+    string ButtonText = string.Empty;
+    string Title = string.Empty;
+    string PromptText = string.Empty;
     FolderSelect? folderSelect;
     TextDialog? textDialog;
-    MaterialFileUpload upload;
+    MaterialFileUpload? upload;
 
     public async Task AddFolder()
     {
         if (textDialog != null)
         {
-            textDialog.ButtonText = "Add";
-            textDialog.Title = $"Add folder under {currentFolder?.Name ?? "root folder"}";
-            textDialog.PromptText = folderName;
+            ButtonText = "Add";
+            Title = $"Add folder under {currentFolder?.Name ?? "root folder"}";
+            PromptText = folderName;
             var result = await textDialog.ShowAsync();
             if (result.Successful)
             {
@@ -91,9 +94,9 @@
     {
         if (currentFolder != null && textDialog != null)
         {
-            textDialog.ButtonText = "Rename";
-            textDialog.Title = $"Rename {currentFolder.Name}";
-            textDialog.PromptText = currentFolder.Name;
+            ButtonText = "Rename";
+            Title = $"Rename {currentFolder.Name}";
+            PromptText = currentFolder.Name;
             var result = await textDialog.ShowAsync();
             if (result.Successful && currentFolder.Name != result.Value)
             {
@@ -166,17 +169,23 @@
 
     private async Task Upload()
     {
-        await upload.ShowAsync();
-        await FolderChange(currentFolder);
+        if (upload != null)
+        {
+            await upload.ShowAsync();
+            await FolderChange(currentFolder);
+        }
     }
 
     public async Task Move(GalleryImage image)
     {
-        var result = await folderSelect.ShowAsync();
-        if (result != null && result.Successful)
+        if (folderSelect != null)
         {
-            await _mediaService.Move(image, result.Value);
+            var result = await folderSelect.ShowAsync();
+            if (result != null && result.Successful)
+            {
+                await _mediaService.Move(image, result.Value);
+            }
+            StateHasChanged();
         }
-        StateHasChanged();
     }
 }

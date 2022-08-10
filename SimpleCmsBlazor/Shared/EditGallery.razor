@@ -1,0 +1,153 @@
+﻿@using SimpleCmsBlazor.Services
+@inject DragDropService DD
+
+@if (Section != null)
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <HxInputText Label="Name"
+                         @bind-Value="Section.GalleryName"
+                         Hint="If set, this name will appear as a heading above the gallery." />
+            </div>
+            <div class="col">
+                <h4 class="mt-0">Margin</h4>
+                <RadzenSlider @bind-Value="@Section.ImageMargin" TValue="int?" Min="1" Max="20" />
+                <p>
+                    The gap between the images when displayed in the gallery: @Section.ImageMargin.
+                </p>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <HxInputNumber Label="Rows per page" @bind-Value="Section.RowsPerPage" Hint="The number of rows to show on gallery before splitting into multiple pages." />
+            </div>
+            <div class="col">
+                <h4 class="mt-0">Image size</h4>
+                <RadzenSlider @bind-Value="Section.ImageSize" TValue="int?" Min="1" Max="20" />
+                <p>The height of the row of images: @Section.ImageSize.</p>
+            </div>
+        </div>
+
+        <p>
+            Drag and drop images top add or remove them from the gallery and to sort them inside the gallery
+        </p>
+        <div class="row" cdkDropListGroup>
+            <div class="col-sm-4">
+                <h4>Folders</h4>
+                <MediaTree SelectedFolder="CurrentFolder" SelectedChanged="@FolderChange" />
+            </div>
+            <div class="col-sm-4">
+                <h4>Available images</h4>
+                <div class="shaded p-3 scroll-list">
+                    <div class="row">
+                        @foreach (var img in AvailableImages)
+                        {
+                            <div draggable="true" @ondragstart="()=>DD.SetData((GalleryImage)img.Clone())">
+                                <HxCard>
+                                    <BodyTemplate>
+                                        <img src="@(prefix + img.PreviewSmallPath)" class="img-fluid" alt="@img.Description" />
+                                    </BodyTemplate>
+                                </HxCard>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <h4>Selected images</h4>
+                <div class="shaded p-3 scroll-list">
+                    <DragDropList Items="Section.Images" TItem="GalleryImage" OnItemSwap="@Change" OnItemAdded="@Change">
+                        <ItemTemplate>
+                            <HxCard>
+                                <BodyTemplate>
+                                    <img src="@(prefix + context.PreviewSmallPath)" class="img-fluid" alt="context.Description" />
+                                    <HxInputText @bind-Value="context.Description" Label="Description" />
+                                    <HxButton Color="@ThemeColor.Danger" Icon="BootstrapIcon.Trash" OnClick="() => Remove(context)" />
+                                </BodyTemplate>
+                            </HxCard>
+                        </ItemTemplate>
+                    </DragDropList>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@inject IConfiguration _config
+@inject IFolderService _folderService
+@code {
+    [Parameter]
+    public PageSection? Section { get; set; }
+
+    [Parameter]
+    public EventCallback<PageSection> SectionChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    GalleryFolder? CurrentFolder;
+    List<GalleryFolder> AllFolders = new();
+    List<GalleryImage> AvailableImages = new();
+    string prefix = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        prefix = $"{_config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/";
+        AllFolders = await _folderService.GetFoldersAsync();
+        CurrentFolder = AllFolders.FirstOrDefault();
+        if (CurrentFolder != null) AvailableImages = await _folderService.GetImagesAsync(CurrentFolder);
+    }
+
+    public async Task FolderChange(GalleryFolder folder)
+    {
+        CurrentFolder = folder;
+        AvailableImages = await _folderService.GetImagesAsync(CurrentFolder);
+        Change();
+    }
+
+    public void Add(GalleryImage image)
+    {
+        if (Section != null && Section.Images != null) Section.Images.Add((GalleryImage)image.Clone());
+        Change();
+    }
+
+    public void Remove(GalleryImage image)
+    {
+        if (Section != null && Section.Images != null) Section.Images.Remove(image);
+        Change();
+    }
+
+    public void Up(int x)
+    {
+        if (x > 0)
+        {
+            Move(x, x - 1);
+        }
+    }
+
+    public void Down(int x)
+    {
+        if (Section != null && Section.Images != null && x < Section.Images.Count)
+        {
+            Move(x, x + 1);
+        }
+    }
+
+    public void Move(int from, int to)
+    {
+        if (Section != null && Section.Images != null)
+        {
+            var temp = Section.Images[from];
+            Section.Images.RemoveAt(from);
+            Section.Images.Insert(to, temp);
+            Change();
+        }
+    }
+
+    public void Change()
+    {
+        OnChange.InvokeAsync(null);
+        StateHasChanged();
+    }
+}

@@ -24,6 +24,7 @@
 @code {
     [Parameter] public PageSection? Section { get; set; }
     [Parameter] public EventCallback<PageSection> SectionChanged { get; set; }
+    [Parameter] public EventCallback OnChange { get; set; }
 
     private PageSection? pageSection;
     SelectImage? selectImage;
@@ -49,6 +50,7 @@
             {
                 pageSection.Image = result.Value;
                 await SectionChanged.InvokeAsync(pageSection);
+                await OnChange.InvokeAsync(null);
             }
         }
     }

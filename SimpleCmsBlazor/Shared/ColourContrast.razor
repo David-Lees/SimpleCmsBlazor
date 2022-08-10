@@ -1,0 +1,83 @@
+﻿@using System.Drawing
+
+<div class="row">
+    <div class="col-9" style="background-color: @BackgroundColour; color: @TextColour">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lobortis cursus velit vel fermentum.
+    </div>
+    <div class="col-3">
+        Constrast<br />
+        @if (Contrast >= 4.5)
+        {
+            <HxIcon Icon="@BootstrapIcon.Check" CssClass="fa-lg" />
+        }
+        else
+        {
+            <HxIcon Icon="@BootstrapIcon.X" CssClass="fa-lg" />
+        }
+        @(Contrast.ToString("F1")):1
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string BackgroundColour { get; set; } = string.Empty;
+
+    [Parameter]
+    public string TextColour { get; set; } = string.Empty;
+
+    public float Contrast { get; set; } = 0.0f;
+
+    protected override void OnParametersSet()
+    {
+        Update();
+    }
+
+    private void Update()
+    {
+        var text = FromHtml(TextColour);
+        var back = FromHtml(BackgroundColour);
+        Contrast = CalculateColourContrast(text, back);
+        StateHasChanged();
+    }
+
+    private Color FromHtml(string c)
+    {
+        if (c.StartsWith("rgba("))
+        {
+            var nums = c.Replace("rgba(", "").Replace(")", "").Split(',').Select(x => float.Parse(x)).ToList();
+            return Color.FromArgb((int)(nums[3] * 255), (int)nums[0], (int)nums[1], (int)nums[2]);
+        }
+        if (c.StartsWith("rgb("))
+        {
+            var nums = c.Replace("rgb(", "").Replace(")", "").Split(',').Select(x => float.Parse(x)).ToList();
+            return Color.FromArgb(255, (int)nums[0], (int)nums[1], (int)nums[2]);
+        }
+        return ColorTranslator.FromHtml(c);
+    }
+
+    private float RelativeLuminance(Color color)
+    {
+        float ColourPartValue(float part)
+        {
+            return part <= 0.03928f ? part / 12.92f : MathF.Pow((part + 0.055f) / 1.055f, 2.4f);
+        }
+        var r = ColourPartValue((float)color.R / 255.0f);
+        var g = ColourPartValue((float)color.G / 255.0f);
+        var b = ColourPartValue((float)color.B / 255.0f);
+
+        var l = 0.2126f * r + 0.7152f * g + 0.0722f * b;
+        return l;
+    }
+
+    private float CalculateColourContrast(Color a, Color b)
+    {
+        float result = 0f;
+        var La = RelativeLuminance(a) + 0.05f;
+        var Lb = RelativeLuminance(b) + 0.05f;
+
+        result = MathF.Max(La, Lb) / MathF.Min(La, Lb);
+
+        return result;
+    }
+}

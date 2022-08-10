@@ -78,6 +78,7 @@
 
     public bool AcceptDrop(GalleryFolder drag)
     {
+        if (Folder == null) return false;
         return CanMove && drag != Folder && !IsChildOf(Folder, drag);
     }
 

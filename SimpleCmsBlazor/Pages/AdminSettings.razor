@@ -1,12 +1,12 @@
 ﻿@using SimpleCmsBlazor.Services
-@inject SiteService _siteService;
+@inject ISiteService _siteService;
 @layout Admin
 @page "/admin/settings"
 
 <div class="container-fluid">
     @if (loaded)
     {
-        <div class="float-right mt-1">
+        <div class="float-end mt-1">
             <HxButton Color="@ThemeColor.Primary" Text="Save site" OnClick="@SaveAsync" />
         </div>
     }
@@ -18,7 +18,7 @@
                   Hint="The name of the site is displayed in the header.">
         </HxInputText>
 
-        <div class="row mt-4">
+        <div class="row mt-4 mb-4">
             <div class="col">
                 <HxInputCheckbox  @bind-Value="site.HasLogo" Label="Site Has Logo?"></HxInputCheckbox>
             </div>

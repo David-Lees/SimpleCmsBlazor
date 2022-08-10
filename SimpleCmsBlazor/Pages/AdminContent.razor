@@ -35,13 +35,9 @@
             <p>Drag and drop pages to rearrange order.</p>
             @if (site != null)
             {
-                <div class="node-item">
-                    <DragDropList Items="site.Pages" TItem="Page" Verify="@AcceptDrop">
-                        <ItemTemplate>
-                            <AdminContentItem Node="@context" ActivePage="@activePage" NodeClick="@NodeClick" ExpandedNodes="@expandedNodes"></AdminContentItem>
-                        </ItemTemplate>
-                    </DragDropList>
-                </div>
+                <CascadingValue Value="@this">
+                    <AdminContentItem Node="@site" ActivePage="@activePage" NodeClick="@NodeClick" ExpandedNodes="@expandedNodes" />
+                </CascadingValue>
             }
         </div>
     }
@@ -51,18 +47,18 @@
         <div class="float-end">
             <HxButton Color="@ThemeColor.Primary" OnClick="@SaveAsync">Save site</HxButton>
         </div>
-        @if (activePage != null)
+        @if (activePage is not null)
         {
-            <h5 class="mt-0">Edit Page: @activePage.Name</h5>
+            <h5 class="mt-0" @onclick=@StateHasChanged>Edit Page: @activePage.Name</h5>
         }
         else
         {
-            <h5 class="mt-0">Edit Page</h5>
+            <h5 class="mt-0" @onclick=@StateHasChanged>Edit Page (No page selected)</h5>
         }
         @if (site != null && site.Pages != null && site.Pages.Count > 0 && activePage != null)
         {
             <h2 class="container-fluid">Properties for @activePage.Name</h2>
-            <app-edit-page [(page)]="activePage"></app-edit-page>
+            <EditPage CurrentPage="activePage" OnChange="@StateHasChanged"/>
         }
     </div>
     <!-- End Body -->
@@ -70,6 +66,7 @@
 
 @code {
     public bool showPages = true;
+    public bool dragging = false;
     public Page? activePage { get; set; }
     public Site? site { get; set; }
     public bool loaded = false;
@@ -134,6 +131,7 @@
             if (string.IsNullOrEmpty(site.Id)) site.Id = Guid.NewGuid().ToString();
             loaded = true;
             activePage = site.Pages.FirstOrDefault();
+            expandedNodes.Add(site.Id);
         }
     }
 
@@ -142,20 +140,16 @@
         return expandedNodes.Contains(id);
     }
 
-    public void NodeClick(Page node)
+    public void NodeClick(Page? node)
     {
-        if (!string.IsNullOrEmpty(node.Id))
+        Log.LogInformation("Node click {ispage} {id}", node != null, node?.Id);
+        if (node != null && !string.IsNullOrEmpty(node.Id))
         {
-            if (expandedNodes.Contains(node.Id))
-            {
-                expandedNodes.Remove(node.Id);
-            }
-            else
-            {
-                expandedNodes.Add(node.Id);
-            }
-            var p = GetNode(node.Id);
-            activePage = p as Page;
+            //var p = GetNode(node.Id);
+            //activePage = p as Page;
+            activePage = node;
+            StateHasChanged();
+            Log.LogInformation("Active page: {null} {id}", activePage is null, activePage?.Id);
         }
     }
 
@@ -177,6 +171,7 @@
 
     public bool AcceptDrop(Page droppedItem)
     {
+        if (site == null) return false;
         if (activePage == null)
         {
             Log.LogInformation("AcceptDrop target is null");

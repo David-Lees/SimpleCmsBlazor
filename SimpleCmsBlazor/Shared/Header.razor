@@ -19,10 +19,10 @@
         {
             <HxNavbarToggler />
             <HxNavbarCollapse>
-                <HxNav CssClass="me-auto mb-2 mg-lg-0">
+                <HxNav CssClass="me-auto">
                     @foreach (var p in Site.Pages)
                     {
-                        <HxNavLink href="@p.Url">@p.Name</HxNavLink>
+                        <HxNavLink href="@p.Url" style=@LogoStyle>@p.Name</HxNavLink>
                     }
                 </HxNav>
             </HxNavbarCollapse>

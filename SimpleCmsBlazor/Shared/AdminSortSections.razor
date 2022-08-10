@@ -1,28 +1,33 @@
-﻿<div id="bottom-sheet" class="overlay @(IsOpen ? "active": "")">
-    <aside class="social" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
-        <HxButton OnClick="@Dismiss">
-            <HxIcon Icon="@BootstrapIcon.X" />
-        </HxButton>
-
-        <h5>Reorder Sections</h5>
-        <p class="mat-body">Drag and drop sections to reorder</p>
-        @if (page != null && page.Sections != null && page.Sections.Any())
+﻿<HxOffcanvas @ref="canvas" Title="Reorder Sections" Placement="OffcanvasPlacement.Bottom" Size="OffcanvasSize.Large" OnClosed="@Change">
+    <BodyTemplate>
+        <div>Drag and drop sections to reorder</div>
+        @if (CurrentPage != null && CurrentPage.Sections != null && CurrentPage.Sections.Any())
         {
-            <DragDropList Items="page.Sections">
+            <DragDropList Items="CurrentPage.Sections" TItem="PageSection">
                 <ItemTemplate>
                     <HxCard CssClass="mb-2">
-                        <HxIcon Icon="@GetIcon(context)"></HxIcon>
-                        @context.Name.ToString().Replace("Section"," Section")
+                        <div class="row w-100 align-items-center">
+                            <div class="col-3 d-flex align-items-center">
+                                <HxIcon Icon="GetIcon(context)" CssClass="fa-2x" />
+                                <div class="ps-3">@(context.Name.ToString().Replace("Section", " Section"))</div>
+                            </div>
+                            <div class="col-9">
+                                @SectionDescription(context)
+                            </div>
+                        </div>
                     </HxCard>
                 </ItemTemplate>
             </DragDropList>
         }
-    </aside>
-</div>
+    </BodyTemplate>
+</HxOffcanvas>
 
 @code {
-    [Inject] Page? page { get; set; }
-    bool IsOpen = false;
+    [Parameter]
+    public Page? CurrentPage { get; set; }
+
+    [Parameter]
+    public EventCallback OnChange { get; set; }
 
     public BootstrapIcon GetIcon(PageSection section)
     {
@@ -37,15 +42,21 @@
         };
     }
 
-    public void Dismiss()
+    private HxOffcanvas? canvas;
+
+    public async Task OpenAsync()
     {
-        IsOpen = false;
-        StateHasChanged();
+        if (canvas != null) await canvas.ShowAsync();
     }
 
-    public void Open()
+    public void Change()
     {
-        IsOpen = true;
-        StateHasChanged();
+        OnChange.InvokeAsync();
+    }
+
+    public string SectionDescription(PageSection s)
+    {
+        string text = s.Html ?? s.Text ?? string.Empty;
+        return text.Length > 80 ? text.Substring(0, 80) + "..." : text;
     }
 }

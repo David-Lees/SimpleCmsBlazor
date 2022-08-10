@@ -1,13 +1,32 @@
 ﻿@inherits LayoutComponentBase
+@using SimpleCmsBlazor.Services
+@inject ISiteService SiteService
+
 <div class="flex-container">
-  <div class="header">
-    <AdminHeader></AdminHeader>
-  </div>
-  <div class="body">
-    @Body
-  </div>
+    <div class="header">
+        <AdminHeader></AdminHeader>
+    </div>
+    <div class="body">
+        @Body
+    </div>
+    <footer class="container-fluid">
+        <div class="row">
+            <div class="col-sm-4 text-start">&copy; @Site.Name @GetYear()</div>
+            <div class="col-sm-4 text-center"></div>
+            <div class="col-sm-4 text-end">
+                <LoginDisplay />
+            </div>
+        </div>
+    </footer>
 </div>
 
 @code {
+    private Site Site = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        Site = await SiteService.GetSiteAsync();
+    }
+    
+    public string GetYear() => DateTime.Now.Year.ToString();
 }

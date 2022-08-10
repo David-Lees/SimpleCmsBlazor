@@ -1,0 +1,223 @@
+﻿@inject IHxMessageBoxService _messageBoxService
+
+@if (CurrentPage != null)
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <HxInputText Label="Page name"
+                         Hint="The name of the page is displayed as the title. It is also displayed in the navigation bar at the top if the is more than a single page in the site."
+                         @bind-Value="@CurrentPage.Name"
+                         Placeholder="Page name" />
+            </div>
+            <div class="col-sm-6">
+                <HxInputText Hint="The Url fragment is the identifier for the page that appears in the browsers navigation bar after the domain. It should be short and not containing any spaces. It must be unique and for the home page can be empty."
+                         @bind-Value="@CurrentPage.Url"
+                         Label="Url fragment"
+                         Placeholder="Url" />
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: right">
+        <HxDropdownButtonGroup Direction="DropdownDirection.Down">
+            <HxDropdownToggleButton Color="@ThemeColor.Primary" Icon="@BootstrapIcon.PlusCircle" Text="Add Section" />
+            <HxDropdownMenu>
+                <HxDropdownItem OnClick="@AddBanner"><HxIcon Icon="@BootstrapIcon.Camera" /> Add banner image</HxDropdownItem>
+                <HxDropdownItem OnClick="@AddText"><HxIcon Icon="@BootstrapIcon.Justify" /> Add text block</HxDropdownItem>
+                <HxDropdownItem OnClick="@AddGallery"><HxIcon Icon="@BootstrapIcon.Image" /> Add image gallery</HxDropdownItem>
+                <HxDropdownItem OnClick="@AddHtml"><HxIcon Icon="@BootstrapIcon.Code" /> Add HTML block</HxDropdownItem>
+                <HxDropdownItem OnClick="@AddChildren"><HxIcon Icon="@BootstrapIcon.Diagram3" /> Add child page list</HxDropdownItem>
+            </HxDropdownMenu>
+        </HxDropdownButtonGroup>
+        <HxButton CssClass="m-2" Color="@ThemeColor.Primary" OnClick="@SortSections" Icon="@BootstrapIcon.SortAlphaDown" Text="Sort Sections" />
+    </div>
+
+    <HxAccordion>
+        @foreach (var (section, i) in CurrentPage.Sections.Select((section, i) => (section, i)))
+        {
+            <HxAccordionItem>
+                <HeaderTemplate>
+                    <div class="row w-100 align-items-center">
+                        <div class="col-3 d-flex align-items-center">
+                            <HxIcon Icon="GetIcon(section)" CssClass="fa-2x" />
+                            <div class="ps-3">@(section.Name.ToString().Replace("Section", " Section"))</div>
+                        </div>
+                        <div class="col-9">
+                            @SectionDescription(section)
+                        </div>
+                    </div>
+                </HeaderTemplate>
+                <BodyTemplate>
+                    <div class="text-end mb-2">
+                        <HxButton Color="@ThemeColor.Danger" OnClick="@(async(MouseEventArgs _) => await Remove(section))">Delete</HxButton>
+                    </div>
+                    <EditSection Section="section" SectionChanged="@((s) => SectionChanged(s, i))" OnChange="@StateHasChanged" />
+                </BodyTemplate>
+            </HxAccordionItem>
+        }
+    </HxAccordion>
+}
+else
+{
+    <div>Please select page...</div>
+}
+
+<AdminSortSections CurrentPage="@CurrentPage" @ref="sorter" OnChange="@Change" />
+
+@code {
+    AdminSortSections? sorter;
+
+    public void SectionChanged(PageSection section, int index)
+    {
+        if (CurrentPage != null)
+        {
+            CurrentPage.Sections[index] = section;
+            CurrentPageChanged.InvokeAsync();
+            StateHasChanged();
+        }
+    }
+
+    public IconBase GetIcon(PageSection s)
+    {
+        return s.Name switch
+        {
+            SectionType.BannerSection => BootstrapIcon.Camera,
+            SectionType.TextSection => BootstrapIcon.Justify,
+            SectionType.GallerySection => BootstrapIcon.Image,
+            SectionType.HtmlSection => BootstrapIcon.Code,
+            SectionType.ChildrenSection => BootstrapIcon.Diagram3,
+            _ => BootstrapIcon.ExclamationCircle
+        };
+    }
+
+    [Parameter]
+    public Page? CurrentPage { get; set; }
+
+    [Parameter]
+    public EventCallback<Page> CurrentPageChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    public PageSection? ActiveSection { get; set; }
+
+    public async Task Change()
+    {
+        await CurrentPageChanged.InvokeAsync(CurrentPage);
+        await OnChange.InvokeAsync();
+        StateHasChanged();
+    }
+
+    public string SectionDescription(PageSection s)
+    {
+        string text = s.Html ?? s.Text ?? string.Empty;
+        return text.Length > 80 ? text.Substring(0, 80) + "..." : text;
+    }
+
+    protected override void OnInitialized()
+    {
+        if (CurrentPage != null && CurrentPage.Sections.Count > 0)
+        {
+            ActiveSection = CurrentPage.Sections[0];
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        ActiveSection = null;
+    }
+
+    public async Task AddChildren()
+    {
+        if (CurrentPage != null)
+        {
+            CurrentPage.Sections.Add(new PageSection
+                {
+                    Name = SectionType.ChildrenSection,
+                    BackgroundColour = "#FFFFFF",
+                    Colour = "#000000",
+                    BackgroundAlign = "center center"
+                });
+            await Change();
+        }
+    }
+
+    public async Task AddBanner()
+    {
+        if (CurrentPage != null)
+        {
+            CurrentPage.Sections.Add(new PageSection
+                {
+                    Name = SectionType.BannerSection,
+                    Image = null
+                });
+
+            await Change();
+        }
+    }
+
+    public async Task AddHtml()
+    {
+        if (CurrentPage != null)
+        {
+            CurrentPage.Sections.Add(new PageSection
+                {
+                    Name = SectionType.HtmlSection,
+                    Html = string.Empty
+                });
+            await Change();
+        }
+    }
+
+    public async Task AddGallery()
+    {
+        if (CurrentPage != null)
+        {
+            CurrentPage.Sections.Add(new PageSection
+                {
+                    Name = SectionType.GallerySection,
+                    GalleryName = "Gallery",
+                    Images = new(),
+                    ImageMargin = 3,
+                    ImageSize = 7,
+                    RowsPerPage = 200
+                });
+
+            await Change();
+        }
+    }
+
+    public async Task AddText()
+    {
+        if (CurrentPage != null)
+        {
+            CurrentPage.Sections.Add(new PageSection
+                {
+                    Name = SectionType.TextSection,
+                    Text = string.Empty,
+                    BackgroundColour = "#FFFFFF",
+                    Colour = "#000000",
+                    Align = "left",
+                });
+            await Change();
+        }
+    }
+
+    public async Task Remove(PageSection s)
+    {
+        if (CurrentPage != null && await _messageBoxService.ConfirmAsync("Remove section", "Are you sure you want to remove this section?"))
+        {
+            CurrentPage.Sections.Remove(s);
+            await Change();
+        }
+    }
+
+    public async Task SortSections()
+    {
+        if (sorter != null)
+        {
+            await sorter.OpenAsync();
+        }
+    }
+}

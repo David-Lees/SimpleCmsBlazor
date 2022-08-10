@@ -1,4 +1,4 @@
-﻿.logo-background {
+﻿::deep .logo-background {
     position: fixed;
     top: 55px;
     left: 0;
@@ -9,7 +9,7 @@
     background-color: white;
 }
 
-.navbar {
+::deep .navbar {
     width: 100%;
     position: fixed;
     top: 0;
@@ -17,39 +17,28 @@
     z-index: 1000;
     height: 56px;
     border-bottom: 1px solid white;
+    background-color: inherit;
+
+    .navbar-brand {
+        width: 134px !important;
+
+        img {
+            max-width: 134px;
+            position: fixed;
+            top: 3px;
+            z-index: 2000;
+            -webkit-filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.35));
+            filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.35));
+        }
+    }
 }
 
-.nav-spacer {
+::deep .nav-spacer {
     height: 56px;
     width: 100%;
 }
 
-/* Switch to fixed positioning, and stick the header to the top of the page */
-html:not([data-scroll='0']) .navbar {
-    border-bottom: 1px solid black;
-    box-shadow: rgba(0, 0, 0, 0.35) 5px 5px 5px;
-}
-
-html:not([data-scroll='0']) .logo-background {
-    border-bottom: 1px solid black;
-    border-right: 1px solid black;
-    box-shadow: rgba(0, 0, 0, 0.35) 5px 5px 5px;
-}
-
-.navbar .navbar-brand {
-    width: 134px !important;
-
-    img {
-        max-width: 134px;
-        position: fixed;
-        top: 3px;
-        z-index: 2000;
-        -webkit-filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.35));
-        filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.35));
-    }
-}
-
-.navbar-collapse.show {
+::deep .navbar-collapse.show {
     position: fixed;
     right: 5px;
     top: 55px;

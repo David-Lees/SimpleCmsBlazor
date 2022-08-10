@@ -5,7 +5,6 @@ using SimpleCmsBlazor;
 using SimpleCmsBlazor.Models;
 using SimpleCmsBlazor.Services;
 using Havit.Blazor.Components.Web;
-using DragDrop.Blazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

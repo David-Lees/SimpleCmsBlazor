@@ -14,7 +14,7 @@
     <SourceRoot Include="C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages\" />
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)wk.blazor.dragdrop\1.1.0\buildTransitive\WK.Blazor.DragDrop.props" Condition="Exists('$(NuGetPackageRoot)wk.blazor.dragdrop\1.1.0\buildTransitive\WK.Blazor.DragDrop.props')" />
+    <Import Project="$(NuGetPackageRoot)radzen.blazor\3.20.2\buildTransitive\Radzen.Blazor.props" Condition="Exists('$(NuGetPackageRoot)radzen.blazor\3.20.2\buildTransitive\Radzen.Blazor.props')" />
     <Import Project="$(NuGetPackageRoot)microsoft.aspnetcore.components.webassembly.authentication\6.0.7\buildTransitive\Microsoft.AspNetCore.Components.WebAssembly.Authentication.props" Condition="Exists('$(NuGetPackageRoot)microsoft.aspnetcore.components.webassembly.authentication\6.0.7\buildTransitive\Microsoft.AspNetCore.Components.WebAssembly.Authentication.props')" />
     <Import Project="$(NuGetPackageRoot)microsoft.authentication.webassembly.msal\6.0.7\buildTransitive\Microsoft.Authentication.WebAssembly.Msal.props" Condition="Exists('$(NuGetPackageRoot)microsoft.authentication.webassembly.msal\6.0.7\buildTransitive\Microsoft.Authentication.WebAssembly.Msal.props')" />
     <Import Project="$(NuGetPackageRoot)microsoft.aspnetcore.components.webassembly\6.0.7\build\net6.0\Microsoft.AspNetCore.Components.WebAssembly.props" Condition="Exists('$(NuGetPackageRoot)microsoft.aspnetcore.components.webassembly\6.0.7\build\net6.0\Microsoft.AspNetCore.Components.WebAssembly.props')" />

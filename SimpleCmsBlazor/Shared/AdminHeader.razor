@@ -1,17 +1,20 @@
-﻿<HxNavbar ColorScheme="NavbarColorScheme.Dark" Color="@ThemeColor.Primary">
-    <HxNavbarBrand>
-        <img src="/favicon-32x32.png" alt="Administration" />
-    </HxNavbarBrand>
-    <HxNavbarToggler />
-    <HxNavbarCollapse>
-        <HxNav CssClass="me-auto mb-2 mg-lg-0">
-            <HxNavLink href="/admin">Content</HxNavLink>
-            <HxNavLink href="/admin/library">Image Library</HxNavLink>
-            <HxNavLink href="/admin/settings">Settings</HxNavLink>
-            <HxNavLink href="/">View Site</HxNavLink>
-        </HxNav>
-    </HxNavbarCollapse>
-</HxNavbar>
+﻿
+<div>
+    <HxNavbar ColorScheme="NavbarColorScheme.Dark" Color="@ThemeColor.Primary">
+        <HxNavbarBrand CssClass="p-0">
+            <img src="/favicon-32x32.png" alt="Administration" />
+        </HxNavbarBrand>
+        <HxNavbarToggler />
+        <HxNavbarCollapse>
+            <HxNav CssClass="me-auto">
+                <HxNavLink Match="NavLinkMatch.All" href="/admin">Content</HxNavLink>
+                <HxNavLink Match="NavLinkMatch.All" href="/admin/library">Image Library</HxNavLink>
+                <HxNavLink Match="NavLinkMatch.All" href="/admin/settings">Settings</HxNavLink>
+                <HxNavLink Match="NavLinkMatch.All" href="/">View Site</HxNavLink>
+            </HxNav>
+        </HxNavbarCollapse>
+    </HxNavbar>
+</div>
 
 @code {
 
