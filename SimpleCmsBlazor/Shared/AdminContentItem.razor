@@ -35,7 +35,7 @@
         </div>
         @if (Node != null && Node.Pages != null && Node.Pages.Count > 0 && IsExpanded(Node.Id ?? string.Empty))
         {
-            <div class="node-children @(Parent?.dragging == true ? "dragging" : "")">
+            <div class="node-children @(Parent?.Dragging == true ? "dragging" : "")">
                 <DragDropList Items="Node.Pages" TItem="Page" Verify="@AcceptDrop">
                     <ItemTemplate>
                         <AdminContentItem Node="@context"
@@ -77,11 +77,9 @@
     {
         if (Node == null)
         {
-            Log.LogInformation("AcceptDrop target is null");
             return false;
         }
         var allowed = !ContainsPage(Node, droppedItem);
-        Log.LogInformation("Accept Drop {allowed}", allowed);
         return allowed;
     }
 
@@ -97,13 +95,13 @@
 
     public void StartDrag()
     {
-        if (Parent != null) Parent.dragging = true;
+        if (Parent != null) Parent.Dragging = true;
         StateHasChanged();
     }
 
     public void EndDrag()
     {
-        if (Parent != null) Parent.dragging = false;
+        if (Parent != null) Parent.Dragging = false;
         StateHasChanged();
     }
 }

@@ -1,8 +1,7 @@
 ﻿@using SimpleCmsBlazor.Services
 @implements IDisposable
 @inject DragDropService DD
-@typeparam TItem where TItem : new() 
-@inject ILogger<DragDropList<TItem>> Log
+@typeparam TItem where TItem : new()
 
 <div class="drop-list"
      ondragover="event.preventDefault()"
@@ -20,12 +19,8 @@
         var item = Items[j];
         if (j == 0)
         {
-            <div @ondragenter=@(() => {
-         overBefore[index] = true;
-         Log.LogInformation("Ondragenter {x} {i}", overBefore[index], index);
-         StateHasChanged();
-         })
-         @ondragleave=@(() => { overBefore[index] = false; StateHasChanged(); Log.LogInformation("Ondragleave"); })
+            <div @ondragenter=@(() => { overBefore[index] = true; StateHasChanged();})
+         @ondragleave=@(() => { overBefore[index] = false; StateHasChanged(); })
          @ondrop="async ()=>await Drop(DropBeforeItem, item)"
          @ondrop:stopPropagation="true"
          class="drop-target @(overBefore.ContainsKey(index) && overBefore[index] ? "over" : "")">
