@@ -131,7 +131,6 @@
     {
         if (Section != null)
         {
-            Log.LogInformation("EditText section text changed");
             Section.Text = codeValue;
             SectionChanged.InvokeAsync(Section);
             UpdateOutput();

@@ -1,7 +1,6 @@
 ﻿@using System.Reactive
 @using SimpleCmsBlazor.Services
 @implements IDisposable
-@inject ILogger<Gallery> logger
 
 <div @ref=galleryContainer class="galleryContainer">
     <div class="innerGalleryContainer">
@@ -30,8 +29,6 @@
         </div>
     }
 </div>
-
-<Viewer></Viewer>
 
 @code {
     private List<List<GalleryImage>> gallery = new();
@@ -213,7 +210,6 @@
             SetMinimumQualityHeight(img, CalcIdealHeight(galleryWidth));
             originalRowWidth += GetMinimumQualityWidth(img);
         }
-        logger.LogInformation($"Row: {imgRow.Count} {originalRowWidth}");
         return originalRowWidth;
     }
 
@@ -289,7 +285,6 @@
     {
         if (runtime == null) return 0;
         var result = await runtime.InvokeAsync<decimal>("GetClientWidth", galleryContainer) - 20;
-        logger.LogInformation("GetClientWidth " + result.ToString());
         return result;
     }
 

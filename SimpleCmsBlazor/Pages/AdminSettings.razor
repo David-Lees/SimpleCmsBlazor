@@ -1,5 +1,4 @@
 ﻿@using SimpleCmsBlazor.Services
-@inject ISiteService _siteService;
 @layout Admin
 @page "/admin/settings"
 
@@ -33,25 +32,3 @@
         </div>
     }
 </div>
-
-@code {
-    Site site = new();
-    bool loaded = false;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadAsync();
-    }
-
-    public async Task SaveAsync()
-    {
-        await _siteService.SaveSiteAsync(site);
-    }
-
-    public async Task LoadAsync()
-    {
-        site = await _siteService.GetSiteAsync();
-        loaded = true;
-        StateHasChanged();
-    }
-}

@@ -24,30 +24,3 @@
         <HxButton Text="Cancel" Color="ThemeColor.Secondary" OnClick="async () => await HideAsCancelledAsync()" />
     </FooterTemplate>
 </HxModal>
-
-
-@inject IFolderService folderService;
-@code {
-    [Parameter] public GalleryImage? Selection { get; set; }
-    [Parameter] public EventCallback<GalleryImage?> SelectionChanged { get; set; }
-
-    List<GalleryFolder> folders = new();
-    GalleryFolder? currentFolder;
-    List<GalleryImage> images = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        folders = await folderService.GetFoldersAsync();
-    }
-
-    public async Task SelectFolder(GalleryFolder folder)
-    {
-        currentFolder = folder;
-        images = await folderService.GetImagesAsync(currentFolder);
-    }
-
-    public async Task Select(GalleryImage image)
-    {
-        await HideAsync(image);
-    }
-}

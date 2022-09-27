@@ -1,8 +1,4 @@
 ﻿@using SimpleCmsBlazor.Services
-@inject ISiteService siteService
-@inject IMediaService mediaService
-@inject IHxMessageBoxService _messageBoxService
-@inject ILogger<AdminContent> Log
 @layout Admin
 @page "/admin"
 
@@ -22,21 +18,21 @@
         <div class="pages">
             <HxContextMenu Icon="@BootstrapIcon.ThreeDots" IconCssClass="fa-lg" CssClass="float-end">
                 <HxContextMenuItem OnClick="@AddPage">Add Page</HxContextMenuItem>
-                @if (activePage != null)
+                @if (ActivePage != null)
                 {
                     <HxContextMenuItem OnClick="@AddChild">Add Child Page</HxContextMenuItem>
                 }
                 @if (CanDelete())
                 {
-                    <HxContextMenuItem OnClick="@DeletePage">Delete @activePage?.Name</HxContextMenuItem>
+                    <HxContextMenuItem OnClick="@DeletePage">Delete @ActivePage?.Name</HxContextMenuItem>
                 }
             </HxContextMenu>
             <h5 class="mt-0">Pages</h5>
             <p>Drag and drop pages to rearrange order.</p>
-            @if (site != null)
+            @if (Site != null)
             {
                 <CascadingValue Value="@this">
-                    <AdminContentItem Node="@site" ActivePage="@activePage" NodeClick="@NodeClick" ExpandedNodes="@expandedNodes" />
+                    <AdminContentItem Node="@Site" ActivePage="@ActivePage" NodeClick="@NodeClick" ExpandedNodes="@expandedNodes" />
                 </CascadingValue>
             }
         </div>
@@ -47,179 +43,19 @@
         <div class="float-end">
             <HxButton Color="@ThemeColor.Primary" OnClick="@SaveAsync">Save site</HxButton>
         </div>
-        @if (activePage is not null)
+        @if (ActivePage is not null)
         {
-            <h5 class="mt-0" @onclick=@StateHasChanged>Edit Page: @activePage.Name</h5>
+            <h5 class="mt-0" @onclick=@StateHasChanged>Edit Page: @ActivePage.Name</h5>
         }
         else
         {
             <h5 class="mt-0" @onclick=@StateHasChanged>Edit Page (No page selected)</h5>
         }
-        @if (site != null && site.Pages != null && site.Pages.Count > 0 && activePage != null)
+        @if (Site != null && Site.Pages != null && Site.Pages.Count > 0 && ActivePage != null)
         {
-            <h2 class="container-fluid">Properties for @activePage.Name</h2>
-            <EditPage CurrentPage="activePage" OnChange="@StateHasChanged"/>
+            <h2 class="container-fluid">Properties for @ActivePage.Name</h2>
+            <EditPage CurrentPage="ActivePage" OnChange="@StateHasChanged"/>
         }
     </div>
     <!-- End Body -->
 </div>
-
-@code {
-    public bool showPages = true;
-    public bool dragging = false;
-    public Page? activePage { get; set; }
-    public Site? site { get; set; }
-    public bool loaded = false;
-    public List<string> expandedNodes = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadAsync();
-    }
-
-    public void AddPage()
-    {
-        if (site != null)
-        {
-            site.Pages.Add(NewPage());
-        }
-    }
-
-    public void AddChild()
-    {
-        activePage?.Pages.Add(NewPage());
-    }
-
-    public bool CanDelete()
-    {
-        return true;
-    }
-
-    private Page NewPage()
-    {
-        return new Page
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "New page",
-                Url = "new-page",
-                Sections = new(),
-                Pages = new(),
-            };
-    }
-
-    public void Remove(Page p)
-    {
-        if (site != null && site.Pages.Contains(p))
-        {
-            site.Pages.Remove(p);
-        }
-    }
-
-    public async Task SaveAsync()
-    {
-        if (site != null)
-        {
-            await siteService.SaveSiteAsync(site);
-        }
-    }
-
-    private async Task LoadAsync()
-    {
-        if (siteService != null)
-        {
-            site = await siteService.GetSiteAsync();
-            if (string.IsNullOrEmpty(site.Id)) site.Id = Guid.NewGuid().ToString();
-            loaded = true;
-            activePage = site.Pages.FirstOrDefault();
-            expandedNodes.Add(site.Id);
-        }
-    }
-
-    public bool IsExpanded(string id)
-    {
-        return expandedNodes.Contains(id);
-    }
-
-    public void NodeClick(Page? node)
-    {
-        Log.LogInformation("Node click {ispage} {id}", node != null, node?.Id);
-        if (node != null && !string.IsNullOrEmpty(node.Id))
-        {
-            //var p = GetNode(node.Id);
-            //activePage = p as Page;
-            activePage = node;
-            StateHasChanged();
-            Log.LogInformation("Active page: {null} {id}", activePage is null, activePage?.Id);
-        }
-    }
-
-    public IPageList? GetNode(string id, IPageList? nodesToSearch = null)
-    {
-        if (id == "main") return site;
-        nodesToSearch ??= site;
-        if (nodesToSearch != null)
-        {
-            foreach (var node in nodesToSearch.Pages)
-            {
-                if (node.Id == id) return node;
-                var ret = GetNode(id, node);
-                if (ret != null) return ret;
-            }
-        }
-        return null;
-    }
-
-    public bool AcceptDrop(Page droppedItem)
-    {
-        if (site == null) return false;
-        if (activePage == null)
-        {
-            Log.LogInformation("AcceptDrop target is null");
-            return true;
-        }
-        var allowed = !ContainsPage(droppedItem, site);
-        Log.LogInformation("Accept Drop {allowed}", allowed);
-        return allowed;
-    }
-
-    private bool ContainsPage(Page item, IPageList parent)
-    {
-        if (parent.Pages.Contains(item)) return true;
-        foreach (var p in parent.Pages)
-        {
-            if (ContainsPage(item, p)) return true;
-        }
-        return false;
-    }
-
-    public IPageList? GetParentNode(string id, IPageList? nodesToSearch = null)
-    {
-        if (id == "main") return site;
-        nodesToSearch ??= site;
-        if (nodesToSearch != null)
-        {
-            foreach (var node in nodesToSearch.Pages ?? new())
-            {
-                if (node.Id == id) return nodesToSearch;
-                return GetParentNode(id, node);
-            }
-        }
-        return null;
-    }
-
-    public async Task DeletePage()
-    {
-        if (activePage != null && await _messageBoxService.ConfirmAsync("Confirm Delete", "Are you sure you want to delete this page?"))
-        {
-            var sourceFolder = GetParentNode(activePage.Id ?? string.Empty);
-            if (sourceFolder != null)
-            {
-                var i = sourceFolder.Pages.FirstOrDefault(c => c.Id == activePage.Id);
-                if (i != null)
-                {
-                    sourceFolder.Pages.Remove(i);
-                }
-            }
-        }
-    }
-}
