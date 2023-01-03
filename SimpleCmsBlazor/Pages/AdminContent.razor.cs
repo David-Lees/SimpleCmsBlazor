@@ -1,6 +1,7 @@
 ﻿using Havit.Blazor.Components.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using SimpleCmsBlazor.Models;
 using SimpleCmsBlazor.Services;
 
@@ -28,10 +29,7 @@ public partial class AdminContent : ComponentBase
 
     public void AddPage()
     {
-        if (Site != null)
-        {
-            Site.Pages.Add(NewPage());
-        }
+        Site?.Pages.Add(NewPage());
     }
 
     public void AddChild()
@@ -74,7 +72,7 @@ public partial class AdminContent : ComponentBase
         if (SiteService != null)
         {
             Site = await SiteService.GetSiteAsync();
-            if (string.IsNullOrEmpty(Site.Id)) Site.Id = Guid.NewGuid().ToString();            
+            if (string.IsNullOrEmpty(Site.Id)) Site.Id = Guid.NewGuid().ToString();
             ActivePage = Site.Pages.FirstOrDefault();
             expandedNodes.Add(Site.Id);
         }

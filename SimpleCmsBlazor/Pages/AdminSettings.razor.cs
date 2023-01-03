@@ -6,7 +6,7 @@ using SimpleCmsBlazor.Services;
 namespace SimpleCmsBlazor.Pages;
 
 [Authorize]
-public partial  class AdminSettings : ComponentBase
+public partial class AdminSettings : ComponentBase
 {
     [Inject]
     public ISiteService SiteService { get; set; } = default!;

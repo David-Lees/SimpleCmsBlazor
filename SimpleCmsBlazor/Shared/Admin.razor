@@ -1,6 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@using SimpleCmsBlazor.Services
-@inject ISiteService SiteService
 
 <div class="flex-container">
     <div class="header">
@@ -19,14 +17,3 @@
         </div>
     </footer>
 </div>
-
-@code {
-    private Site Site = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        Site = await SiteService.GetSiteAsync();
-    }
-    
-    public string GetYear() => DateTime.Now.Year.ToString();
-}

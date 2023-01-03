@@ -5,7 +5,7 @@ using SimpleCmsBlazor.Services;
 
 namespace SimpleCmsBlazor.Shared;
 
-public partial class SelectImage: HxDialogBase<GalleryImage>
+public partial class SelectImage : HxDialogBase<GalleryImage>
 {
     [Inject]
     public IFolderService FolderService { get; set; } = default!;

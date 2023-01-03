@@ -5,13 +5,14 @@ using SimpleCmsBlazor;
 using SimpleCmsBlazor.Models;
 using SimpleCmsBlazor.Services;
 using Havit.Blazor.Components.Web;
+using TanvirArjel.Blazor.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-var apiUrl = builder.Configuration.GetValue<string>("ApiUrl");
-var storageUrl = builder.Configuration.GetValue<string>("StorageUrl");
+var apiUrl = builder.Configuration.GetValue<string>("ApiUrl") ?? string.Empty;
+var storageUrl = builder.Configuration.GetValue<string>("StorageUrl") ?? string.Empty;
 
 builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
 builder.Services.AddHttpClient(HttpClients.Storage, client => client.BaseAddress = new Uri(storageUrl))
@@ -25,7 +26,7 @@ builder.Services.AddHttpClient(HttpClients.Public, client => client.BaseAddress 
 builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
-    options.ProviderOptions.DefaultAccessTokenScopes.Add(builder.Configuration.GetValue<string>("Scope"));
+    options.ProviderOptions.DefaultAccessTokenScopes.Add(builder.Configuration.GetValue<string>("Scope") ?? string.Empty);
 });
 
 builder.Services.AddHxServices();
@@ -38,5 +39,6 @@ builder.Services.AddScoped<ISiteService, SiteService>();
 builder.Services.AddSingleton<DragDropService>();
 builder.Services.AddHxMessenger();
 builder.Services.AddHxMessageBoxHost();
+builder.Services.AddComponents();
 
 await builder.Build().RunAsync();

@@ -1,5 +1,5 @@
 ﻿using Havit.Blazor.Components.Web;
-using SimpleCmsBlazor.Shared;
+using SimpleCmsBlazor.Services.Shared;
 
 namespace SimpleCmsBlazor.Models;
 

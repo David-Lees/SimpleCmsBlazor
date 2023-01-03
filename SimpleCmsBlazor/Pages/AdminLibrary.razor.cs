@@ -8,7 +8,7 @@ using SimpleCmsBlazor.Shared;
 namespace SimpleCmsBlazor.Pages;
 
 [Authorize]
-public partial class AdminLibrary: ComponentBase
+public partial class AdminLibrary : ComponentBase
 {
     [Inject]
     public IFolderService FolderService { get; set; } = default!;

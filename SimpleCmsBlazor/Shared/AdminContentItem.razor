@@ -1,7 +1,4 @@
-﻿@using SimpleCmsBlazor.Pages
-@inject ILogger<AdminContentItem> Log
-
-@if (Node != null)
+﻿@if (Node != null)
 {
     <div class="node-item m-0 p-0" data-id="@(Node.Id)" id="@($"node-{Node.Id}")">
         <div class="node-label">
@@ -47,61 +44,4 @@
             </div>
         }
     </div>
-}
-
-@code {
-    [CascadingParameter]
-    public AdminContent? Parent { get; set; }
-
-    [Parameter]
-    public IPageList? Node { get; set; }
-
-    [Parameter]
-    public Page? ActivePage { get; set; }
-
-    [Parameter]
-    public EventCallback<Page> NodeClick { get; set; }
-
-    [Parameter]
-    public List<string> ExpandedNodes { get; set; } = new();
-
-    public bool IsExpanded(string id) => ExpandedNodes.Contains(id);
-
-    public async Task OnNodeClick()
-    {
-        await NodeClick.InvokeAsync(Node as Page);
-        StateHasChanged();
-    }
-
-    public bool AcceptDrop(Page droppedItem)
-    {
-        if (Node == null)
-        {
-            return false;
-        }
-        var allowed = !ContainsPage(Node, droppedItem);
-        return allowed;
-    }
-
-    private bool ContainsPage(IPageList item, IPageList parent)
-    {
-        if (parent.Pages.Contains(item)) return true;
-        foreach (var p in parent.Pages)
-        {
-            if (ContainsPage(item, p)) return true;
-        }
-        return false;
-    }
-
-    public void StartDrag()
-    {
-        if (Parent != null) Parent.Dragging = true;
-        StateHasChanged();
-    }
-
-    public void EndDrag()
-    {
-        if (Parent != null) Parent.Dragging = false;
-        StateHasChanged();
-    }
 }

@@ -1,0 +1,14 @@
+﻿@using SkiaSharp.Views.Blazor
+@page "/admin/image-edit"
+@layout Admin
+
+<div>
+    <SKGLView style="width:800px; height:600px" OnPaintSurface="OnPaintSurface" EnableRenderLoop="true" class="canvas" @ref="_canvas">
+    </SKGLView>
+    <div class="marker" draggable="true" style="left: 25%; top: 25%"></div>
+    <div class="marker" draggable="true" style="left: 75%; top: 25%"></div>
+    <div class="marker" draggable="true" style="left: 75%; top: 75%"></div>
+    <div class="marker" draggable="true" style="left: 25%; top: 75%"></div>
+</div>
+
+

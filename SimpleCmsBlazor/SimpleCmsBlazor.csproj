@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>a582055a-86e8-4bf4-8a14-7cb229808885</UserSecretsId>
@@ -16,20 +16,26 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.13.0" />
-    <PackageReference Include="Havit.Blazor.Components.Web.Bootstrap" Version="2.8.1" />
-    <PackageReference Include="Markdig" Version="0.30.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.8" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="6.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.14.1" />
+    <PackageReference Include="Havit.Blazor.Components.Web.Bootstrap" Version="3.2.2" />
+    <PackageReference Include="Markdig" Version="0.30.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageReference Include="ObjectsComparer" Version="1.4.1" />
-    <PackageReference Include="Radzen.Blazor" Version="3.20.3" />
+    <PackageReference Include="Radzen.Blazor" Version="4.4.7" />
+    <PackageReference Include="SkiaSharp.Views.Blazor" Version="2.88.3" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="TanvirArjel.Blazor" Version="1.6.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\js\codemirror\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleCmsBlazor.Services\SimpleCmsBlazor.Services.csproj" />
   </ItemGroup>
 
 </Project>

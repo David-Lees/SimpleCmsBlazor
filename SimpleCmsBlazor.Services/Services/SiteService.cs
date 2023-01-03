@@ -27,10 +27,7 @@ public class SiteService : ISiteService
 
     public async Task<Site> GetSiteAsync()
     {
-        if (_site == null)
-        {            
-            _site = await _storageClient.GetFromJsonAsync<Site>("/images/site.json") ?? new();
-        }
+        _site ??= await _storageClient.GetFromJsonAsync<Site>("/images/site.json") ?? new();
         return _site;
     }
 
