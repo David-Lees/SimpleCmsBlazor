@@ -3,12 +3,15 @@
 @layout Admin
 
 <div>
-    <SKGLView style="width:800px; height:600px" OnPaintSurface="OnPaintSurface" EnableRenderLoop="true" class="canvas" @ref="_canvas">
+    <SKGLView style="@($"width:{_canvasWidth}px; height:600px")" OnPaintSurface="OnPaintSurface" EnableRenderLoop="true" class="canvas" @ref="_canvas">
     </SKGLView>
-    <div class="marker" draggable="true" style="left: 25%; top: 25%"></div>
-    <div class="marker" draggable="true" style="left: 75%; top: 25%"></div>
-    <div class="marker" draggable="true" style="left: 75%; top: 75%"></div>
-    <div class="marker" draggable="true" style="left: 25%; top: 75%"></div>
+    @foreach (var marker in Markers)
+    {
+        <div class="marker" title="Marker" draggable="true"
+             style="@($"left: {marker.X}px; top: {marker.Y}px")"
+         @ondragend="x => DragEnd(marker, x)"
+         @ondrag="x => DragEnd(marker, x)"></div>
+    }
 </div>
-
+<button @onclick="ProcessImage">Process Image</button>
 

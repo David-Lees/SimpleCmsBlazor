@@ -1,5 +1,5 @@
 ﻿.marker {
-  border: 1px solid black;
+  border: 5px solid rgba(0, 0, 0, 0.3333333333);
   width: 3px;
   height: 3px;
   background: rgba(255, 255, 255, 0.3333333333);

@@ -290,6 +290,10 @@
         }
         GetClientHeight = (elem) => elem.clientHeight;
 
+        window.GetWindowWidth = () => {
+            return window.innerWidth;
+        };
+
         window.Click = (id) => {
             document.getElementById(id).click();
         };
