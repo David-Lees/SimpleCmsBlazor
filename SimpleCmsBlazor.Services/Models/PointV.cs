@@ -1,11 +1,7 @@
-﻿using Microsoft.VisualBasic;
-using SkiaSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿#if false
+
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleCmsBlazor.Services.Models;
 
@@ -919,3 +915,4 @@ public class PointV : IFormattable, IEquatable<PointV>, IComparable<PointV>
         }
 #endif
 }
+#endif

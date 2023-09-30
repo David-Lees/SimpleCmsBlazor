@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Components.Web;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
+using OpenCvSharp;
 using SimpleCmsBlazor.Models;
-using SkiaSharp;
-using SkiaSharp.Views.Blazor;
+using System.Net.Http;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SimpleCmsBlazor.Pages;
 
@@ -19,52 +20,67 @@ public class Marker
         Y = y;
     }
 
-    public SKPoint ToPoint()
+    public Point2f ToPoint2f(double factorx, double factory)
     {
-        return new SKPoint((float)(X), (float)(Y));
+        return new Point2f((float)(X * factorx), (float)(Y * factory));
     }
 }
 
-public partial class ImageEdit
+public partial class ImageEdit : IDisposable
 {
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; } = default!;
+
     private readonly HttpClient _storageClient;
     private readonly HttpClient _client;
-    private SKBitmap? _source;
-    private SKBitmap? _destination;
-    private SKGLView _canvas = default!;
-    private double _canvasWidth = 800;
+    private Mat? _source;
+    private Mat? _destination;
+
+    private ElementReference srcCanvasElement;
+    private ElementReference dstCanvasElement;
+    private CanvasClient? srcCanvasClient;
+    private CanvasClient? dstCanvasClient;
+    private bool disposedValue;
 
     public ImageEdit(IHttpClientFactory clientFactory)
     {
         _storageClient = clientFactory.CreateClient(HttpClients.Storage);
         _client = clientFactory.CreateClient(HttpClients.Public);
-        _canvasWidth = WindowWidth();
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadImageAsync();
-    }
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    await LoadImageAsync();
+    //}
 
     public async Task LoadImageAsync()
     {
         //var image = await _storageClient.GetByteArrayAsync(url);
         var image = await _client.GetByteArrayAsync("/test.jpg");
-        _source = SKBitmap.Decode(image);
-        _destination = SKBitmap.Decode(image);
+        _source = Mat.FromImageData(image, ImreadModes.Unchanged);
+        _destination = _source.Clone();
+        StateHasChanged();
     }
 
-    public void OnPaintSurface(SKPaintGLSurfaceEventArgs args)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var canvas = args.Surface.Canvas;
-        canvas.Clear(SKColors.Wheat);
-        if (_source == null) return;
+        await base.OnAfterRenderAsync(firstRender);
 
-        canvas.DrawBitmap(_source, new SKRect(0, 0, 800, 600));
+        srcCanvasClient ??= new CanvasClient(JSRuntime, srcCanvasElement);
+        dstCanvasClient ??= new CanvasClient(JSRuntime, dstCanvasElement);
 
-        if (_destination == null) return;
-        canvas.DrawBitmap(_destination, new SKRect(800, 0, 1600, 600));
+        if (_source is not null)
+        {
+            var srcMat = _source.Clone().Resize(new Size(800, 600));
+            await srcCanvasClient.DrawMatAsync(srcMat);
+        }
+        if (_destination is not null)
+        {
+            var dstMat = _destination.Clone().Resize(new Size(800, 600));
+            await dstCanvasClient.DrawMatAsync(dstMat);
+        }
     }
+
 
 
     [JSImport("globalThis.window.GetWindowWidth")]
@@ -87,33 +103,50 @@ public partial class ImageEdit
 
     public void ProcessImage()
     {
-        if (_source == null) return;
-        var canvas = new SKCanvas(_destination);
-        canvas.Clear();
-        var matrix = CreateMatrixFromPoints(Markers[0].ToPoint(), Markers[3].ToPoint(), Markers[2].ToPoint(), Markers[1].ToPoint(), _source.Width, _source.Height);
-        canvas.SetMatrix(matrix);
-        canvas.DrawBitmap(_source, 0, 0);
+        if (_source == null || _destination == null) return;
+
+        var fx = 1 / 800 * _source.Width;
+        var fy = 1 / 600 * _source.Height;
+
+        var size = new Size(_source.Width, _source.Height);
+
+        using var matrix = Cv2.GetPerspectiveTransform(
+            new Point2f[] { Markers[0].ToPoint2f(fx, fy), Markers[3].ToPoint2f(fx, fy), Markers[2].ToPoint2f(fx, fy), Markers[1].ToPoint2f(fx, fy) },
+            new Point2f[] { new(0, 0), new(_source.Width, 0), new(_source.Width, _source.Height), new Point2f(0, _source.Height) }
+        );
+
+        Cv2.WarpPerspective(_source, _destination, matrix, size);
+        StateHasChanged();
     }
 
-    public static SKMatrix CreateMatrixFromPoints(SKPoint topLeft, SKPoint topRight, SKPoint botRight, SKPoint botLeft, float width, float height)
+    protected virtual void Dispose(bool disposing)
     {
-        (float x1, float y1) = (-topLeft.X / 800 * width, -topLeft.Y / 600 * height);
-        (float x2, float y2) = ((width - topRight.X + width) / 800 * width, -topRight.Y / 600 * height);
-        (float x3, float y3) = ((width - botRight.X + width) / 800 * width, (height - botRight.Y + height) / 600 * height);
-        (float x4, float y4) = (-botLeft.X / 800 * width, (height - botLeft.Y + height) / 600 * height);
-        (float w, float h) = (width, height);
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                // TODO: dispose managed state (managed objects)
+            }
 
-        float scaleX = (y1 * x2 * x4 - x1 * y2 * x4 + x1 * y3 * x4 - x2 * y3 * x4 - y1 * x2 * x3 + x1 * y2 * x3 - x1 * y4 * x3 + x2 * y4 * x3) / (x2 * y3 * w + y2 * x4 * w - y3 * x4 * w - x2 * y4 * w - y2 * w * x3 + y4 * w * x3);
-        float skewX = (-x1 * x2 * y3 - y1 * x2 * x4 + x2 * y3 * x4 + x1 * x2 * y4 + x1 * y2 * x3 + y1 * x4 * x3 - y2 * x4 * x3 - x1 * y4 * x3) / (x2 * y3 * h + y2 * x4 * h - y3 * x4 * h - x2 * y4 * h - y2 * h * x3 + y4 * h * x3);
-        float transX = x1;
-        float skewY = (-y1 * x2 * y3 + x1 * y2 * y3 + y1 * y3 * x4 - y2 * y3 * x4 + y1 * x2 * y4 - x1 * y2 * y4 - y1 * y4 * x3 + y2 * y4 * x3) / (x2 * y3 * w + y2 * x4 * w - y3 * x4 * w - x2 * y4 * w - y2 * w * x3 + y4 * w * x3);
-        float scaleY = (-y1 * x2 * y3 - y1 * y2 * x4 + y1 * y3 * x4 + x1 * y2 * y4 - x1 * y3 * y4 + x2 * y3 * y4 + y1 * y2 * x3 - y2 * y4 * x3) / (x2 * y3 * h + y2 * x4 * h - y3 * x4 * h - x2 * y4 * h - y2 * h * x3 + y4 * h * x3);
-        float transY = y1;
-        float persp0 = (x1 * y3 - x2 * y3 + y1 * x4 - y2 * x4 - x1 * y4 + x2 * y4 - y1 * x3 + y2 * x3) / (x2 * y3 * w + y2 * x4 * w - y3 * x4 * w - x2 * y4 * w - y2 * w * x3 + y4 * w * x3);
-        float persp1 = (-y1 * x2 + x1 * y2 - x1 * y3 - y2 * x4 + y3 * x4 + x2 * y4 + y1 * x3 - y4 * x3) / (x2 * y3 * h + y2 * x4 * h - y3 * x4 * h - x2 * y4 * h - y2 * h * x3 + y4 * h * x3);
-        float persp2 = 1;
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
 
-        Console.WriteLine($"{scaleX}, {skewX}, {transX}, {skewY}, {scaleY}, {transY}, {persp0}, {persp1}, {persp2}");
-        return new SKMatrix(scaleX / 10, skewX, transX / 10, skewY, scaleY / 10, transY / 10, persp0, persp1, persp2);
+            _source?.Dispose();
+            _destination?.Dispose();
+            disposedValue = true;
+        }
+    }
+
+    ~ImageEdit()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: false);
+    }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

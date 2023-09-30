@@ -1,10 +1,9 @@
-﻿@using SkiaSharp.Views.Blazor
-@page "/admin/image-edit"
+﻿@page "/admin/image-edit"
 @layout Admin
 
 <div>
-    <SKGLView style="@($"width:{_canvasWidth}px; height:600px")" OnPaintSurface="OnPaintSurface" EnableRenderLoop="true" class="canvas" @ref="_canvas">
-    </SKGLView>
+    <canvas @ref="srcCanvasElement" width="800" height="600"></canvas>
+    <canvas @ref="dstCanvasElement" width="800" height="600"></canvas>
     @foreach (var marker in Markers)
     {
         <div class="marker" title="Marker" draggable="true"
@@ -13,5 +12,7 @@
          @ondrag="x => DragEnd(marker, x)"></div>
     }
 </div>
+
+<button @onclick="LoadImageAsync">Load Image</button>
 <button @onclick="ProcessImage">Process Image</button>
 

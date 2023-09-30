@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -66,3 +67,4 @@ public static partial class Constant
 
     public const double Pi2 = Math.PI * 2.0;
 }
+#endif

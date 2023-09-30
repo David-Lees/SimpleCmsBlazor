@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿#if false
+using System.Runtime.InteropServices;
 using System.Text;
 
 #pragma warning disable S112 // General exceptions should never be thrown
@@ -605,3 +606,4 @@ public sealed class Matrix : IFormattable, IEquatable<Matrix>
         }
 #endif
 }
+#endif
