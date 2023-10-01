@@ -1,5 +1,5 @@
 global using NUnit.Framework;
-global using Moq;
+global using NSubstitute;
 global using Bunit;
 global using Microsoft.Extensions.DependencyInjection;
 global using SimpleCmsBlazor.Models;

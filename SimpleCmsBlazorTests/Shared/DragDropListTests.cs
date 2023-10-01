@@ -35,7 +35,7 @@ public class DragDropListTests : BunitTestContext
 
         // Act
         await cut.InvokeAsync(() => dds.SetData(new Page() { Id = "new", Name = "new", Url = "new" }));
-        await cut.InvokeAsync(async() => await cut.Find(".drop-target").DropAsync(new()));
+        await cut.InvokeAsync(async () => await cut.Find(".drop-target").DropAsync(new()));
 
         // Assert
         var ddl = cut.Instance;
@@ -195,6 +195,6 @@ public class DragDropListTests : BunitTestContext
         // Assert
         var ddl = cut.Instance;
         Assert.That(ddl.Items, Has.Count.EqualTo(5));
-        Assert.That(ddl.Items[0].Pages, Has.Count.EqualTo(1));          
+        Assert.That(ddl.Items[0].Pages, Has.Count.EqualTo(1));
     }
 }

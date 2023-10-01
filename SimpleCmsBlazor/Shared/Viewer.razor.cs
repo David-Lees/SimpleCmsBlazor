@@ -8,8 +8,8 @@ using Timer = System.Timers.Timer;
 namespace SimpleCmsBlazor.Shared;
 
 public partial class Viewer : ComponentBase, IDisposable
-{    
-    [Inject] 
+{
+    [Inject]
     public ILogger<Viewer>? Log { get; set; }
 
     [Inject]
@@ -81,10 +81,10 @@ public partial class Viewer : ComponentBase, IDisposable
     protected virtual void Dispose(bool disposing)
     {
         // Cleanup
-        if (imagesUpdatedSubscription != null) imagesUpdatedSubscription.Dispose();
-        if (imageSelectedSubscription != null) imageSelectedSubscription.Dispose();
-        if (showImageSubscription != null) showImageSubscription.Dispose();
-        if (resizeSubscription != null) resizeSubscription.Dispose();
+        imagesUpdatedSubscription?.Dispose();
+        imageSelectedSubscription?.Dispose();
+        showImageSubscription?.Dispose();
+        resizeSubscription?.Dispose();
     }
 
     public void TouchStart(TouchEventArgs touch)
@@ -112,7 +112,6 @@ public partial class Viewer : ComponentBase, IDisposable
             }
         }
     }
-
 
     public bool LeftArrowActive() => currentIdx > 0;
 
@@ -152,6 +151,7 @@ public partial class Viewer : ComponentBase, IDisposable
      * direction (-1: left, 1: right)
      * swipe (user swiped)
      */
+
     public void Navigate(int direction)
     {
         if ((direction == 1 && currentIdx < images.Count - 1) || (direction == -1 && currentIdx > 0))

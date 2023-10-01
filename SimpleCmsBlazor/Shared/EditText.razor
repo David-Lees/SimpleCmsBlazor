@@ -33,9 +33,9 @@
                                TItem="Alignment"
                                TValue="string"
                                Data="@TextAlignments"
-                               @bind-Value="Section.Align"
-                               TextSelector="@(p => p.Description)"
-                               ValueSelector="@(p => p.Value)" />
+                               @bind-Value="@Section.Align"
+                               ItemTextSelector="@(p => p.Description)"
+                               ItemValueSelector="@(p => p.Value)" />
             </div>
         </div>
         <div class="row mt-3">
@@ -45,9 +45,9 @@
                                TItem="Alignment"
                                TValue="string"
                                Data="@Alignments"
-                               @bind-Value="Section.BackgroundAlign"
-                               TextSelector="@(p => p.Description)"
-                               ValueSelector="@(p => p.Value)" />
+                               @bind-Value="@Section.BackgroundAlign"
+                               ItemTextSelector="@(p => p.Description)"
+                               ItemValueSelector="@(p => p.Value)" />
             </div>
         </div>
     </div>

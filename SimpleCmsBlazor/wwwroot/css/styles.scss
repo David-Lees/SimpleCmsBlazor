@@ -19,7 +19,7 @@ p {
     margin-left: auto;
     margin-right: auto;
 
-    &:first {
+    &:first-of-type {
         margin-top: 2em;
     }
 }
@@ -44,7 +44,7 @@ p {
 }
 
 .node-title {
-    padding-left: 2px;
+    padding-left: 8px;
 }
 
 .transparent {
@@ -82,15 +82,34 @@ footer {
 }
 
 .page-link {
+    position: relative;
+    display: block;
+    background-color: white;
     border-width: 2px;
+    border-style: solid;
     padding: 15px 20px;
     margin: 2em;
     min-width: 200px;
     text-align: center;
     font-weight: bold;
+
+    &:hover {
+        z-index: 2;
+        color: #0056b3;
+        text-decoration: none;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+        box-shadow: 0 0 0 .2rem #007bff40;
+    }
+
+    &:focus {
+        z-index: 3;
+        outline: 0;
+        box-shadow: 0 0 0 .2rem #007bff40;
+    }
 }
 
-﻿ /*add this to avoid flickering*/
+﻿ /* add this to avoid flickering */
 .plk-dd-inprogess > * {
     pointer-events: none;
 }
@@ -176,11 +195,9 @@ footer {
 .plk-dd-noselect {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
     -moz-user-select: none; /* Old versions of Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
 .drop-list {
@@ -223,4 +240,37 @@ html:not([data-scroll='0']) .logo-background {
     border-bottom: 1px solid black;
     border-right: 1px solid black;
     box-shadow: rgba(0, 0, 0, 0.35) 5px 5px 5px;
+}
+
+div:has(> iframe#videoCont) {
+    display: none;
+}
+
+.vh-80 {
+    height: 80vh;
+}
+
+.marker {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    overflow: hidden;
+    opacity: 0.3;
+
+    &:before, &:after {
+        position: absolute;
+        left: 15px;
+        content: ' ';
+        height: 33px;
+        width: 2px;
+        background-color: #333;
+    }
+
+    &:before {
+        transform: rotate(90deg);
+    }
+
+    &:hover {
+        opacity: 1;
+    }
 }

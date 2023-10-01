@@ -1,0 +1,26 @@
+﻿@layout Admin
+@page "/admin/library/image/{PartitionKey:guid}/{RowKey:guid}"
+
+<div class="container-fluid">
+
+    <h1 class="mt-2">Edit image</h1>
+
+    <div class="row vh-80">
+        <div class="col vh-80" @onpointermove="HandleDrag" @onpointermove:preventDefault="true" @onpointermove:stopPropagation="true" @onpointerup="CloseDrag">
+            <div class="position-relative" style="width: 100%; height:80vh; object-fit: none">
+                @foreach (var m in Markers)
+                {
+                    <div class="marker" style="top: @(m.Y - 16)px; left: @(m.X - 16)px; z-index: 2" @onpointerdown="() => StartDrag(m)" @onpointerdown:preventDefault="true" @onpointerdown:stopPropagation="true"></div>
+                }
+                <canvas style="border: 1px solid grey; width: 100%; height:80vh; z-index: 1" @ref=canvasSrcRef></canvas>
+            </div>
+        </div>
+        <div class="col-1">
+            <HxButton Color="ThemeColor.Primary" OnClick="ProcessImage" Text="Process" />
+        </div>
+        <div class="col vh-80">
+            <canvas style="border: 1px solid grey; width: 100%; height:80vh; object-fit: none" @ref=canvasDestRef></canvas>
+        </div>
+    </div>
+</div>
+

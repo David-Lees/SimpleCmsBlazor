@@ -1,35 +1,51 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>a582055a-86e8-4bf4-8a14-7cb229808885</UserSecretsId>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<WasmBuildNative>true</WasmBuildNative>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<UserSecretsId>a582055a-86e8-4bf4-8a14-7cb229808885</UserSecretsId>
+		<Title>SimpleCmsBlazor</Title>
+		<Authors>David Lees</Authors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Remove="compilerconfig.json" />
-  </ItemGroup>
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="compilerconfig.json" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Remove="compilerconfig.json" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.13.0" />
-    <PackageReference Include="Havit.Blazor.Components.Web.Bootstrap" Version="2.8.1" />
-    <PackageReference Include="Markdig" Version="0.30.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.8" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="6.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-    <PackageReference Include="ObjectsComparer" Version="1.4.1" />
-    <PackageReference Include="Radzen.Blazor" Version="3.20.3" />
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="compilerconfig.json" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\js\codemirror\" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.18.0" />
+		<PackageReference Include="Havit.Blazor.Components.Web.Bootstrap" Version="4.2.1" />
+		<PackageReference Include="Markdig" Version="0.33.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.11" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="7.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+		<PackageReference Include="ObjectsComparer" Version="1.4.1" />
+		<PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+		<PackageReference Include="OpenCvSharp4.runtime.wasm" Version="4.8.0.20230708" />
+		<PackageReference Include="Radzen.Blazor" Version="4.16.3" />
+		<PackageReference Include="SpawnDev.BlazorJS" Version="2.2.10" />
+		<PackageReference Include="System.Reactive" Version="6.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="wwwroot\js\codemirror\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleCmsBlazor.OpenCVSharp4\SimpleCmsBlazor.OpenCVSharp4.csproj" />
+	</ItemGroup>
 
 </Project>

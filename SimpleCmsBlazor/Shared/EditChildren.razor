@@ -18,13 +18,12 @@
             <div class="col">
                 <div>Image Alignment</div>
                 <HxRadioButtonList Label=""
-                               Inline="true"
-                               TItem="Alignment"
-                               TValue="string"
-                               Data="@Alignments"
-                               @bind-Value="Section.BackgroundAlign"
-                               TextSelector="@(p => p.Description)"
-                               ValueSelector="@(p => p.Value)" />
+                                   Inline="true"
+                                   TItem="Alignment"
+                                   TValue="string"
+                                   Data="@Alignments" @bind-Value="@Section.BackgroundAlign"
+                                   ItemTextSelector="@(p => p.Description)"
+                                   ItemValueSelector="@(p => p.Value)" />
             </div>
         </div>
     </div>

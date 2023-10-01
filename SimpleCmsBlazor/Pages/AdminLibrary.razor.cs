@@ -8,7 +8,7 @@ using SimpleCmsBlazor.Shared;
 namespace SimpleCmsBlazor.Pages;
 
 [Authorize]
-public partial class AdminLibrary: ComponentBase
+public partial class AdminLibrary : ComponentBase
 {
     [Inject]
     public IFolderService FolderService { get; set; } = default!;
@@ -19,13 +19,15 @@ public partial class AdminLibrary: ComponentBase
     [Inject]
     public IHxMessageBoxService MessageBoxService { get; set; } = default!;
 
+    [Inject]
+    public NavigationManager Navigation { get; set; } = default!;
 
-    string ButtonText = string.Empty;
-    string Title = string.Empty;
-    string PromptText = string.Empty;
-    FolderSelect? folderSelect;
-    TextDialog? textDialog;
-    MaterialFileUpload? upload;
+    private string ButtonText = string.Empty;
+    private string Title = string.Empty;
+    private string PromptText = string.Empty;
+    private FolderSelect? folderSelect;
+    private TextDialog? textDialog;
+    private MaterialFileUpload? upload;
 
     public async Task AddFolder()
     {
@@ -72,8 +74,8 @@ public partial class AdminLibrary: ComponentBase
     public async Task DeleteFolder()
     {
         if (currentFolder != null && currentFolder.RowKey != Guid.Empty &&
-            !folders.Any(x => x.PartitionKey == currentFolder.RowKey) &&
-            !images.Any(x => x.PartitionKey == currentFolder.RowKey) &&
+            !folders.Exists(x => x.PartitionKey == currentFolder.RowKey) &&
+            !images.Exists(x => x.PartitionKey == currentFolder.RowKey) &&
             await MessageBoxService.ConfirmAsync("Delete Folder", $"Are you sure you want to delete the {currentFolder.Name} folder?"))
         {
             await FolderService.DeleteAsync(currentFolder);
@@ -82,17 +84,17 @@ public partial class AdminLibrary: ComponentBase
     }
 
     public bool CanDelete() => currentFolder != null &&
-        !folders.Any(x => x.PartitionKey == currentFolder.RowKey) &&
+        !folders.Exists(x => x.PartitionKey == currentFolder.RowKey) &&
         currentFolder.RowKey != Guid.Empty &&
         images.Count == 0;
 
     public bool CanRename() => currentFolder != null && currentFolder.RowKey != Guid.Empty;
 
-    GalleryFolder? currentFolder;
-    List<GalleryFolder> folders = new();
-    bool showFolders = true;
-    List<GalleryImage> images = new();
-    readonly string folderName = "New Folder";
+    private GalleryFolder? currentFolder;
+    private List<GalleryFolder> folders = new();
+    private bool showFolders = true;
+    private List<GalleryImage> images = new();
+    private readonly string folderName = "New Folder";
 
     protected override async Task OnInitializedAsync()
     {
@@ -122,7 +124,7 @@ public partial class AdminLibrary: ComponentBase
     {
         var current = currentFolder?.RowKey;
         folders = await FolderService.GetFoldersAsync(true);
-        var newFolder = folders.FirstOrDefault(x => x.RowKey == current);
+        var newFolder = folders.Find(x => x.RowKey == current);
         if (newFolder != null)
         {
             await FolderChange(newFolder);
@@ -149,5 +151,10 @@ public partial class AdminLibrary: ComponentBase
             }
             StateHasChanged();
         }
+    }
+
+    public void Edit(GalleryImage image)
+    {
+        Navigation.NavigateTo($"/admin/library/image/{image.PartitionKey}/{image.RowKey}");
     }
 }

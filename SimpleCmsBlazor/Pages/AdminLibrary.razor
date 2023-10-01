@@ -45,7 +45,7 @@
         }
         @if (currentFolder != null && images.Count > 0)
         {
-            <MediaList Images="@images" CanSort="true" CanDelete="true" CanMove="true" Moved="@Move" Deleted="@Delete" />
+            <MediaList Images="@images" CanSort="true" CanEdit="true" CanDelete="true" CanMove="true" Moved="Move" Deleted="Delete" Edit="Edit" />
         }
     </div>
     <!-- End Body -->

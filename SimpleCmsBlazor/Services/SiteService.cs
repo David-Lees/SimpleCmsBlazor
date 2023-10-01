@@ -8,6 +8,7 @@ namespace SimpleCmsBlazor.Services;
 public interface ISiteService
 {
     Task<Site> GetSiteAsync();
+
     Task SaveSiteAsync(Site site);
 }
 
@@ -27,15 +28,12 @@ public class SiteService : ISiteService
 
     public async Task<Site> GetSiteAsync()
     {
-        if (_site == null)
-        {            
-            _site = await _storageClient.GetFromJsonAsync<Site>("/images/site.json") ?? new();
-        }
+        _site ??= await _storageClient.GetFromJsonAsync<Site>("/images/site.json") ?? new();
         return _site;
     }
 
     public async Task SaveSiteAsync(Site site)
-    {        
+    {
         var response = await _apiClient.PostAsJsonAsync("/api/UpdateSite", site);
         if (response.IsSuccessStatusCode)
         {

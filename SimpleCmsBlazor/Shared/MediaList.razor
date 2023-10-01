@@ -10,41 +10,45 @@
             <ItemTemplate>
                 <div class="row m-2">
                     <div class="col-3">
-                        <img src="@(prefix + context.PreviewSmallPath)"
+                        <img src="@(Prefix + context.PreviewSmallPath)"
                          class="img-fluid"
                          alt="@context.Description" />
                     </div>
                     <div class="col-6">
                         <h4 class="m-1">@context.Description</h4>
                         <p class="m-1">
-                            <NavLink href="@(prefix + context.PreviewSmallPath)" target="_blank">Small</NavLink>:
+                            <NavLink href="@(Prefix + context.PreviewSmallPath)" target="_blank">Small</NavLink>:
                             @context.PreviewSmallWidth x @context.PreviewSmallHeight px
                         </p>
                         <p class="m-1">
-                            <NavLink href="@(prefix + context.PreviewMediumPath)" target="_blank">Medium</NavLink>:
+                            <NavLink href="@(Prefix + context.PreviewMediumPath)" target="_blank">Medium</NavLink>:
                             @context.PreviewMediumWidth x @context.PreviewMediumHeight px
                         </p>
                         <p class="m-1">
-                            <NavLink href="@(prefix + context.PreviewLargePath)" target="_blank">Large</NavLink>:
+                            <NavLink href="@(Prefix + context.PreviewLargePath)" target="_blank">Large</NavLink>:
                             @context.PreviewLargeWidth x @context.PreviewLargeHeight px
                         </p>
                         <p class="m-1">
-                            <NavLink href="@(prefix + context.RawPath)" target="_blank">Original</NavLink>:
+                            <NavLink href="@(Prefix + context.RawPath)" target="_blank">Original</NavLink>:
                             @context.RawWidth x @context.RawHeight px
                         </p>
                     </div>
                     <div class="col-3">
                         @if (CanSelect)
                         {
-                            <HxButton CssClass="m-1" Color="@ThemeColor.Primary" OnClick="@(_ => Select(context))">Select</HxButton>
+                            <HxButton CssClass="m-1" Color="ThemeColor.Primary" OnClick="@(_ => Select(context))">Select</HxButton>
+                        }
+                        @if (CanEdit)
+                        {
+                            <HxButton CssClass="m-1" Color="ThemeColor.Secondary" OnClick="@(_ => EditImage(context))">Edit</HxButton>
                         }
                         @if (CanMove)
                         {
-                            <HxButton CssClass="m-1" Color="@ThemeColor.Secondary" OnClick="@(_ => Move(context))">Move</HxButton>
+                            <HxButton CssClass="m-1" Color="ThemeColor.Secondary" OnClick="@(_ => Move(context))">Move</HxButton>
                         }
                         @if (CanDelete)
                         {
-                            <HxButton CssClass="m-1" Color="@ThemeColor.Danger" OnClick="@(_ => Delete(context))">Delete</HxButton>
+                            <HxButton CssClass="m-1" Color="ThemeColor.Danger" OnClick="@(_ => Delete(context))">Delete</HxButton>
                         }
                     </div>
                 </div>
@@ -53,79 +57,4 @@
     }
 </div>
 
-@code {
-    [Parameter]
-    public List<GalleryImage> Images { get; set; } = new();
 
-    [Parameter]
-    public EventCallback<List<GalleryImage>> ImagesChanged { get; set; }
-
-    private List<GalleryImage> images = new();
-
-    [Parameter]
-    public bool CanSelect { get; set; } = false;
-
-    [Parameter]
-    public bool CanDelete { get; set; } = false;
-
-    [Parameter]
-    public bool CanMove { get; set; } = false;
-
-    [Parameter]
-    public bool CanSort { get; set; } = false;
-
-    [Parameter]
-    public EventCallback<GalleryImage> Deleted { get; set; }
-
-    [Parameter]
-    public EventCallback<GalleryImage> Selected { get; set; }
-
-    [Parameter]
-    public EventCallback<GalleryImage> Moved { get; set; }
-
-    public string prefix => $"{Config?.GetValue<string>("StorageUrl") ?? string.Empty}/images/";
-
-    protected override void OnInitialized()
-    {
-        images = Images;
-    }
-
-    public async Task Select(GalleryImage image)
-    {
-        await Selected.InvokeAsync(image);
-    }
-
-    public async Task Swap(Tuple<int, int> data)
-    {
-        if (CanSort)
-        {
-            await ImagesChanged.InvokeAsync(images);
-        }
-    }
-
-    public async Task Drop(GalleryImage image)
-    {
-        if (CanSort)
-        {
-            await ImagesChanged.InvokeAsync(images);
-        }
-    }
-
-    public async Task Remove(GalleryImage image)
-    {
-        if (_messageBoxService != null && await _messageBoxService.ConfirmAsync("Confirm Deletion", $"Are you sure you want to remove {image.Description}?"))
-        {
-            await Delete(image);
-        }
-    }
-
-    public async Task Move(GalleryImage image)
-    {
-        await Moved.InvokeAsync(image);
-    }
-
-    public async Task Delete(GalleryImage image)
-    {
-        await Deleted.InvokeAsync(image);
-    }
-}

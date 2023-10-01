@@ -1,0 +1,1 @@
+Simple CMS Blazor is a CMS contained in a Blazor app that uses and Azure function as a back end.
