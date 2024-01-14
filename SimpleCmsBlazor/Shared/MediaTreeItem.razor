@@ -1,7 +1,4 @@
-﻿@using SimpleCmsBlazor.Services
-@inject IFolderService _folderService
-
-@if (Folder != null)
+﻿@if (Folder != null)
 {
     <div class="node-item m-0 p-0" data-id="@(Folder.RowKey)" id="@($"node-{Folder.RowKey}")">
         <div class="node-label">
@@ -30,9 +27,9 @@
         @if (HasChildren(Folder.RowKey) && IsExpanded(Folder.RowKey))
         {
             <div class="node-children" id="@Folder.RowKey">
-                <DragDropList Items="GetChildren(Folder.RowKey)" TItem="GalleryFolder" OnItemAdded="@DropItem" Verify="@AcceptDrop">
+                <DragDropList Items="GetChildren(Folder.RowKey)" TItem="GalleryFolder" OnItemDroppedOnTarget="DropItem" Verify="@AcceptDrop">
                     <ItemTemplate>
-                        <MediaTreeItem Folders="@Folders" CanMove="CanMove" Folder="@context" ActiveFolder="@ActiveFolder" NodeClick="@NodeClick" ExpandedNodes="@ExpandedNodes" />
+                        <MediaTreeItem Folders="@Folders" CanMove="true" Folder="@context" ActiveFolder="@ActiveFolder" NodeClick="@NodeClick" ExpandedNodes="@ExpandedNodes" />
                     </ItemTemplate>
                 </DragDropList>
             </div>
@@ -40,64 +37,4 @@
     </div>
 }
 
-@code {
-    [Parameter]
-    public List<GalleryFolder> Folders { get; set; } = new();
 
-    [Parameter]
-    public GalleryFolder? Folder { get; set; }
-
-    [Parameter]
-    public GalleryFolder? ActiveFolder { get; set; }
-
-    [Parameter]
-    public EventCallback<GalleryFolder> NodeClick { get; set; }
-
-    [Parameter]
-    public List<Guid> ExpandedNodes { get; set; } = new();
-
-    [Parameter]
-    public bool CanMove { get; set; } = false;
-
-    public bool IsExpanded(Guid id) => ExpandedNodes.Contains(id);
-
-    public bool HasChildren(Guid parentId)
-    {
-        return Folders.Any(x => x.PartitionKey == parentId && x.RowKey != Guid.Empty);
-    }
-
-    public List<GalleryFolder> GetChildren(Guid parentId)
-    {
-        return Folders.Where(x => x.PartitionKey == parentId && x.RowKey != Guid.Empty).ToList();
-    }
-
-    public async Task OnNodeClick()
-    {
-        await NodeClick.InvokeAsync(Folder);
-    }
-
-    public bool AcceptDrop(GalleryFolder drag)
-    {
-        if (Folder == null) return false;
-        return CanMove && drag != Folder && !IsChildOf(Folder, drag);
-    }
-
-    private bool IsChildOf(GalleryFolder target, GalleryFolder item)
-    {
-        var isChild = false;
-        foreach (var child in GetChildren(target.RowKey))
-        {
-            isChild = isChild || child == item || IsChildOf(child, item);
-        }
-        return isChild;
-    }
-
-    public async Task DropItem(GalleryFolder item)
-    {
-        if (CanMove)
-        {
-            await _folderService.MoveAsync(item, Folder?.RowKey ?? Guid.Empty);
-            StateHasChanged();
-        }
-    }
-}

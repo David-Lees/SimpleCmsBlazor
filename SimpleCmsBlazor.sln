@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleCmsBlazor", "SimpleCm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleCmsBlazorTests", "SimpleCmsBlazorTests\SimpleCmsBlazorTests.csproj", "{94F97934-804C-482B-94DB-69751F7D2FFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleCmsBlazor.OpenCVSharp4", "SimpleCmsBlazor.OpenCVSharp4\SimpleCmsBlazor.OpenCVSharp4.csproj", "{C709BE70-75F0-4CD2-8120-79E31E315CDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleCmsBlazor.OpenCVSharp4", "SimpleCmsBlazor.OpenCVSharp4\SimpleCmsBlazor.OpenCVSharp4.csproj", "{C709BE70-75F0-4CD2-8120-79E31E315CDB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0FE91E2B-E63F-462D-B4E1-B5E264FE0563}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -21,8 +21,11 @@ builder.Services.AddScoped<CustomAuthorizationMessageHandler>();
 builder.Services.AddHttpClient(HttpClients.Storage, client => client.BaseAddress = new Uri(storageUrl))
     .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
 
-builder.Services.AddHttpClient(HttpClients.Api, client => client.BaseAddress = new Uri(apiUrl))
-    .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
+builder.Services.AddHttpClient(HttpClients.Api, client =>
+{
+    client.BaseAddress = new Uri(apiUrl);
+    client.DefaultRequestHeaders.Add("x-functions-key", builder.Configuration.GetValue<string>("FunctionKey"));
+}).AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
 
 builder.Services.AddHttpClient(HttpClients.Public, client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
@@ -35,10 +38,11 @@ builder.Services.AddMsalAuthentication(options =>
 builder.Services.AddHxServices();
 builder.Services.AddScoped<IBrowserResizeService, BrowserResizeService>();
 builder.Services.AddScoped<IBlobUploadService, BlobUploadService>();
-builder.Services.AddScoped<IFolderService, FolderService>();
+builder.Services.AddSingleton<FolderService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<ISiteService, SiteService>();
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddSingleton<DragDropService>();
 builder.Services.AddHxMessenger();
 builder.Services.AddHxMessageBoxHost();

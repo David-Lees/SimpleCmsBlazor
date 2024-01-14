@@ -23,6 +23,8 @@ namespace SimpleCmsBlazor.Models
         public decimal? RawWidth { get; set; }
         public decimal? RawHeight { get; set; }
 
+        public string? OriginalPath { get; set; }
+
         public string? DominantColour { get; set; }
         public string? Description { get; set; }
 
@@ -70,6 +72,7 @@ namespace SimpleCmsBlazor.Models
                 RawHeight = RawHeight,
                 RawPath = RawPath,
                 RawWidth = RawWidth,
+                OriginalPath = OriginalPath,
                 SrcAfterFocus = SrcAfterFocus,
                 Transition = Transition,
                 ViewerImageLoaded = ViewerImageLoaded,

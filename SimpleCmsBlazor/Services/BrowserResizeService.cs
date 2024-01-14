@@ -6,22 +6,19 @@ namespace SimpleCmsBlazor.Services;
 public interface IBrowserResizeService
 {
     IObservable<(decimal, decimal)> OnResize { get; }
+
     Task<decimal> GetInnerHeight();
+
     Task<decimal> GetInnerWidth();
 }
 
-public class BrowserResizeService : IBrowserResizeService
+public class BrowserResizeService(IJSRuntime runtime) : IBrowserResizeService
 {
     private readonly Subject<(decimal, decimal)> onResize = new();
-    
+
     public IObservable<(decimal, decimal)> OnResize => onResize;
 
-    private readonly IJSRuntime _runtime;
-
-    public BrowserResizeService(IJSRuntime runtime)
-    {
-        _runtime = runtime;
-    }
+    private readonly IJSRuntime _runtime = runtime;
 
     [JSInvokable]
     public void OnBrowserResize(decimal width, decimal height)

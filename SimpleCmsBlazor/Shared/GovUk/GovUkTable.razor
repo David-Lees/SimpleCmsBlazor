@@ -1,0 +1,15 @@
+﻿<div class="table-responsive">
+    <table class="table govuk-table responsive">
+        <thead class="govuk-table__head">
+            @GovUkTableHeader
+        </thead>
+        <tbody class="govuk-table__body">
+            @GovUkTableBody
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public RenderFragment? GovUkTableHeader { get; set; }
+    [Parameter, EditorRequired] public RenderFragment? GovUkTableBody { get; set; }
+}

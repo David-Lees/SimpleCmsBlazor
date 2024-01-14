@@ -5,8 +5,7 @@
   flex-direction: column;
 }
 .flex-container .header {
-  height: 54px;
-  min-height: 0;
+  height: 50px;
 }
 .flex-container .body {
   flex: 1;

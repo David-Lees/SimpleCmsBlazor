@@ -31,9 +31,10 @@
                 {
                     <HxContextMenuItem OnClick="@DeleteFolder">Delete @currentFolder?.Name</HxContextMenuItem>
                 }
+                <HxContextMenuItem OnClick="@Reload">Reload folders</HxContextMenuItem>
             </HxContextMenu>
             <h5 class="mt-0">Folders</h5>
-            <MediaTree SelectedFolder="@currentFolder" SelectedChanged="@FolderChange"></MediaTree>
+            <MediaTree SelectedFolder="@currentFolder" SelectedChanged="@FolderChange" NodesChanged="Reload"></MediaTree>
         </div>
     }
     <!-- End Folders -->
@@ -51,5 +52,5 @@
     <!-- End Body -->
 </div>
 <FolderSelect @ref="folderSelect" />
-<TextDialog @ref="textDialog"  ButtonText="@ButtonText" Title="@Title" PromptText="@PromptText" />
-<MaterialFileUpload @ref="upload" />
+<TextDialog @ref="textDialog" ButtonText="@ButtonText" Title="@Title" PromptText="@PromptText" />
+<MaterialFileUpload @ref="upload" folder="currentFolder" />

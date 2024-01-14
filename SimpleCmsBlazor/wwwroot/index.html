@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>SimpleCmsBlazor</title>
     <base href="/" />
+    <link href="css/styles.min.css" rel="stylesheet" />
     <link href="_content/Havit.Blazor.Components.Web.Bootstrap/bootstrap.css" rel="stylesheet" />
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
     <link href="css/app.css" rel="stylesheet" />
-    <link href="css/styles.min.css" rel="stylesheet" />
     <link href="SimpleCmsBlazor.styles.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -85,7 +85,6 @@
             -ms-transform-origin: 50px 50px;
             -o-transform-origin: 50px 50px;
             transform-origin: 50px 50px;
-            -webkit-mask-image: -webkit-linear-gradient(top, #000000, rgba(0, 0, 0, 0));
             mask-image: linear-gradient(top, #000000, rgba(0, 0, 0, 0));
             mix-blend-mode: hard-light;
             opacity: 0.8;
@@ -141,10 +140,6 @@
                     box-shadow: inset 0 0 0 8px #247ba0;
                 }
 
-        lesshat-selector {
-            -lh-property: 0;
-        }
-
         @-webkit-keyframes rotate {
             0% {
                 -webkit-transform: rotate(0deg);
@@ -193,10 +188,6 @@
 
         [not-existing] {
             transform: scale(1);
-        }
-
-        lesshat-selector {
-            -lh-property: 0;
         }
 
         @-webkit-keyframes fadein {
@@ -249,8 +240,45 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+
+    <noscript>
+        <div class="govuk-width-container govuk-body">
+            <main class="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main" aria-label="No JavaScript support">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-full">
+                        <h1 class="govuk-heading-l">Sorry, your web browser isn't capable of using this site</h1>
+                        <p>
+                            You browser must support the use of JavaScript. Please check your browser supports JavaScript and it is enabled.
+                        </p>
+                        <ul>
+                            <li><a href="https://caniuser.com/es6">Web browser support for JavaScript</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </noscript>
+
+    <div id="wasmMissing" style="display: none;">
+        <div class="govuk-width-container govuk-body">
+            <main class="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main" aria-label="No WebAssembly support">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-full">
+                        <h1 class="govuk-heading-l">Sorry, your web browser isn't capable of using this site</h1>
+                        <p>
+                            You browser must support the use of WebAssembly. Please check your browser supports WebAssembly and it is enabled.
+                        </p>
+                        <ul>
+                            <li><a href="https://caniuser.com/wasm">Web browser support for WebAssembly</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
     <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
     <script src="js/browser-resize.js"></script>
     <script src="js/codemirror/codemirror.js"></script>
@@ -258,6 +286,32 @@
     <script src="js/codemirror/markdown/markdown.js"></script>
     <script src="js/codemirror/addon/display/autorefresh.js"></script>
     <script type="text/javascript">
+        //check if webassembly is supported
+        const webassemblySupported = (function () {
+            try {
+                if (typeof WebAssembly === "object"
+                    && typeof WebAssembly.instantiate === "function") {
+                    const module = new WebAssembly.Module(
+                        Uint8Array.of(0x0, 0x61, 0x73, 0x6d,
+                            0x01, 0x00, 0x00, 0x00));
+                    if (module instanceof WebAssembly.Module)
+                        return new WebAssembly.Instance(module)
+                            instanceof WebAssembly.Instance;
+                }
+            } catch (e) {
+            }
+            return false;
+        })();
+
+        // Modern browsers e.g. Microsoft Edge
+        if (webassemblySupported) {
+            Blazor.start({});
+        }
+        // Older browsers e.g. IE11
+        else {
+            document.getElementById("wasmMissing").style.display = "block";
+        }
+
         const debounce = (fn) => {
             // This holds the requestAnimationFrame reference, so we can cancel it if we wish
             let frame;

@@ -1,0 +1,12 @@
+﻿<td class="govuk-table__cell@(IsNumeric ? " govuk-table__cell--numeric":"") @CssClass" data-title="@Title" colspan="@ColSpan" rowspan="@RowSpan">
+    @ChildContent
+</td>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = null!;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public int ColSpan { get; set; } = 1;
+    [Parameter] public int RowSpan { get; set; } = 1;
+    [Parameter] public bool IsNumeric { get; set; } = false;
+    [Parameter] public string CssClass { get; set; } = string.Empty;
+}

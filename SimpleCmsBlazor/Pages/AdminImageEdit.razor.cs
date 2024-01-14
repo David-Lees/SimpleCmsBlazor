@@ -19,7 +19,10 @@ public partial class AdminImageEdit
     public Guid RowKey { get; set; }
 
     [Inject]
-    public IFolderService FolderService { get; set; } = default!;
+    public FolderService FolderService { get; set; } = default!;
+
+    [Inject]
+    public IMediaService MediaService { get; set; } = default!;
 
     [Inject]
     public IConfiguration? Config { get; set; }
@@ -27,7 +30,7 @@ public partial class AdminImageEdit
     [Inject]
     public IJSRuntime JSRuntime { get; set; } = default!;
 
-    public List<Marker> Markers { get; set; } = new();
+    public List<Marker> Markers { get; set; } = [];
 
     public GalleryImage? Original { get; set; }
 
@@ -49,14 +52,19 @@ public partial class AdminImageEdit
 
     public double Ratio { get; set; }
 
+    private double contrast = 1;
+    private int brightness = 0;
+    private double saturation = 1;
+
     protected override void OnInitialized()
     {
-        Markers.AddRange(new Marker[] {
-                new Marker(0, 0),
-                new Marker(0, 0),
-                new Marker(0, 0),
-                new Marker(0, 0),
-            });
+        Markers.AddRange(new Marker[]
+        {
+            new(0, 0),
+            new(0, 0),
+            new(0, 0),
+            new(0, 0),
+        });
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -77,7 +85,7 @@ public partial class AdminImageEdit
             var folder = folders.Find(x => x.RowKey == PartitionKey) ?? throw new NotFoundException();
             var images = await FolderService.GetImagesAsync(folder) ?? throw new NotFoundException();
             Original = images.Find(x => x.RowKey == RowKey) ?? throw new NotFoundException();
-            await Src.LoadImageURL(GetImagePath(Original, "Raw") ?? throw new NotFoundException());
+            await Src.LoadImageURL(GetImagePath(Original, string.IsNullOrEmpty(Original.OriginalPath) ? "Raw" : "Original") ?? throw new NotFoundException());
 
             SetScaled(canvasSrcCtx);
 
@@ -142,7 +150,7 @@ public partial class AdminImageEdit
 
         using var matrix = Cv2.GetPerspectiveTransform(
             new Point2f[] { markers[0], markers[1], markers[3], markers[2] },
-            new Point2f[] { new(0, 0), new(w, 0), new(w, h), new Point2f(0, h) }
+            new Point2f[] { new(0, 0), new(w, 0), new(w, h), new(0, h) }
         );
 
         var size = new Size(w, h);
@@ -153,7 +161,26 @@ public partial class AdminImageEdit
 
         Cv2.WarpPerspective(Src, Dest, matrix, size);
 
+        // Britghtness and contrast
+        Cv2.ConvertScaleAbs(Dest, Dest, contrast, brightness);
+
+        // Saturation
+        var imghsv = new Mat(size, MatType.CV_8UC1);
+        Cv2.CvtColor(Dest, imghsv, ColorConversionCodes.RGB2HSV);
+        Cv2.Split(imghsv, out Mat[] channels);
+        channels[1] = channels[1].Multiply(saturation);
+        Cv2.Merge(channels, imghsv);
+        Cv2.CvtColor(imghsv, Dest, ColorConversionCodes.HSV2BGR);
+
         DrawOnCanvas(Dest, canvasDestCtx);
+    }
+
+    public async Task SaveImage()
+    {
+        if (Original != null && Dest != null)
+        {
+            await MediaService.SaveEdit(Original, Dest);
+        }
     }
 
     private static float Distance(Point2f a, Point2f b)

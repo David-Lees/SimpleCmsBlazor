@@ -15,8 +15,19 @@
                 <canvas style="border: 1px solid grey; width: 100%; height:80vh; z-index: 1" @ref=canvasSrcRef></canvas>
             </div>
         </div>
-        <div class="col-1">
+        <div class="col-1" style="min-width: 220px">
             <HxButton Color="ThemeColor.Primary" OnClick="ProcessImage" Text="Process" />
+            <div style="transform: rotate(-90deg) translate(-35%, -50%); width: 400px">
+                <HxInputRange Min="0" Max="2" @bind-Value="contrast" Label="Contrast" Step="0.1" />
+                <HxInputRange Min="-127" Max="127" @bind-Value="brightness" Label="Brightness" Step="1" />
+                <HxInputRange Min="0" Max="2" @bind-Value="saturation" Label="Saturation" Step="0.1" />
+            </div>
+            <div class="row" style="margin-top: 240px">
+                <div class="col">@contrast</div>
+                <div class="col">@brightness</div>
+                <div class="col">@saturation</div>
+            </div>
+            <HxButton Color="ThemeColor.Primary" OnClick="SaveImage" Text="Save" />
         </div>
         <div class="col vh-80">
             <canvas style="border: 1px solid grey; width: 100%; height:80vh; object-fit: none" @ref=canvasDestRef></canvas>

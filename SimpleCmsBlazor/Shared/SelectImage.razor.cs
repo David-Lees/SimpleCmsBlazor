@@ -5,17 +5,17 @@ using SimpleCmsBlazor.Services;
 
 namespace SimpleCmsBlazor.Shared;
 
-public partial class SelectImage: HxDialogBase<GalleryImage>
+public partial class SelectImage : HxDialogBase<GalleryImage>
 {
     [Inject]
-    public IFolderService FolderService { get; set; } = default!;
+    public FolderService FolderService { get; set; } = default!;
 
     [Parameter] public GalleryImage? Selection { get; set; }
     [Parameter] public EventCallback<GalleryImage?> SelectionChanged { get; set; }
 
-    List<GalleryFolder> folders = new();
-    GalleryFolder? currentFolder;
-    List<GalleryImage> images = new();
+    private List<GalleryFolder> folders = [];
+    private GalleryFolder? currentFolder;
+    private List<GalleryImage> images = [];
 
     protected override async Task OnInitializedAsync()
     {

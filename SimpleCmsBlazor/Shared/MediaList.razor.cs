@@ -7,12 +7,12 @@ namespace SimpleCmsBlazor.Shared
     public partial class MediaList
     {
         [Parameter]
-        public List<GalleryImage> Images { get; set; } = new();
+        public List<GalleryImage> Images { get; set; } = [];
 
         [Parameter]
         public EventCallback<List<GalleryImage>> ImagesChanged { get; set; }
 
-        private List<GalleryImage> images = new();
+        private List<GalleryImage> images = [];
 
         [Parameter]
         public bool CanSelect { get; set; } = false;

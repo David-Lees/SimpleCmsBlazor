@@ -73,13 +73,13 @@
         StateHasChanged();
     }
 
-    public bool AcceptDrop(Page droppedItem)
+    public bool AcceptDrop(Page droppedItem, Page target)
     {
         if (Node == null)
         {
             return false;
         }
-        var allowed = !ContainsPage(Node, droppedItem);
+        var allowed = !ContainsPage(target, droppedItem);
         return allowed;
     }
 

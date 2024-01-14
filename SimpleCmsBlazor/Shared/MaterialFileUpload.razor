@@ -6,71 +6,17 @@
 
 @inherits HxDialogBase<bool>
 
-<HxModal Title="File Upload" @ref="modal">
+<HxModal Title="File Upload" @ref="modal" Size="ModalSize.ExtraLarge">
     <BodyTemplate>
         <h5>Add files to @folder?.Name</h5>
-        <HxButton Color="@ThemeColor.Primary" OnClick="@OnClick">
-            <HxIcon Icon="@BootstrapIcon.Upload" /> @Text
-        </HxButton>
-        <br />
-        <ul>
-            @foreach (var file in Files)
-            {
-                <li>
-                    <HxProgressBar Value="file.Progress" />
-                    <span>
-                        @file.File.Name
-                        @if (file.TokenSource.Token.CanBeCanceled)
-                        {
-                            <HxButton OnClick="@file.CancelUpload"><HxIcon Icon="@BootstrapIcon.X" /></HxButton>
-                        }
-                    </span>
-                </li>
-            }
-        </ul>
+        <FileUpload ParentId="@(folder?.RowKey ?? Guid.Empty)" />
     </BodyTemplate>
     <FooterTemplate>
-        <HxButton Text="Close and return value" Color="ThemeColor.Secondary" OnClick="async () => await HideAsCancelledAsync()" />
+        <HxButton Text="Close" Color="ThemeColor.Secondary" OnClick="async () => await HideAsCancelledAsync()" />
     </FooterTemplate>
 </HxModal>
 
-<InputFile id="fileUpload" @ref="fileUpload" OnChange="@OnInputFileChange" hidden multiple accept=@Accept />
-
 @code {
-    InputFile? fileUpload;
-
     [Parameter]
     public GalleryFolder? folder { get; set; }
-
-    [Parameter]
-    public string Text { get; set; } = "Upload";
-
-    [Parameter]
-    public string Param { get; set; } = "file";
-
-    [Parameter]
-    public string Target { get; set; } = "https://file.io";
-
-    [Parameter]
-    public string Accept { get; set; } = "image/*";
-
-    [Parameter]
-    public EventCallback<string>? UploadComplete { get; set; }
-
-    public List<FileUploadProgress> Files { get; set; } = new();
-
-    public async Task OnClick()
-    {
-        await _runtime.InvokeVoidAsync("Click", new object[] { "fileUpload" });
-    }
-
-    public async Task OnInputFileChange(InputFileChangeEventArgs e)
-    {
-        var files = e.GetMultipleFiles();
-        foreach (var f in files)
-        {
-            Files.Add(new FileUploadProgress(f, () => StateHasChanged()));
-        }
-        await _mediaService.Upload(Files);
-    }
 }

@@ -7,14 +7,9 @@ public interface IBlobUploadService
     Task<string> GetUserDelegationKeyAsync();
 }
 
-public class BlobUploadService : IBlobUploadService
+public class BlobUploadService(IHttpClientFactory clientFactory) : IBlobUploadService
 {
-    private readonly HttpClient _httpClient;
-
-    public BlobUploadService(IHttpClientFactory clientFactory)
-    {
-        _httpClient = clientFactory.CreateClient(HttpClients.Api);
-    }
+    private readonly HttpClient _httpClient = clientFactory.CreateClient(HttpClients.Api);
 
     public async Task<string> GetUserDelegationKeyAsync()
     {

@@ -29,7 +29,7 @@ public partial class Viewer : ComponentBase, IDisposable
     private decimal transform;
     private bool qualitySelectorShown = false;
     private string qualitySelected = "auto";
-    private List<GalleryImage> images = new();
+    private List<GalleryImage> images = [];
     private IDisposable? imagesUpdatedSubscription;
     private IDisposable? imageSelectedSubscription;
     private IDisposable? showImageSubscription;

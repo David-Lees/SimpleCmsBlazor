@@ -4,7 +4,7 @@ public static class Helpers
 {
     public static T GetPropValue<T>(this object obj, string name)
     {
-        var prop = obj.GetType().GetProperty(name) ?? throw new NullReferenceException("Property does not exist");
+        var prop = obj.GetType().GetProperty(name) ?? throw new NullReferenceException($"Property {name} does not exist");
         return (T)(prop.GetValue(obj) ?? new());
     }
 

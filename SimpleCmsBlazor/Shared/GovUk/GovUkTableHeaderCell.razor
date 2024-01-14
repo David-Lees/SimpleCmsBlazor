@@ -1,0 +1,10 @@
+﻿<th scope="@Scope" class="govuk-table__header @CssClass" colspan="@ColSpan">
+    @ChildContent
+</th>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Scope { get; set; } = "col";
+    [Parameter] public string CssClass { get; set; } = string.Empty;
+    [Parameter] public int ColSpan { get; set; } = 1;
+}

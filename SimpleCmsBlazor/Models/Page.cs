@@ -12,6 +12,6 @@ public class Page : IPageList
     public string? Id { get; set; }
     public string? Name { get; set; }
     public string? Url { get; set; }
-    public List<PageSection> Sections { get; set; } = new();
-    public List<Page> Pages { get; set; } = new();
+    public List<PageSection> Sections { get; set; } = [];
+    public List<Page> Pages { get; set; } = [];
 }

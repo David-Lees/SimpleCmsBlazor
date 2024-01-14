@@ -1,0 +1,76 @@
+﻿<div class="row">
+    <div class="col-sm-5 center d-flex">
+        <div>
+            <InputFile multiple OnChange="@OnChange" />
+        </div>
+    </div>
+    <div class="col-sm-2 center d-flex">
+        <div>or</div>
+    </div>
+    <div class="col-sm-5">
+        <div @ref="FileDropContainer" class="file-drop-zone center @_hoverClass"
+             @ondragleave="OnDragLeave" @ondrop="OnDragLeave" @ondragover="OnDragEnter" @ondragenter="OnDragEnter">
+            <InputFile multiple OnChange="@OnChange" @onclick:preventDefault="true" />
+            Drop files here
+        </div>
+    </div>
+    @if (_filesToUpload.Any())
+    {
+        <GovUkTable>
+            <GovUkTableHeader>
+                <GovUkTableHeaderCell Scope="col">Description</GovUkTableHeaderCell>
+                <GovUkTableHeaderCell Scope="col">Status</GovUkTableHeaderCell>
+                <GovUkTableHeaderCell Scope="col">Upload progress</GovUkTableHeaderCell>
+            </GovUkTableHeader>
+            <GovUkTableBody>
+                @foreach (var file in _filesToUpload)
+                {
+                    <GovUkTableRow>
+                        <GovUkTableCell Title="Description" CssClass="w-50">
+                            @if (file.Status == UploadStatus.Pending)
+                            {
+                                <GovUkInputText @bind-Value="file.Description" LargeLabel="false"
+                                    DivCssClass="m-0" LabelCssClass="govuk-visually-hidden" Label="Description" />
+                            }
+                            else
+                            {
+                                @file.Description
+                            }
+                        </GovUkTableCell>
+                        <GovUkTableCell Title="Status">
+                            @switch (file.Status)
+                            {
+                                case UploadStatus.Pending:
+                                    <strong class="govuk-tag govuk-tag--blue">To be uploaded</strong>
+                                    break;
+
+                                case UploadStatus.Uploading:
+                                    <strong class="govuk-tag govuk-tag--yellow">Uploading...</strong>
+                                    break;
+
+                                case UploadStatus.Success:
+                                    <strong class="govuk-tag govuk-tag--green">Uploaded</strong>
+                                    break;
+
+                                case UploadStatus.Failure:
+                                    <strong class="govuk-tag govuk-tag--red">Failed</strong>
+                                    break;
+                            }
+                        </GovUkTableCell>
+                        <GovUkTableCell Title="Upload progress" CssClass="w-25">
+                            <HxProgress>
+                                <HxProgressBar Value="file.Progress" Label="@($"{file.Progress}%")" Animated="false" />
+                            </HxProgress>
+                        </GovUkTableCell>
+                    </GovUkTableRow>
+                }
+            </GovUkTableBody>
+        </GovUkTable>
+    }
+    @if (_filesToUpload.Any(x => x.Status == UploadStatus.Pending || x.Status == UploadStatus.Failure))
+    {
+        <div class="text-end">            
+            <HxButton Color="ThemeColor.Primary" OnClick="UploadFileQueue" Text="Upload" />
+        </div>
+    }
+</div>

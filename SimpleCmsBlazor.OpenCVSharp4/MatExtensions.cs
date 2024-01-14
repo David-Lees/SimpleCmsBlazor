@@ -50,7 +50,7 @@ public static class MatExtensions
 
     public static byte[] GetRGBABytes(this Mat mat)
     {
-        byte[] ret = System.Array.Empty<byte>();
+        byte[] ret = [];
         Mat? rgba = null;
         try
         {

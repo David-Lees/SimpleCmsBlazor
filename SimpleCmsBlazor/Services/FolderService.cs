@@ -1,28 +1,18 @@
 ﻿using SimpleCmsBlazor.Models;
 using System.Net.Http.Json;
+using System.Reactive.Subjects;
 
 namespace SimpleCmsBlazor.Services;
 
-public interface IFolderService
+public class FolderService(IHttpClientFactory clientFactory)
 {
-    Task CreateAsync(GalleryFolder folder);
-    Task DeleteAsync(GalleryFolder folder);
-    Task<List<GalleryFolder>> GetFoldersAsync(bool reload = false);
-    Task<List<GalleryImage>> GetImagesAsync(GalleryFolder folder);
-    Task MoveAsync(GalleryFolder folder, Guid destination);
-    Task ReloadAsync();
-    void Update(List<GalleryFolder> galleryFolders);
-}
-
-public class FolderService : IFolderService
-{
+    private int count = 0;
     private List<GalleryFolder>? _folders;
-    private readonly HttpClient _client;
+    private readonly HttpClient _client = clientFactory.CreateClient(HttpClients.Api);
 
-    public FolderService(IHttpClientFactory clientFactory)
-    {
-        _client = clientFactory.CreateClient(HttpClients.Api);
-    }
+    private readonly Subject<int> _reloadSubject = new();
+
+    public IObservable<int> ReloadSubscription => _reloadSubject;
 
     public async Task<List<GalleryFolder>> GetFoldersAsync(bool reload = false)
     {
@@ -39,8 +29,9 @@ public class FolderService : IFolderService
 
     public async Task ReloadAsync()
     {
-        _folders = await _client.GetFromJsonAsync<List<GalleryFolder>>("/api/folder") ?? new();
+        _folders = await _client.GetFromJsonAsync<List<GalleryFolder>>("/api/folder") ?? [];
         _folders.Sort((a, b) => a.Name.CompareTo(b.Name));
+        _reloadSubject.OnNext(count++);
     }
 
     public void Update(List<GalleryFolder> galleryFolders)
@@ -74,6 +65,6 @@ public class FolderService : IFolderService
 
     public async Task<List<GalleryImage>> GetImagesAsync(GalleryFolder folder)
     {
-        return await _client.GetFromJsonAsync<List<GalleryImage>>($"/api/folder/{folder.RowKey}") ?? new();
+        return await _client.GetFromJsonAsync<List<GalleryImage>>($"/api/folder/{folder.RowKey}") ?? [];
     }
 }

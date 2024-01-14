@@ -1,0 +1,51 @@
+﻿<div id="@(Id)-group" class="govuk-form-group @DivCssClass @(string.IsNullOrEmpty(ErrorMessage) ? "" : "govuk-form-group--error")">
+	@if (LargeLabel)
+	{
+		<h1 class="govuk-label-wrapper">
+			<label class="govuk-label @LabelCssClass" for="@Id">@Label</label>
+		</h1>
+	}
+	else
+	{
+		<label class="govuk-label @LabelCssClass" for="@Id">@Label</label>
+	}
+	@if (!string.IsNullOrEmpty(Hint))
+	{
+		<div id="@(Id)-hint" class="govuk-hint">@Hint</div>
+	}
+	@if (!string.IsNullOrEmpty(ErrorMessage))
+	{
+		<p id="@(Id)-error" class="govuk-error-message">
+			<span class="govuk-visually-hidden">Error:</span> @ErrorMessage
+		</p>
+	}
+	@if (string.IsNullOrEmpty(Suffix) && string.IsNullOrEmpty(Prefix))
+	{
+		<input @onkeyup="KeyPress"
+			   class="govuk-input @CssClass @(string.IsNullOrEmpty(ErrorMessage) ? "" : "govuk-input--error")"
+			   type="@Type" @bind:get="_textboxValue" @bind:set="SetTextBoxValueAsync" @bind:event="oninput"
+			   id="@Id"
+			   disabled="@Disabled"
+		@attributes="InputAttributes" />
+	}
+	else
+	{
+		<div class="govuk-input__wrapper">
+			@if (!string.IsNullOrEmpty(Prefix))
+			{
+				<div class="govuk-input__prefix" aria-hidden="true">@Prefix</div>
+			}
+			<input @onkeyup="KeyPress"
+				   class="govuk-input @CssClass @(string.IsNullOrEmpty(ErrorMessage) ? "" : "govuk-input--error")"
+			@bind:event="oninput" @bind:get="_textboxValue" @bind:set="SetTextBoxValueAsync"
+				   type="@Type"
+				   id="@Id"
+				   disabled="@Disabled"
+			@attributes="InputAttributes" />
+			@if (!string.IsNullOrEmpty(Suffix))
+			{
+				<div class="govuk-input__suffix" aria-hidden="true">@Suffix</div>
+			}
+		</div>
+	}
+</div>

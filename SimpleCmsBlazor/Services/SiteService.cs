@@ -12,19 +12,12 @@ public interface ISiteService
     Task SaveSiteAsync(Site site);
 }
 
-public class SiteService : ISiteService
+public class SiteService(IHttpClientFactory clientFactory, IHxMessengerService toastService) : ISiteService
 {
     private Site? _site;
-    private readonly HttpClient _storageClient;
-    private readonly HttpClient _apiClient;
-    private readonly IHxMessengerService _toastService;
-
-    public SiteService(IHttpClientFactory clientFactory, IHxMessengerService toastService)
-    {
-        _storageClient = clientFactory.CreateClient(HttpClients.Storage);
-        _apiClient = clientFactory.CreateClient(HttpClients.Api);
-        _toastService = toastService;
-    }
+    private readonly HttpClient _storageClient = clientFactory.CreateClient(HttpClients.Storage);
+    private readonly HttpClient _apiClient = clientFactory.CreateClient(HttpClients.Api);
+    private readonly IHxMessengerService _toastService = toastService;
 
     public async Task<Site> GetSiteAsync()
     {

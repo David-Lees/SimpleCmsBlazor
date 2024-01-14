@@ -19,7 +19,7 @@ public partial class AdminContent : ComponentBase
     private bool showPages = true;
     public Page? ActivePage { get; set; }
     public Site? Site { get; set; }
-    private readonly List<string> expandedNodes = new();
+    private readonly List<string> expandedNodes = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -45,8 +45,8 @@ public partial class AdminContent : ComponentBase
             Id = Guid.NewGuid().ToString(),
             Name = "New page",
             Url = "new-page",
-            Sections = new(),
-            Pages = new(),
+            Sections = [],
+            Pages = [],
         };
     }
 
@@ -118,7 +118,7 @@ public partial class AdminContent : ComponentBase
         return allowed;
     }
 
-    private bool ContainsPage(IPageList item, IPageList parent)
+    private static bool ContainsPage(IPageList item, IPageList parent)
     {
         if (parent.Pages.Contains(item)) return true;
         return parent.Pages.Exists(p => ContainsPage(item, p));
@@ -130,7 +130,7 @@ public partial class AdminContent : ComponentBase
         nodesToSearch ??= Site;
         if (nodesToSearch != null)
         {
-            foreach (var node in nodesToSearch.Pages ?? new())
+            foreach (var node in nodesToSearch.Pages ?? [])
             {
                 if (node.Id == id) return nodesToSearch;
                 var result = GetParentNode(id, node);

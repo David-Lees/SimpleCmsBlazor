@@ -1,62 +1,9 @@
 ﻿@using SimpleCmsBlazor.Services
-@inject IFolderService folderService;
+@inject FolderService folderService;
 
-<MediaTreeItem CanMove="CanMove" ActiveFolder="null" Folders="@folders" Folder="@root" ExpandedNodes="@expandedNodes" NodeClick="@selectNode"></MediaTreeItem>
+<MediaTreeItem CanMove="CanMove"
+               ActiveFolder="null" Folders="@folders"
+               Folder="@root" ExpandedNodes="@expandedNodes"
+               NodeClick="@SelectNode"></MediaTreeItem>
 
-@code {
-    private List<GalleryFolder> folders = new();
 
-    [Parameter]
-    public GalleryFolder? SelectedFolder { get; set; }
-
-    [Parameter]
-    public EventCallback<GalleryFolder> NodesChanged { get; set; }
-
-    [Parameter]
-    public EventCallback<GalleryFolder> SelectedChanged { get; set; }
-
-    [Parameter]
-    public bool CanMove { get; set; } = false;
-
-    List<Guid> expandedNodes = new();
-
-    private GalleryFolder root = new GalleryFolder
-        {
-            Name = "Library",
-            Level = 0,
-            PartitionKey = Guid.Empty,
-            RowKey = Guid.Empty
-        };
-
-    public async Task selectNode(GalleryFolder folder)
-    {
-        if (expandedNodes.Contains(folder.RowKey))
-        {
-            expandedNodes.Remove(folder.RowKey);
-        }
-        else
-        {
-            expandedNodes.Add(folder.RowKey);
-        }
-
-        SelectedFolder = folder;
-        await SelectedChanged.InvokeAsync(folder);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        folders.AddRange(await folderService.GetFoldersAsync());
-        if (SelectedFolder == null)
-        {
-            SelectedFolder = folders.FirstOrDefault(y => y.RowKey == Guid.Empty);
-        }
-        expandedNodes.Add(Guid.Empty);
-    }
-
-    public GalleryFolder GetRoot()
-    {
-        return folders.First(
-          x => x.PartitionKey == Guid.Empty && x.RowKey == Guid.Empty
-        );
-    }
-}

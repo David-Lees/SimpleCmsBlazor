@@ -11,7 +11,10 @@ namespace SimpleCmsBlazor.Pages;
 public partial class AdminLibrary : ComponentBase
 {
     [Inject]
-    public IFolderService FolderService { get; set; } = default!;
+    public ILogger<AdminLibrary> Logger { get; set; } = default!;
+
+    [Inject]
+    public FolderService FolderService { get; set; } = default!;
 
     [Inject]
     public IMediaService MediaService { get; set; } = default!;
@@ -91,9 +94,9 @@ public partial class AdminLibrary : ComponentBase
     public bool CanRename() => currentFolder != null && currentFolder.RowKey != Guid.Empty;
 
     private GalleryFolder? currentFolder;
-    private List<GalleryFolder> folders = new();
+    private List<GalleryFolder> folders = [];
     private bool showFolders = true;
-    private List<GalleryImage> images = new();
+    private List<GalleryImage> images = [];
     private readonly string folderName = "New Folder";
 
     protected override async Task OnInitializedAsync()
@@ -104,7 +107,7 @@ public partial class AdminLibrary : ComponentBase
     public async Task FolderChange(GalleryFolder? folder)
     {
         currentFolder = folder;
-        images = folder != null ? await FolderService.GetImagesAsync(folder) : new();
+        images = folder != null ? await FolderService.GetImagesAsync(folder) : [];
         StateHasChanged();
     }
 
@@ -142,12 +145,14 @@ public partial class AdminLibrary : ComponentBase
 
     public async Task Move(GalleryImage image)
     {
+        Logger.LogInformation("Move called for image {Image}", image.Description);
         if (folderSelect != null)
         {
             var result = await folderSelect.ShowAsync();
             if (result != null && result.Successful)
             {
                 await MediaService.Move(image, result.Value);
+                await Reload();
             }
             StateHasChanged();
         }
