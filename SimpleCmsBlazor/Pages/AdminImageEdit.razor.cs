@@ -190,8 +190,6 @@ public partial class AdminImageEdit
         return MathF.Sqrt(c * c + d * d);
     }
 
-    private int pos1 = 0;
-    private int pos2 = 0;
     private int pos3 = 0;
     private int pos4 = 0;
     private bool dragging = false;
@@ -215,7 +213,6 @@ public partial class AdminImageEdit
 
             dragMarker.X = pos3 - CanvasX;
             dragMarker.Y = pos4 - CanvasY + GetScroll();
-            Console.WriteLine("{0} {1}, {2} {3}, {4} {5}, {6} {7}", pos1, pos2, pos3, pos4, CanvasX, CanvasY, dragMarker.X, dragMarker.Y);
             StateHasChanged();
         }
     }

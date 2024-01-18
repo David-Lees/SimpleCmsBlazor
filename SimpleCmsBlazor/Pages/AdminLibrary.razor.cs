@@ -101,12 +101,14 @@ public partial class AdminLibrary : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        await FolderChange(FolderService.CurrentFolder);
         await LoadFoldersAsync();
     }
 
     public async Task FolderChange(GalleryFolder? folder)
     {
         currentFolder = folder;
+        FolderService.CurrentFolder = folder;
         images = folder != null ? await FolderService.GetImagesAsync(folder) : [];
         StateHasChanged();
     }
@@ -114,7 +116,7 @@ public partial class AdminLibrary : ComponentBase
     public async Task LoadFoldersAsync()
     {
         folders = await FolderService.GetFoldersAsync();
-        await FolderChange(folders.First(x => x.RowKey == Guid.Empty));
+        if (currentFolder is null) await FolderChange(folders.First(x => x.RowKey == Guid.Empty));
     }
 
     public async Task Delete(GalleryImage image)

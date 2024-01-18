@@ -6,6 +6,8 @@ namespace SimpleCmsBlazor.Services;
 
 public class FolderService(IHttpClientFactory clientFactory)
 {
+    public GalleryFolder? CurrentFolder { get; set; }
+
     private int count = 0;
     private List<GalleryFolder>? _folders;
     private readonly HttpClient _client = clientFactory.CreateClient(HttpClients.Api);

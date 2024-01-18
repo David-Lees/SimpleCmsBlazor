@@ -10,7 +10,7 @@
             <ItemTemplate>
                 <div class="row m-2">
                     <div class="col-3">
-                        <img src="@(Prefix + context.PreviewSmallPath)"
+                        <img src="@($"{Prefix}{context.PreviewSmallPath}?r={DateTime.Now.Ticks}")"
                          class="img-fluid"
                          alt="@context.Description" />
                     </div>

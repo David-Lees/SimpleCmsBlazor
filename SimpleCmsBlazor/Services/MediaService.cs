@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using OpenCvSharp;
 using SimpleCmsBlazor.Models;
+using SimpleCmsBlazor.OpenCVSharp4;
 using System.Net.Http.Json;
 
 namespace SimpleCmsBlazor.Services;
@@ -79,10 +80,10 @@ public class MediaService(IHttpClientFactory clientFactory, IHxMessengerService 
 
     public async Task SaveEdit(GalleryImage image, Mat data)
     {
-        var stream = new MemoryStream();
-        data.WriteToStream(stream, ".png");
-        stream.Seek(0, SeekOrigin.Begin);
-        var response = await _apiClient.PostAsync($"/api/save?rowKey={image.RowKey}&partitionKey={image.PartitionKey}", new StreamContent(stream));
+        var bytes = data.GetRGBABytes();
+        var response = await _apiClient.PostAsync(
+            $"/api/SaveEdit?rowKey={image.RowKey}&partitionKey={image.PartitionKey}&width={data.Width}&height={data.Height}",
+            new ByteArrayContent(bytes));
         if (response.IsSuccessStatusCode)
         {
             _toastService.AddInformation("Image saved");
