@@ -34,11 +34,11 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.3" />
 		<PackageReference Include="OpenCvSharp4" Version="4.9.0.20240103" />
 		<PackageReference Include="OpenCvSharp4.runtime.wasm" Version="4.9.0.20240103" PrivateAssets="all" />
-		<PackageReference Include="SpawnDev.BlazorJS" Version="2.2.48" />
+		<PackageReference Include="SpawnDev.BlazorJS" Version="2.2.67" />
 	</ItemGroup>
 
 </Project>

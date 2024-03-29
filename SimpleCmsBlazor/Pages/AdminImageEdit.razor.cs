@@ -58,13 +58,13 @@ public partial class AdminImageEdit
 
     protected override void OnInitialized()
     {
-        Markers.AddRange(new Marker[]
-        {
+        Markers.AddRange(
+        [
             new(0, 0),
             new(0, 0),
             new(0, 0),
             new(0, 0),
-        });
+        ]);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -74,8 +74,8 @@ public partial class AdminImageEdit
 
         if (firstRender)
         {
-            CanvasWidth = canvasSrcEl.OffsetWidth;
-            CanvasHeight = canvasSrcEl.OffsetHeight;
+            CanvasWidth = (int)canvasSrcEl.OffsetWidth;
+            CanvasHeight = (int)canvasSrcEl.OffsetHeight;
 
             var rect = await JSRuntime.InvokeAsync<BoundingClientRect>("window.GetRect", canvasSrcRef);
             CanvasX = (int)rect.X;
@@ -110,17 +110,17 @@ public partial class AdminImageEdit
         Ratio = Math.Min(hRatio, vRatio);
         ScaledWidth = (int)(Src.Width * Ratio);
         ScaledHeight = (int)(Src.Height * Ratio);
-        OffsetX = (ctx.Canvas.OffsetWidth - ScaledWidth) / 2;
-        OffsetY = (ctx.Canvas.OffsetHeight - ScaledHeight) / 2;
+        OffsetX = (int)((ctx.Canvas.OffsetWidth - ScaledWidth) / 2);
+        OffsetY = (int)((ctx.Canvas.OffsetHeight - ScaledHeight) / 2);
     }
 
     public void DrawOnCanvas(Mat mat, CanvasRenderingContext2D ctx)
     {
-        ctx.Canvas.Width = ctx.Canvas.OffsetWidth;
-        ctx.Canvas.Height = ctx.Canvas.OffsetHeight;
+        ctx.Canvas.Width = (int)ctx.Canvas.OffsetWidth;
+        ctx.Canvas.Height = (int)ctx.Canvas.OffsetHeight;
 
         ctx.FillStyle = "Linen";
-        ctx.FillRect(0, 0, ctx.Canvas.OffsetWidth, ctx.Canvas.OffsetHeight);
+        ctx.FillRect(0, 0, (int)ctx.Canvas.OffsetWidth, (int)ctx.Canvas.OffsetHeight);
 
         var hRatio = ctx.Canvas.OffsetWidth / (double)mat.Width;
         var vRatio = ctx.Canvas.OffsetHeight / (double)mat.Height;
@@ -148,10 +148,7 @@ public partial class AdminImageEdit
         var h = (Distance(markers[0], markers[2]) + Distance(markers[1], markers[3])) / 2;
         var w = (Distance(markers[0], markers[1]) + Distance(markers[2], markers[3])) / 2;
 
-        using var matrix = Cv2.GetPerspectiveTransform(
-            new Point2f[] { markers[0], markers[1], markers[3], markers[2] },
-            new Point2f[] { new(0, 0), new(w, 0), new(w, h), new(0, h) }
-        );
+        using var matrix = Cv2.GetPerspectiveTransform([markers[0], markers[1], markers[3], markers[2]], [new(0, 0), new(w, 0), new(w, h), new(0, h)]);
 
         var size = new Size(w, h);
         Dest = new Mat(size, Src.Type());

@@ -20,7 +20,7 @@ public partial class DragDropList<TItem> : IDisposable
     public string ItemTemplateClass { get; set; } = "";
 
     [Parameter]
-    public IList<TItem> Items { get; set; } = new List<TItem>();
+    public IList<TItem> Items { get; set; } = [];
 
     [Parameter]
     public EventCallback<TItem> OnItemAdded { get; set; }

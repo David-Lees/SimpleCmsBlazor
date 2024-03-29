@@ -1,6 +1,7 @@
 ﻿using OpenCvSharp;
 using System.Runtime.InteropServices;
 using SpawnDev.BlazorJS.JSObjects;
+using System.Reflection;
 
 namespace SimpleCmsBlazor.OpenCVSharp4;
 

@@ -75,7 +75,6 @@ public partial class MediaTree : IDisposable
         {
             if (disposing)
             {
-                // TODO: dispose managed state (managed objects)
                 _reloadSubscription?.Dispose();
             }
             disposedValue = true;

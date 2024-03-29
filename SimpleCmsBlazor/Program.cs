@@ -6,6 +6,7 @@ using SimpleCmsBlazor.Models;
 using SimpleCmsBlazor.Services;
 using Havit.Blazor.Components.Web;
 using SpawnDev.BlazorJS;
+using System.Reflection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
