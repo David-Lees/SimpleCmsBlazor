@@ -33,7 +33,7 @@ public partial class AdminContent : ComponentBase
 
     public void AddChild()
     {
-        ActivePage?.Pages.Add(NewPage());
+        ActivePage?.Pages.Insert(0, NewPage());
     }
 
     public bool CanDelete() => ActivePage != null;

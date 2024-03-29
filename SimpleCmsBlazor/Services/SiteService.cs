@@ -21,7 +21,7 @@ public class SiteService(IHttpClientFactory clientFactory, IHxMessengerService t
 
     public async Task<Site> GetSiteAsync()
     {
-        _site ??= await _storageClient.GetFromJsonAsync<Site>("/images/site.json") ?? new();
+        _site ??= await _storageClient.GetFromJsonAsync<Site>($"/images/site.json?v={DateTime.UtcNow.Ticks}") ?? new();
         return _site;
     }
 
@@ -30,8 +30,7 @@ public class SiteService(IHttpClientFactory clientFactory, IHxMessengerService t
         var response = await _apiClient.PostAsJsonAsync("/api/UpdateSite", site);
         if (response.IsSuccessStatusCode)
         {
-            var newSite = await response.Content.ReadFromJsonAsync<Site>() ?? site;
-            _site = newSite;
+            _site = await _storageClient.GetFromJsonAsync<Site>($"/images/site.json?v={DateTime.UtcNow.Ticks}") ?? site;
             _toastService.AddInformation("Site Saved");
         }
         else

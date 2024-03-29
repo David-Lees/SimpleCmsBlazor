@@ -44,6 +44,18 @@ namespace SimpleCmsBlazor.Shared
             Change();
         }
 
+        public void AddAll()
+        {
+            if (Section != null && Section.Images != null)
+            {
+                foreach (var image in AvailableImages)
+                {
+                    Section.Images.Add((GalleryImage)image.Clone());
+                }
+            }
+            Change();
+        }
+
         public void Add(GalleryImage image)
         {
             if (Section != null && Section.Images != null) Section.Images.Add((GalleryImage)image.Clone());

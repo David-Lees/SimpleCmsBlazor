@@ -2,7 +2,7 @@
 @using SimpleCmsBlazor.Services
 @implements IDisposable
 
-<div @ref=galleryContainer class="galleryContainer">
+<div @ref=galleryContainer class="galleryContainer mt-2">
     <div class="innerGalleryContainer">
         @foreach (var imgRow in gallery.Skip(rowIndex).Take(RowsPerPage))
         {

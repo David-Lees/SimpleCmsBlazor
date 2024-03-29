@@ -1,14 +1,14 @@
 ﻿@using SimpleCmsBlazor.Services
 @inherits HxDialogBase<GalleryImage>
 
-<HxModal Title="Select Image" @ref="modal">
+<HxModal Fullscreen="ModalFullscreen.Always" Size="ModalSize.ExtraLarge" Title="Select Image" @ref="modal">
     <BodyTemplate>
         <div class="row mt-4">
-            <div class="col-3">
+            <div class="col-4">
                 <h5>Select folder:</h5>
-                <MediaTree Nodes="@folders" SelectedChanged="@SelectFolder"></MediaTree>
+                <MediaTree SelectedFolder="@currentFolder" SelectedChanged="@SelectFolder"></MediaTree>
             </div>
-            <div class="col-9" *ngIf="currentFolder && images">
+            <div class="col-8">
                 @if (currentFolder != null && images != null)
                 {
                     <h5>Media for folder: @currentFolder.Name</h5>

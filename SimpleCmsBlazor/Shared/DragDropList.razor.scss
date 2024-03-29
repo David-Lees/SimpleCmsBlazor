@@ -1,10 +1,10 @@
 ﻿﻿.drop-list {
     margin-left: 0;
     margin-right: 0;
-    min-height: 0px;
     border-color: #000;
     border-style: solid;
     border-width: 0px;
+    height: 100%;
 }
 
 .dragging {
@@ -26,6 +26,7 @@
     width: 100%;
     background-color: transparent;
 }
+
 .over {
     background-color: rgb(0, 157, 224);
 }

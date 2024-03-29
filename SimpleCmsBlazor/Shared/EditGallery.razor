@@ -33,11 +33,19 @@
         </p>
         <div class="row" cdkDropListGroup>
             <div class="col-sm-4">
-                <h4>Folders</h4>
+                <h4 class="m-0">Folders</h4>
                 <MediaTree SelectedFolder="CurrentFolder" SelectedChanged="@FolderChange" />
             </div>
             <div class="col-sm-4">
-                <h4>Available images</h4>
+                <div class="row m-0">
+                    <h4 class="col m-0">Available images</h4>
+                    <div class="col-auto">
+                        @if (AvailableImages.Count > 0)
+                        {
+                            <HxButton Color="@ThemeColor.Success" Icon="BootstrapIcon.Plus" OnClick="AddAll" Text="Add All"/>
+                        }
+                    </div>
+                </div>
                 <div class="shaded p-3 scroll-list">
                     <div class="row">
                         @foreach (var img in AvailableImages)
@@ -54,7 +62,7 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <h4>Selected images</h4>
+                <h4 class="m-0">Selected images</h4>
                 <div class="shaded p-3 scroll-list">
                     <DragDropList Items="Section.Images" TItem="GalleryImage" OnItemSwap="@Change" OnItemAdded="@Change">
                         <ItemTemplate>

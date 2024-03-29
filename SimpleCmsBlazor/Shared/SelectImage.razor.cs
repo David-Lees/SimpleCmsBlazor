@@ -11,16 +11,11 @@ public partial class SelectImage : HxDialogBase<GalleryImage>
     public FolderService FolderService { get; set; } = default!;
 
     [Parameter] public GalleryImage? Selection { get; set; }
+
     [Parameter] public EventCallback<GalleryImage?> SelectionChanged { get; set; }
 
-    private List<GalleryFolder> folders = [];
     private GalleryFolder? currentFolder;
     private List<GalleryImage> images = [];
-
-    protected override async Task OnInitializedAsync()
-    {
-        folders = await FolderService.GetFoldersAsync();
-    }
 
     public async Task SelectFolder(GalleryFolder folder)
     {
