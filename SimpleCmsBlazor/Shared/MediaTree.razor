@@ -2,7 +2,7 @@
 @inject FolderService folderService;
 
 <MediaTreeItem CanMove="CanMove"
-               ActiveFolder="null" Folders="@folders"
+               ActiveFolder="@SelectedFolder" Folders="@folders"
                Folder="@root" ExpandedNodes="@expandedNodes"
                NodeClick="@SelectNode"></MediaTreeItem>
 

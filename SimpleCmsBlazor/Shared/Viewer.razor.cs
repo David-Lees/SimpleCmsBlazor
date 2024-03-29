@@ -25,7 +25,7 @@ public partial class Viewer : ComponentBase, IDisposable
     private string viewerClass = "viewer-fade-in";
     public bool LeftArrowVisible { get; set; } = true;
     public bool RightArrowVisible { get; set; } = true;
-    private string categorySelected = "PreviewSmall";
+    private string categorySelected = "Raw";
     private decimal transform;
     private bool qualitySelectorShown = false;
     private string qualitySelected = "auto";
@@ -41,7 +41,7 @@ public partial class Viewer : ComponentBase, IDisposable
     private sealed record TouchDataRecord(TouchPoint Point, DateTime Time);
     private TouchDataRecord? TouchData;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         resizeSubscription = BrowserResizeService?.OnResize.Subscribe(async x =>
         {
@@ -70,6 +70,7 @@ public partial class Viewer : ComponentBase, IDisposable
             viewerClass = x ? "viewer-fade-in" : "viewer-fade-out";
             StateHasChanged();
         });
+        width = await BrowserResizeService!.GetInnerWidth();
     }
 
     public void Dispose()
@@ -168,6 +169,7 @@ public partial class Viewer : ComponentBase, IDisposable
             }
             currentIdx += direction;
             UpdateImage();
+            StateHasChanged();
         }
     }
 
@@ -175,6 +177,11 @@ public partial class Viewer : ComponentBase, IDisposable
     {
         LeftArrowVisible = true;
         RightArrowVisible = true;
+    }
+
+    public static string IsActive(GalleryImage image)
+    {
+        return image.Active ? "active" : "";
     }
 
     public void CloseViewer()
@@ -249,6 +256,7 @@ public partial class Viewer : ComponentBase, IDisposable
             }
             await InvokeAsync(() => StateHasChanged());
         };
+        t.Start();
     }
 
     private string GetImagePath(GalleryImage image, string quality)
@@ -258,6 +266,7 @@ public partial class Viewer : ComponentBase, IDisposable
 
     private string GetAutoCategory()
     {
+        Log?.LogInformation("Width: {width}", width);
         var category = "PreviewSmall";
         if (width > images[currentIdx].PreviewSmallWidth || height > images[currentIdx].PreviewSmallHeight)
         {
@@ -271,6 +280,7 @@ public partial class Viewer : ComponentBase, IDisposable
         {
             category = "Raw";
         }
+        Log?.LogInformation("Category: {category}", category);
         return category;
     }
 

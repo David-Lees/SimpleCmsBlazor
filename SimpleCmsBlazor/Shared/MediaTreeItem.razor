@@ -22,7 +22,7 @@
                     <HxIcon Icon="@FontAwesome.Folder" />
                 }
             </div>
-            <div @onclick="@OnNodeClick" class="node-title">@Folder.Name</div>
+            <div @onclick="@OnNodeClick" class="node-title  @(ActiveFolder == Folder ? "fw-bold": "")">@Folder.Name</div>
         </div>
         @if (HasChildren(Folder.RowKey) && IsExpanded(Folder.RowKey))
         {
