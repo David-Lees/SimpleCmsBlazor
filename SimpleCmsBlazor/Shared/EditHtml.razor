@@ -1,39 +1,5 @@
 ﻿@inject IJSRuntime _jsRuntime;
 
-<div class="container-fluid">
-    <div @ref="myInput" class="border border-dark"></div>
+<div class="container-fluid p-0">
+    <textarea @oninput="HandleOnChange" style="height:  100%;width: 100%;">@data</textarea>
 </div>
-
-@code {
-    private ElementReference myInput;
-
-    [Parameter]
-    public PageSection? Section { get; set; }
-
-    [Parameter]
-    public EventCallback<PageSection> SectionChanged { get; set; }
-
-    [Parameter]
-    public EventCallback OnChange { get; set; }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await _jsRuntime.InvokeVoidAsync("codemirror.create", myInput, Section?.Html ?? "Error", "htmlmixed", DotNetObjectReference.Create(this));
-        }
-    }
-
-    [JSInvokable("UpdateField")]
-    public Task UpdateField(string codeValue)
-    {
-        if (Section != null)
-        {
-            Section.Html = codeValue;
-            SectionChanged.InvokeAsync(Section);
-            OnChange.InvokeAsync(null);
-    
-        }
-        return Task.CompletedTask;
-    }    
-}

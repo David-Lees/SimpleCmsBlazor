@@ -6,8 +6,8 @@
 {
     <div class="container-fluid">
         <div class="row">
-            <div class="col-6 border border-dark">
-                <div @ref="myInput"></div>
+            <div class="col-6 border border-dark p-0">
+                <textarea @oninput="HandleOnChange" style="height:  100%;width: 100%;">@data</textarea>
             </div>
             <div class="col-6 border border-dark">
                 @((MarkupString)output)
@@ -57,93 +57,4 @@
 }
 
 
-@code {
-    private string text = string.Empty;
-    private string back = string.Empty;
 
-    [Parameter]
-    public PageSection? Section { get; set; }
-
-    [Parameter]
-    public EventCallback<PageSection> SectionChanged { get; set; }
-
-    [Parameter]
-    public EventCallback OnChange { get; set; }
-
-    string output = string.Empty;
-    MarkdownPipeline pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-
-    private class Alignment
-    {
-        public string Value { get; set; }
-        public string Description { get; set; }
-        public Alignment(string value, string description)
-        {
-            Value = value;
-            Description = description;
-        }
-    }
-
-    private List<Alignment> Alignments = new()
-    {
-        new Alignment("left top","Top left"),
-        new Alignment("left center","Centre Left"),
-        new Alignment("left bottom","Bottom Left"),
-        new Alignment("right top","Top Right"),
-        new Alignment("right center","Centre Right"),
-        new Alignment("right bottom","Bottom Right"),
-        new Alignment("center top","Top Centre"),
-        new Alignment("center center","Centered"),
-        new Alignment("center bottom","Center Bottom"),
-    };
-
-    private List<Alignment> TextAlignments = new()
-    {
-        new Alignment("left", "Left"),
-        new Alignment("center", "Centred"),
-        new Alignment("right", "Right")
-    };
-
-    protected override void OnInitialized()
-    {
-        text = Section?.Colour ?? string.Empty;
-        back = Section?.BackgroundColour ?? string.Empty;
-        UpdateOutput();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await _jsRuntime.InvokeVoidAsync("codemirror.create", myInput, Section?.Text ?? "Error", "markdown", DotNetObjectReference.Create(this));
-        }
-    }
-
-    private void UpdateOutput()
-    {
-        output = Markdown.ToHtml(Section?.Text ?? string.Empty, pipeline);
-    }
-
-    private ElementReference myInput;
-
-    [JSInvokable("UpdateField")]
-    public Task UpdateField(string codeValue)
-    {
-        if (Section != null)
-        {
-            Section.Text = codeValue;
-            SectionChanged.InvokeAsync(Section);
-            UpdateOutput();
-            Change();
-        }
-        return Task.CompletedTask;
-    }
-
-    public void Change()
-    {
-        text = Section?.Colour ?? string.Empty;
-        back = Section?.BackgroundColour ?? string.Empty;
-        OnChange.InvokeAsync(null);
-        StateHasChanged();
-    }
-}

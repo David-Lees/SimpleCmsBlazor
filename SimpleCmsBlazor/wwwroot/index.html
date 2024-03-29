@@ -16,7 +16,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="stylesheet" href="css/codemirror.css" />
     <link rel="manifest" href="/site.webmanifest" />
 </head>
 
@@ -281,10 +280,6 @@
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
     <script src="js/browser-resize.js"></script>
-    <script src="js/codemirror/codemirror.js"></script>
-    <script src="js/codemirror/htmlmixed/htmlmixed.js"></script>
-    <script src="js/codemirror/markdown/markdown.js"></script>
-    <script src="js/codemirror/addon/display/autorefresh.js"></script>
     <script type="text/javascript">
         //check if webassembly is supported
         const webassemblySupported = (function () {
@@ -348,33 +343,6 @@
 
         window.Click = (id) => {
             document.getElementById(id).click();
-        };
-
-        window.codemirror = {
-            create: function (div, initialCode, mode, obj) {
-                var cm = CodeMirror(div, {
-                    value: initialCode,
-                    mode: mode,
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    autoRefresh: true,
-                    extraKeys: {
-                        "F11": function (c) {
-                            c.setOption("fullScreen", !c.getOption("fullScreen"));
-                        },
-                        "Esc": function (c) {
-                            if (c.getOption("fullScreen")) c.setOption("fullScreen", false);
-                        }
-                    }
-                });
-                cm.setSize("100%", 500);
-                cm.on("change", editor => {
-                    obj.invokeMethodAsync("UpdateField", editor.getValue());
-                });
-                cm.refresh();
-
-                return cm;
-            }
         };
 
         window.GetRect = (element) => {
